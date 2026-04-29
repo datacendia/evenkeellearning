@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // ─────────────────────────────────────────────────────────────────────────────
 // scripts/build-transparency-bundle.mjs
 //

@@ -55,6 +55,10 @@ export type BusEventType =
   | "teacher.honors.pushed"         // teacher pushed an honors prompt
   | "compliance.conflict.resolved"  // a regulatory conflict was signed off
   | "safeguarding.escalation.requested" // Decision Gate fired a crisis match — category only, never text (v1.4.8)
+  | "student.session.paused"        // SafetyGate paused the /student surface (bedtime or daily cap) (v1.5.4)
+  | "student.session.resumed"       // SafetyGate released a previously-paused session (v1.5.4)
+  | "parent.erasure.completed"      // GDPR Art. 17 erasure ran; payload reports counts (v1.5.4)
+  | "student.crt.session.finalized" // a per-problem CRT session was finalized + signed (v1.5.4 follow-up)
   | "system.ping";                  // heartbeat, mostly for tests
 
 /** Shape of a single bus event. `ts` and `id` are set by `publish()`. */

@@ -1,7 +1,7 @@
 {
   "name": "even-keel-learning",
-  "version": "1.5.3",
-  "description": "Even Keel Learning — Sovereign Learning OS with Cognitive Reasoning Trace, Eke AI, the v1.5.0 signed content authoring pipeline (LLM-drafted, teacher-reviewed), and the v1.5.1 symbolic answer-checking + LaTeX rendering + step validator, and the v1.5.2 heavy-CAS worker + JSXGraph figures + move-vocabulary verification, and the v1.5.3 diagnoseHeavy dispatcher + first authored figure + extended move vocabulary",
+  "version": "1.5.4",
+  "description": "Even Keel Learning — Sovereign Learning OS with Cognitive Reasoning Trace, Eke AI, the v1.5.0 signed content authoring pipeline (LLM-drafted, teacher-reviewed), v1.5.1 symbolic answer-checking + LaTeX rendering + step validator, v1.5.2 heavy-CAS worker + JSXGraph figures + move-vocabulary verification, v1.5.3 diagnoseHeavy dispatcher + first authored figure + extended move vocabulary, and v1.5.4 wired Parent Safety Centre (real bedtime/cap/tone enforcement, GDPR Art. 17 erasure)",
   "private": true,
   "engines": {
     "node": ">=20"

@@ -12,9 +12,11 @@ import PracticeModeBar from "@/components/shared/PracticeModeBar";
 import ComingBackCard from "@/components/shared/ComingBackCard";
 import IssueReceiptCard from "@/components/shared/IssueReceiptCard";
 import PasskeyEnrolCard from "@/components/shared/PasskeyEnrolCard";
+import SafetyGate from "@/components/shared/SafetyGate";
 import { CheckCircle2, Flame, Target, Trophy } from "lucide-react";
 import { publish } from "@/lib/data-bus";
 import { useLiveTrust } from "@/lib/hooks/useLiveTrust";
+import { useSafety } from "@/components/shared/SafetyProvider";
 
 const STORAGE_KEY = "evenkeel.student.prefs";
 
@@ -27,6 +29,12 @@ function StudentPageInner() {
   // The right-rail meters now reflect actual learner activity instead of the
   // previous fixed 72/64 values.
   const live = useLiveTrust();
+  // v1.5.4 — read base Eke tone from the Parent Safety Centre. The a11y
+  // `literalTone` toggle still wins via getEffectiveTone inside EkeChat,
+  // but now a parent-chosen base tone (mentor / peer / foreman) actually
+  // reaches the learner surface instead of being decorative.
+  const { settings: safety } = useSafety();
+  const baseTone = safety.tone === "literal" ? "mentor" : safety.tone;
 
   // Hydrate from localStorage
   useEffect(() => {
@@ -85,8 +93,16 @@ function StudentPageInner() {
         {/* center: Eke chat */}
         <section style={{ minHeight: 580 }}>
           <PracticeModeBar />
+          {/*
+            v1.5.4 — SafetyGate enforces the Parent Safety Centre's bedtime
+            window and daily screen-time cap. When either is active the
+            gate replaces its children with a calm "paused" card and emits
+            a `student.session.paused` bus event for the parent feed. The
+            CRT / receipt path is untouched.
+          */}
+          <SafetyGate>
           <EkeChat
-            tone="mentor"
+            tone={baseTone}
             jurisdiction={jurisdiction}
             studentAgeBand="Y10"
             problemTitle={`${subject.toUpperCase()} · today's problem`}
@@ -106,6 +122,7 @@ function StudentPageInner() {
             // worked solution would echo this problem's expected value.
             skillFamily="linear-eq-1var"
           />
+          </SafetyGate>
 
           {/* Comprehension Gate. The learner cannot mark the problem complete
               without proving understanding through three reasoning questions.

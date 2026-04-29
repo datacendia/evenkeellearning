@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { AccessibilityProvider } from "@/components/shared/AccessibilityProvider";
+import { SafetyProvider } from "@/components/shared/SafetyProvider";
 
 export const metadata: Metadata = {
   title: "Even Keel Learning — Sovereign Learning OS",
@@ -37,7 +38,9 @@ export default function RootLayout({
           Skip to main content
         </a>
         <AccessibilityProvider>
-          <I18nProvider>{children}</I18nProvider>
+          <SafetyProvider>
+            <I18nProvider>{children}</I18nProvider>
+          </SafetyProvider>
         </AccessibilityProvider>
       </body>
     </html>

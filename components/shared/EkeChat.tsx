@@ -25,6 +25,7 @@ import { getMisconception, getExplanation } from "@/lib/content/registry";
 import { useT, useI18n } from "@/lib/i18n/I18nProvider";
 import { TextWithMath } from "@/lib/render/text-with-math";
 import { publish } from "@/lib/data-bus";
+import { signPayloadWithAutoPasskey } from "@/lib/crypto/signing";
 import { recordError } from "@/lib/eke/error-bank";
 import { getPracticeState } from "@/lib/eke/practice-mode";
 import { recordAttempt as recordSchedulerAttempt } from "@/lib/eke/scheduler";
@@ -35,6 +36,25 @@ import {
   startSpeechRecognition,
   type SpeechSession,
 } from "@/lib/a11y/speech";
+import { createCRTLogger, type CRTLogger } from "@/lib/vertolearn/crt-logger";
+import { appendCRT } from "@/lib/crt/bank";
+
+/**
+ * SHA-256 of the raw UTF-8 bytes of `s`, encoded base64url. Used to build
+ * the per-submission CRT envelope: the digest goes into the signed payload,
+ * but the plaintext never leaves this module. Verifiers who hold the
+ * original text can recompute the digest with any standard SHA-256
+ * implementation. SubtleCrypto-based, async, dependency-free.
+ */
+async function sha256B64url(s: string): Promise<string> {
+  const bytes = new TextEncoder().encode(s);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  // base64url: standard base64, then `+` → `-`, `/` → `_`, strip `=`.
+  let bin = "";
+  const arr = new Uint8Array(digest);
+  for (let i = 0; i < arr.length; i++) bin += String.fromCharCode(arr[i]);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
 
 interface Props {
   tone?: EkeTone;
@@ -145,10 +165,47 @@ export default function EkeChat({
   const [speechError, setSpeechError] = useState<string | null>(null);
   const speechSupport = getSpeechSupport();
 
+  // v1.5.4 follow-up — CRTLogger session-trace lifecycle.
+  // A per-problem logger that captures start, keystrokes, paste, focus
+  // gain/loss, hint requests, and submissions. Finalized on unmount and
+  // persisted to the CRT bank as a signed envelope.
+  const crtLoggerRef = useRef<CRTLogger | null>(null);
+  // Generate a stable studentId per browser session. Stored in localStorage
+  // so it survives reloads but is separate from any server-side identity.
+  const studentId = (() => {
+    if (typeof window === "undefined") return "demo-student";
+    const KEY = "evenkeel.student.id";
+    let id = window.localStorage.getItem(KEY);
+    if (!id) {
+      id = crypto.randomUUID();
+      window.localStorage.setItem(KEY, id);
+    }
+    return id;
+  })();
+
   useEffect(() => {
     setMessages([engine.greet()]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Initialize CRTLogger when problemId is available. Finalize on unmount.
+  useEffect(() => {
+    if (!problemId) return;
+    const logger = createCRTLogger(studentId, problemId);
+    crtLoggerRef.current = logger;
+    return () => {
+      // Finalize and persist on unmount or problem change.
+      try {
+        const trace = logger.finalizeTrace();
+        appendCRT(trace).catch(() => {
+          /* persistence failure is non-critical for the learner flow */
+        });
+      } catch {
+        /* finalizeTrace may throw if no events were logged; ignore */
+      }
+      crtLoggerRef.current = null;
+    };
+  }, [problemId, studentId]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -210,6 +267,8 @@ export default function EkeChat({
     setMessages((prev) => [...prev, ...newMessages]);
     setInput("");
     setSending(false);
+    // Log submission to CRTLogger (answer hash only, never the text).
+    crtLoggerRef.current?.logSubmission(text);
     // Announce the submission to other surfaces. We deliberately do NOT
     // forward the learner's text — only the metadata. Privacy first.
     publish(
@@ -224,6 +283,68 @@ export default function EkeChat({
       },
       "student"
     );
+    // v1.5.4 follow-up — CRT envelope signing on every submission.
+    //
+    // What this is
+    // ────────────
+    // A per-submission Cognitive Reasoning Trace envelope: metadata about
+    // the attempt (problem, jurisdiction, age-band, trust, character count)
+    // plus a SHA-256 digest of the learner's text — never the text itself.
+    // The envelope is signed with the session ECDSA-P256 key via
+    // `signPayload`, and the resulting envelope summary is published on the
+    // bus as `student.crt.signed` so the parent / teacher / compliance
+    // surfaces can show "this submission has a verifiable signature".
+    //
+    // What this is NOT
+    // ────────────────
+    // • Not a passkey signature. The session key is the demo session key;
+    //   passkey enrolment exists separately (`/parent` "Passkey enrolment"
+    //   card) and that path will be wired next. Envelope `keyType` is
+    //   `"session-demo"`.
+    // • Not the full CRTLogger session-trace shape. That requires session
+    //   lifecycle wiring (start/end + intermediate event capture) which is
+    //   a larger change and remains deferred — see HONESTY.md §4.2.
+    // • Failure here must NEVER break the learner-facing flow. The whole
+    //   block is wrapped in try/catch and the engine's reply has already
+    //   been rendered by the time this runs.
+    try {
+      const submittedAtIso = new Date().toISOString();
+      const inputDigestB64url = await sha256B64url(text);
+      const crt = {
+        version: 1 as const,
+        kind: "submission-crt" as const,
+        submittedAtIso,
+        problemTitle,
+        problemId,
+        jurisdiction,
+        studentAgeBand,
+        inputDigestB64url,
+        inputChars: text.length,
+        trust,
+        mimicryPct,
+        ...practiceMarker(),
+      };
+      const env = await signPayloadWithAutoPasskey(crt);
+      publish(
+        "student.crt.signed",
+        {
+          submittedAtIso,
+          contentDigestB64url: env.contentDigestB64url,
+          signaturePrefix: env.signatureB64url.slice(0, 16),
+          publicKeyPrefix: env.publicKeyB64url.slice(0, 16),
+          algorithm: env.algorithm,
+          keyType: env.keyType,
+          problemTitle,
+          jurisdiction,
+          ...practiceMarker(),
+        },
+        "student",
+      );
+    } catch {
+      // Signing failure must not break the submit flow. The reply has
+      // already been rendered, the `student.submit` event has already
+      // fired. We swallow here and continue.
+    }
     // v1.4.8 — DSL escalation pipeline. If the Decision Gate blocked this
     // turn with a crisis_response trigger, fan the (category-only) signal
     // out two ways: (a) publish a `safeguarding.escalation.requested`
@@ -390,6 +511,10 @@ export default function EkeChat({
       { tier: msg.hintTier ?? null, problemTitle, ...practiceMarker() },
       "student"
     );
+    // Log hint request to CRTLogger.
+    if (msg.hintTier != null) {
+      crtLoggerRef.current?.logHintRequest(msg.hintTier);
+    }
   };
 
   const handleKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -409,6 +534,10 @@ export default function EkeChat({
     setInput(e.target.value);
     ipa.recordKeystroke();
     recomputeTrust();
+    // Note: CRTLogger does not have a "keystroke" event type; keystroke
+    // cadence is captured by the IPA analyser instead. CRT events are
+    // higher-level: pause, deletion, pivot, submission, hint_request,
+    // focus_gain, focus_loss.
   };
 
   const stopSpeech = () => {
@@ -466,6 +595,8 @@ export default function EkeChat({
     if (zeroPaste) {
       e.preventDefault();
     }
+    // Note: CRTLogger does not have a "paste" event type. Paste attempts
+    // are captured by the IPA analyser and published on the bus.
   };
 
   // Focus loss is a strong mimicry signal: the most common attack pattern is
@@ -475,6 +606,13 @@ export default function EkeChat({
   const handleBlur = () => {
     ipa.recordFocusLoss();
     recomputeTrust();
+    // Log focus loss to CRTLogger.
+    crtLoggerRef.current?.logFocusLoss();
+  };
+
+  const handleFocus = () => {
+    // Log focus gain to CRTLogger.
+    crtLoggerRef.current?.logFocusGain();
   };
 
   return (
@@ -718,6 +856,7 @@ export default function EkeChat({
             onKeyDown={handleKey}
             onPaste={handlePaste}
             onBlur={handleBlur}
+            onFocus={handleFocus}
             rows={1}
             placeholder="Type your reasoning. Enter to send."
             aria-describedby="eke-input-hint"

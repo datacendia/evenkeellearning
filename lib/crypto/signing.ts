@@ -215,6 +215,48 @@ export type SignKeySource =
   | { keySource: "passkey" };
 
 /**
+ * Auto-detects passkey enrolment and prefers passkey signing with graceful
+ * fallback to the session key. This is the "smart" entry point for CRT
+ * envelope signing in v1.5.4 follow-up.
+ *
+ * Behaviour:
+ *   • If a passkey is enrolled (via `lib/crypto/passkey.ts.enrolPasskey()`),
+ *     attempts passkey signing first. On success, returns a
+ *     `keyType: "passkey-derived"` envelope.
+ *   • If passkey signing fails (user cancel, browser unsupported, no enrolment,
+ *     ceremony error), silently falls back to the session key and returns a
+ *     `keyType: "session-demo"` envelope. The learner flow is never blocked.
+ *   • If no passkey is enrolled, uses the session key directly.
+ *
+ * This is distinct from the explicit `{ keySource: "passkey" }` path, which
+ * throws on failure and requires caller-side error handling. Use this helper
+ * for CRT envelopes where the goal is "use passkey if available, otherwise
+ * use session key" without blocking the learner.
+ */
+export async function signPayloadWithAutoPasskey<T>(
+  payload: T,
+): Promise<SignedEnvelope<T>> {
+  // Lazy-import passkey module to avoid pulling it into code paths that
+  // never need it (e.g. SSR build).
+  try {
+    const { getEnrolment } = await import("./passkey");
+    const enrolment = getEnrolment();
+    if (enrolment) {
+      try {
+        return await signPayload(payload, { keySource: "passkey" });
+      } catch {
+        // Passkey signing failed (user cancel, unsupported, ceremony error).
+        // Fall back to session key silently.
+      }
+    }
+  } catch {
+    // Passkey module unavailable or getEnrolment threw. Fall back to session key.
+  }
+  // Default to session key.
+  return signPayload(payload, { keySource: "session" });
+}
+
+/**
  * Signs `payload` with the supplied private key (or the session key if none
  * is given) and returns a fully serialisable envelope that can be stored,
  * displayed in the UI, and verified later by any holder of the public key.

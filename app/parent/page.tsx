@@ -9,10 +9,24 @@
 // comprehension gate — a card will appear here within ~one frame.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import SurfaceShell from "@/components/shared/SurfaceShell";
-import { Heart, Coffee, Compass, ShieldHalf, Clock, Trash2, Bell, Activity } from "lucide-react";
+import { Heart, Coffee, Compass, ShieldHalf, Clock, Trash2, Bell, Activity, Moon } from "lucide-react";
 import { subscribe, recentEvents, BusEvent } from "@/lib/data-bus";
+import { useSafety } from "@/components/shared/SafetyProvider";
+import {
+  SCREEN_TIME_PRESETS,
+  BEDTIME_START_PRESETS,
+  BEDTIME_END_PRESETS,
+  TONE_PRESETS,
+  type CrisisChannel,
+} from "@/lib/safety/settings";
+import {
+  getNotificationPermission,
+  requestNotificationPermission,
+  type NotificationPermissionState,
+} from "@/lib/safety/notifications";
+import type { EkeTone } from "@/lib/eke/personality";
 
 const NAV = [
   { id: "feed",    label: "Shadow Feed" },
@@ -286,40 +300,451 @@ function CareerDNA() {
 }
 
 function SafetyCentre() {
+  // v1.5.4 — real controls, not display-only. Persistence + enforcement live
+  // in `lib/safety/settings.ts` + `components/shared/SafetyGate.tsx`. Crisis
+  // notifications remain in-app only in v1.5.4; the channel-select is
+  // locked to in-app with an honest Phase 2 note. See HONESTY.md and
+  // SAFEGUARDING.md §1 for the deferred out-of-band channel work.
+  const { settings, update, hydrated } = useSafety();
+
   return (
     <div className="space-y-4">
       <div className="kl-card flex items-center gap-3">
         <ShieldHalf size={20} style={{ color: "var(--accent)" }} />
         <p style={{ color: "var(--fg-dim)" }}>
-          Full parental controls. Even Keel Learning collects no biometrics, shows no advertising, and never sells data.
+          Full parental controls. Settings persist on this device and are
+          enforced on the /student surface. Even Keel Learning collects no
+          biometrics, shows no advertising, and never sells data.
         </p>
       </div>
+
       <div className="grid md:grid-cols-2 gap-4">
-        <Toggle icon={Clock} label="Daily screen-time cap" value="60 min" />
-        <Toggle icon={Clock} label="Bedtime mode" value="21:00 → 07:00" />
-        <Toggle icon={Bell} label="Crisis notifications" value="Push + SMS" />
-        <Toggle icon={Heart} label="Eke tone" value="Mentor (age 11–14)" />
+        {/* Screen-time cap */}
+        <SafetyControl
+          icon={Clock}
+          label="Daily screen-time cap"
+          description={
+            settings.screenTime.enabled
+              ? `${settings.screenTime.dailyCapMinutes} min per day — session pauses when reached`
+              : "No cap enforced"
+          }
+          enabled={settings.screenTime.enabled}
+          onEnabledChange={(v) =>
+            update("screenTime", { ...settings.screenTime, enabled: v })
+          }
+          disabled={!hydrated}
+        >
+          <label className="text-xs font-mono block mb-1" style={{ color: "var(--fg-faint)" }}>
+            Cap
+          </label>
+          <select
+            value={settings.screenTime.dailyCapMinutes}
+            onChange={(e) =>
+              update("screenTime", {
+                ...settings.screenTime,
+                dailyCapMinutes: Number(e.target.value),
+              })
+            }
+            className="w-full text-sm px-2 py-1.5 rounded"
+            style={{ background: "var(--bg-deep)", border: "1px solid var(--border)", color: "var(--fg)" }}
+            disabled={!hydrated || !settings.screenTime.enabled}
+          >
+            {SCREEN_TIME_PRESETS.map((p) => (
+              <option key={p.minutes} value={p.minutes}>{p.label}</option>
+            ))}
+          </select>
+        </SafetyControl>
+
+        {/* Bedtime window */}
+        <SafetyControl
+          icon={Moon}
+          label="Bedtime mode"
+          description={
+            settings.bedtime.enabled
+              ? `${settings.bedtime.startHHMM} → ${settings.bedtime.endHHMM} — session paused during window`
+              : "Off"
+          }
+          enabled={settings.bedtime.enabled}
+          onEnabledChange={(v) => update("bedtime", { ...settings.bedtime, enabled: v })}
+          disabled={!hydrated}
+        >
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-xs font-mono block mb-1" style={{ color: "var(--fg-faint)" }}>
+                Start
+              </label>
+              <select
+                value={settings.bedtime.startHHMM}
+                onChange={(e) => update("bedtime", { ...settings.bedtime, startHHMM: e.target.value })}
+                className="w-full text-sm px-2 py-1.5 rounded"
+                style={{ background: "var(--bg-deep)", border: "1px solid var(--border)", color: "var(--fg)" }}
+                disabled={!hydrated || !settings.bedtime.enabled}
+              >
+                {BEDTIME_START_PRESETS.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-mono block mb-1" style={{ color: "var(--fg-faint)" }}>
+                End
+              </label>
+              <select
+                value={settings.bedtime.endHHMM}
+                onChange={(e) => update("bedtime", { ...settings.bedtime, endHHMM: e.target.value })}
+                className="w-full text-sm px-2 py-1.5 rounded"
+                style={{ background: "var(--bg-deep)", border: "1px solid var(--border)", color: "var(--fg)" }}
+                disabled={!hydrated || !settings.bedtime.enabled}
+              >
+                {BEDTIME_END_PRESETS.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </SafetyControl>
+
+        {/* Crisis notifications — in-app + optional browser channel (v1.5.4 follow-up) */}
+        <CrisisControl
+          enabled={settings.crisis.enabled}
+          channel={settings.crisis.channel}
+          hydrated={hydrated}
+          onEnabledChange={(v) => update("crisis", { ...settings.crisis, enabled: v })}
+          onChannelChange={(ch) =>
+            update("crisis", { ...settings.crisis, channel: ch })
+          }
+        />
+
+        {/* Eke tone */}
+        <SafetyControl
+          icon={Heart}
+          label="Eke tone"
+          description={TONE_PRESETS.find((t) => t.id === settings.tone)?.blurb ?? ""}
+          enabled
+          onEnabledChange={() => { /* no-op: tone is always set */ }}
+          showToggle={false}
+          disabled={!hydrated}
+        >
+          <label className="text-xs font-mono block mb-1" style={{ color: "var(--fg-faint)" }}>
+            Voice
+          </label>
+          <select
+            value={settings.tone}
+            onChange={(e) => update("tone", e.target.value as EkeTone)}
+            className="w-full text-sm px-2 py-1.5 rounded"
+            style={{ background: "var(--bg-deep)", border: "1px solid var(--border)", color: "var(--fg)" }}
+            disabled={!hydrated}
+          >
+            {TONE_PRESETS.map((t) => (
+              <option key={t.id} value={t.id}>{t.label}</option>
+            ))}
+          </select>
+        </SafetyControl>
       </div>
-      <div
-        className="kl-card flex items-center justify-between"
-        style={{ borderColor: "rgba(197, 48, 48, 0.4)" }}
-      >
+
+      <ErasurePanel />
+    </div>
+  );
+}
+
+/**
+ * GDPR Article 17 — Right to Erasure card.
+ *
+ * Two-step confirmation: the first click expands an inline confirmation row
+ * with an explicit "I understand, erase now" button and a "Cancel" button.
+ * Only the second click actually calls `eraseLearnerData()`. After the
+ * erasure runs, a transient receipt is shown stating exactly how many
+ * keys were removed and how many parent-policy keys were intentionally
+ * kept — no silent action.
+ *
+ * Honesty notes
+ * ─────────────
+ * • Local-only: there is no server, so this is the entire surface area.
+ *   `lib/safety/erasure.ts` documents what is and isn't in scope.
+ * • Parent-set policy keys (bedtime, cap, tone, webhook config) are
+ *   intentionally KEPT — they are the parent's data, not the child's.
+ *   The card text states this so the parent isn't surprised.
+ */
+function ErasurePanel() {
+  const [stage, setStage] = useState<"idle" | "confirming" | "done">("idle");
+  const [report, setReport] = useState<{ removed: number; kept: number } | null>(null);
+
+  function runErasure() {
+    // Lazy import keeps the module out of the SSR bundle for any consumer
+    // that prerenders this page; localStorage access is gated inside
+    // `eraseLearnerData` itself, but this is one less reason to ship it.
+    import("@/lib/safety/erasure").then(({ eraseLearnerData }) => {
+      const r = eraseLearnerData();
+      setReport({ removed: r.removed.length, kept: r.kept.length });
+      setStage("done");
+    });
+  }
+
+  return (
+    <div
+      className="kl-card"
+      style={{ borderColor: "rgba(197, 48, 48, 0.4)" }}
+    >
+      <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Trash2 size={18} style={{ color: "var(--red)" }} />
           <div>
             <p style={{ fontWeight: 600 }}>Right to erasure (GDPR Art. 17)</p>
             <p className="text-xs" style={{ color: "var(--fg-dim)" }}>
-              Permanently delete all of Alex's CRTs, traces, and Career DNA. Cannot be undone.
+              Permanently delete Alex's CRTs, traces, error bank, scheduler
+              state, receipts, comprehension and session history from this
+              device. Parent-set safety policy is intentionally kept.
             </p>
           </div>
         </div>
-        <button
-          className="px-4 py-2 rounded-md text-sm"
-          style={{ background: "rgba(197, 48, 48, 0.1)", color: "var(--red)", border: "1px solid var(--red)" }}
-        >
-          Request deletion
-        </button>
+        {stage === "idle" && (
+          <button
+            type="button"
+            onClick={() => setStage("confirming")}
+            className="px-4 py-2 rounded-md text-sm"
+            style={{
+              background: "rgba(197, 48, 48, 0.1)",
+              color: "var(--red)",
+              border: "1px solid var(--red)",
+            }}
+          >
+            Request deletion
+          </button>
+        )}
       </div>
+
+      {stage === "confirming" && (
+        <div
+          className="mt-3 pt-3 flex items-center justify-between gap-3"
+          style={{ borderTop: "1px solid var(--border)" }}
+          role="alertdialog"
+          aria-label="Confirm erasure"
+        >
+          <p className="text-xs" style={{ color: "var(--fg)" }}>
+            This action cannot be undone. Continue?
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setStage("idle")}
+              className="px-3 py-1.5 rounded text-xs"
+              style={{
+                background: "var(--bg-deep)",
+                color: "var(--fg)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={runErasure}
+              className="px-3 py-1.5 rounded text-xs"
+              style={{
+                background: "var(--red)",
+                color: "var(--paper, #FAF7F2)",
+                border: "1px solid var(--red)",
+              }}
+            >
+              I understand, erase now
+            </button>
+          </div>
+        </div>
+      )}
+
+      {stage === "done" && report && (
+        <div
+          className="mt-3 pt-3"
+          style={{ borderTop: "1px solid var(--border)" }}
+          role="status"
+        >
+          <p className="text-xs" style={{ color: "var(--fg)" }}>
+            Erasure complete. Removed <strong>{report.removed}</strong> learner
+            data {report.removed === 1 ? "key" : "keys"} from this device;
+            kept <strong>{report.kept}</strong> parent-policy{" "}
+            {report.kept === 1 ? "key" : "keys"}.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Crisis-notifications card. Two settings live here:
+ *
+ *   1. master enable/disable (the detector still fires either way; this only
+ *      controls whether ALERTS are surfaced)
+ *   2. delivery channel — `"in-app"` always works; `"in-app+browser"`
+ *      additionally fires a real browser `Notification` (handled by
+ *      `lib/safety/notifications.ts` subscribed in `SafetyProvider`).
+ *      Reserved values `"in-app+push"` / `"in-app+sms"` are not selectable
+ *      in v1.5.4 — they require server infra.
+ *
+ * The card also surfaces the live browser-permission state and exposes a
+ * "Allow notifications" button that triggers the standard
+ * `Notification.requestPermission()` prompt. Picking the browser channel
+ * without granting permission is permitted (the master `enabled` flag
+ * still works for the in-app strip), but the helper text makes the
+ * combination's behaviour explicit.
+ */
+function CrisisControl({
+  enabled,
+  channel,
+  hydrated,
+  onEnabledChange,
+  onChannelChange,
+}: {
+  enabled: boolean;
+  channel: CrisisChannel;
+  hydrated: boolean;
+  onEnabledChange: (v: boolean) => void;
+  onChannelChange: (ch: CrisisChannel) => void;
+}) {
+  const [perm, setPerm] = useState<NotificationPermissionState>("default");
+
+  // Read the live permission state on mount and on visibility changes
+  // (a parent who flips the Site Settings -> Notifications toggle in
+  // another tab/OS dialog should see this card update on return).
+  useEffect(() => {
+    setPerm(getNotificationPermission());
+    const onVis = () => setPerm(getNotificationPermission());
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
+  const browserSelected = channel === "in-app+browser";
+  const description = !enabled
+    ? "Off — detector still fires, alerts suppressed"
+    : browserSelected && perm === "granted"
+      ? "In-app feed strip + system browser notification"
+      : browserSelected
+        ? "Browser channel selected — permission not granted yet"
+        : "In-app feed strip on the parent surface";
+
+  return (
+    <SafetyControl
+      icon={Bell}
+      label="Crisis notifications"
+      description={description}
+      enabled={enabled}
+      onEnabledChange={onEnabledChange}
+      disabled={!hydrated}
+    >
+      <label className="text-xs font-mono block mb-1" style={{ color: "var(--fg-faint)" }}>
+        Channel
+      </label>
+      <select
+        value={channel}
+        onChange={(e) => onChannelChange(e.target.value as CrisisChannel)}
+        className="w-full text-sm px-2 py-1.5 rounded"
+        style={{ background: "var(--bg-deep)", border: "1px solid var(--border)", color: "var(--fg)" }}
+        disabled={!hydrated || !enabled}
+      >
+        <option value="in-app">In-app feed strip only</option>
+        <option value="in-app+browser">In-app + browser notification</option>
+        {/* Reserved server channels — disabled, kept in the DOM so a future
+            release does not need a schema migration on stored settings. */}
+        <option value="in-app+push" disabled>
+          In-app + Web Push (server required)
+        </option>
+        <option value="in-app+sms" disabled>
+          In-app + SMS (server required)
+        </option>
+      </select>
+
+      {browserSelected && (
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <p className="text-xs font-mono" style={{ color: "var(--fg-faint)" }}>
+            Permission:{" "}
+            <span style={{ color: perm === "granted" ? "var(--accent)" : perm === "denied" ? "var(--red)" : "var(--fg-dim)" }}>
+              {perm}
+            </span>
+          </p>
+          {perm !== "granted" && perm !== "unsupported" && (
+            <button
+              type="button"
+              onClick={async () => {
+                const next = await requestNotificationPermission();
+                setPerm(next);
+              }}
+              className="text-xs px-3 py-1 rounded"
+              style={{
+                background: "var(--accent)",
+                color: "var(--paper, #FAF7F2)",
+                border: "1px solid var(--accent)",
+              }}
+              disabled={perm === "denied"}
+              title={perm === "denied" ? "Permission denied — adjust in browser settings" : "Allow browser notifications"}
+            >
+              {perm === "denied" ? "Blocked in browser" : "Allow notifications"}
+            </button>
+          )}
+        </div>
+      )}
+
+      <p className="text-xs mt-2" style={{ color: "var(--fg-faint)" }}>
+        Push (Web Push) and SMS channels require server infrastructure and are
+        not part of v1.5.4 — see HONESTY.md and SAFEGUARDING.md §1.
+      </p>
+    </SafetyControl>
+  );
+}
+
+/**
+ * Editable safety-control card. Replaces the v1.5.3 display-only `Toggle`.
+ * The old helper is retained below for any remaining callers but is no
+ * longer used by the Safety Centre.
+ */
+function SafetyControl({
+  icon: Icon,
+  label,
+  description,
+  enabled,
+  onEnabledChange,
+  disabled,
+  showToggle = true,
+  children,
+}: {
+  icon: any;
+  label: string;
+  description: string;
+  enabled: boolean;
+  onEnabledChange: (v: boolean) => void;
+  disabled?: boolean;
+  showToggle?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <div className="kl-card">
+      <div className="flex items-start gap-3 mb-3">
+        <Icon size={18} style={{ color: "var(--accent)", marginTop: 2 }} />
+        <div className="flex-1">
+          <p className="text-sm font-semibold">{label}</p>
+          <p className="text-xs font-mono" style={{ color: "var(--fg-faint)" }}>
+            {description}
+          </p>
+        </div>
+        {showToggle && (
+          <button
+            type="button"
+            onClick={() => onEnabledChange(!enabled)}
+            disabled={disabled}
+            aria-pressed={enabled}
+            className="text-xs px-3 py-1.5 rounded"
+            style={{
+              background: enabled ? "var(--accent)" : "var(--bg-deep)",
+              color: enabled ? "var(--paper)" : "var(--fg)",
+              border: "1px solid",
+              borderColor: enabled ? "var(--accent)" : "var(--border)",
+              opacity: disabled ? 0.5 : 1,
+            }}
+          >
+            {enabled ? "On" : "Off"}
+          </button>
+        )}
+      </div>
+      {children}
     </div>
   );
 }

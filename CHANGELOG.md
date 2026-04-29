@@ -4,6 +4,130 @@ All notable changes to Even Keel Learning are tracked in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.4] — 2026-04-29 — Wired Parent Safety Centre + Art. 17 erasure
+
+The v1.5.3 audit (`HONESTY.md` §4.2) flagged the Parent Safety Centre as
+"display-only — toggles do not persist or enforce". v1.5.4 closes that gap.
+Every control in the Centre is now backed by real state, real enforcement,
+and a real test contract. Same trust posture as prior releases — no model in
+the learner runtime, no telemetry, all settings local-only.
+
+### Added — Safety settings module (`lib/safety/settings.ts`)
+
+- `SafetySettings` type with `screenTime`, `bedtime`, `tone`, and `crisis`
+  sub-objects. Defaults are deliberately permissive (no cap, bedtime off,
+  mentor tone, in-app crisis alerts on).
+- `getSafetySettings` / `setSafetySettings` / `updateSafetySetting` /
+  `resetSafetySettings` — defensive parser rejects malformed JSON, garbage
+  values, and out-of-range times (`"25:99"` regression caught by the unit
+  suite). Cap minutes are clamped to `[5, 600]`.
+- `isBedtimeActive(bt, now)` — pure predicate. Handles same-day windows,
+  cross-midnight windows, and zero-length windows correctly.
+- `getDailyUsage` / `bumpDailyUsage` / `resetDailyUsage` — UTC-day-keyed
+  foreground-minutes counter. Self-resets when the stored date is stale.
+- `screenTimeCapState` — composes settings + usage into a remaining-minutes
+  view; reports `Infinity` remaining when the cap is disabled.
+- `shouldPauseSession(settings, usage, now)` — the single composition
+  used by enforcement. Bedtime wins over cap when both would trigger.
+- 21 unit tests in `tests/unit/safety-settings.test.ts`.
+
+### Added — Safety provider + enforcement gate
+
+- `components/shared/SafetyProvider.tsx` mounts in `app/layout.tsx` and
+  exposes `settings`, `usage`, `update`, `setAll`, `reset`, `hydrated`
+  via React context. SSR-safe — first render uses defaults, then hydrates
+  from `localStorage` on mount.
+- The 60s foreground-minutes ticker lives in the provider (not the gate),
+  so multiple `<SafetyGate>` instances cannot double-count. Cross-tab
+  `storage` events keep `usage` in sync across open tabs.
+- `components/shared/SafetyGate.tsx` wraps `<EkeChat>` on `/student`. While
+  bedtime is active or the cap is exceeded, the gate replaces children
+  with a calm "paused" card (separate copy for bedtime vs cap) and emits
+  `student.session.paused` on the cross-surface bus. On transition back
+  to open, emits `student.session.resumed`. Children are unmounted while
+  paused so streaks/timers in `EkeChat` do not advance.
+- A 30s wall-clock tick re-evaluates predicates so the pause appears
+  mid-session without a click.
+
+### Added — GDPR Article 17 erasure (`lib/safety/erasure.ts`)
+
+- `eraseLearnerData()` — allowlist-of-namespaces + denylist-of-policy-keys.
+  Walks every `localStorage` key, takes anything in `evenkeel.*` /
+  `evenkeel/*` / legacy `keellearn.*` namespaces, and excludes a small
+  set of parent-policy keys (`evenkeel/safety/v1`,
+  `evenkeel.safeguarding.webhook.v1`, `evenkeel/role-guard/*`). New
+  learner keys are erased by default — a hardcoded list would silently
+  fall behind future releases.
+- Returns a structured `ErasureReport` with `removed[]`, `kept[]`, and
+  `at` ISO timestamp. The UI shows exact counts; no silent action.
+- Publishes `parent.erasure.completed` on the bus *before* the actual
+  removals so the audit entry survives only via BroadcastChannel —
+  post-erasure storage state is genuinely clean. Idempotent.
+- 10 unit tests in `tests/unit/safety-erasure.test.ts` covering namespace
+  classification, foreign-key safety, accurate report, idempotency.
+
+### Changed — Parent Safety Centre is now editable
+
+- `app/parent/page.tsx` — replaces the v1.5.3 display-only `Toggle`
+  rows with real controls:
+  - **Daily screen-time cap.** On/off + minutes preset.
+  - **Bedtime mode.** On/off + start/end HH:MM presets (cross-midnight
+    windows handled).
+  - **Crisis notifications.** On/off; channel select locked to "in-app"
+    in v1.5.4 (out-of-band push/SMS/email is a Phase 2 item — see
+    `HONESTY.md` and `SAFEGUARDING.md` §1).
+  - **Eke tone.** Mentor / peer / foreman selector that flows into
+    `<EkeChat>` via `getEffectiveTone` (the a11y "literal tone" toggle
+    still wins).
+- `app/student/page.tsx` — `<EkeChat>` is now wrapped in `<SafetyGate>`
+  and reads its `tone` prop from the parent-set safety setting.
+
+### Added — GDPR Art. 17 panel
+
+- New `ErasurePanel` in `app/parent/page.tsx` with a two-step
+  confirmation (`idle` → `confirming` → `done`) and an inline receipt
+  showing exactly how many learner-data keys were removed and how many
+  parent-policy keys were intentionally kept. No silent no-op, no
+  `confirm()` dialog, no surprise.
+
+### Fixed — vitest `.mjs` shebang transform regression
+
+- Removed `#!/usr/bin/env node` shebangs from
+  `scripts/build-repro-manifest.mjs`, `scripts/verify-repro-manifest.mjs`,
+  `scripts/build-transparency-bundle.mjs`, and
+  `scripts/verify-transparency-bundle.mjs`. Vitest's loader passes `.mjs`
+  straight to `node:vm.Script`, which does not strip shebangs and was
+  reporting a misleading `SyntaxError` on the importing test file. The
+  shebangs were decorative — `package.json` invokes every one of these
+  via `node scripts/...mjs`. `tests/unit/repro-manifest.test.ts` (20
+  tests) and `tests/unit/transparency-bundle.test.ts` (11 tests) now
+  load and pass.
+
+### Fixed — defensive parser missed range-invalid HH:MM
+
+- The persistence parser at `lib/safety/settings.ts:148-156` previously
+  accepted any string matching `/^\d{2}:\d{2}$/`, so garbage like
+  `"25:99"` round-tripped through storage and silently broke the
+  bedtime window. The parser now reuses `hhmmToMinutes` so range
+  validation is shared with enforcement. Caught by a unit test.
+
+### Test totals
+
+| Metric | v1.5.3 | v1.5.4 |
+|---|---|---|
+| Test files | 38 / 40 (2 pre-existing failures) | **40 / 40** |
+| Tests | 428 / 428 | **469 / 469** |
+
+### Honest deferrals
+
+- Out-of-band crisis channels (push, SMS, email) — `HONESTY.md` §3 / §4.2.
+- CRT submit not yet calling `signPayload` over a CRT envelope — the
+  primitive is real, the wiring is the missing ~30 lines. `HONESTY.md`
+  §4.2.
+- The `2x + 5 = 17` demo answer pin remains `6`; same as prior releases.
+
+---
+
 ## [1.5.3] — 2026-04-28 — Heavy escalation, extended moves, first figure
 
 Closes the three v1.5.2 follow-up gaps disclosed in `HONESTY.md` §4.4.
