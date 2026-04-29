@@ -59,13 +59,15 @@ describe("providers: registry", () => {
     expect(getProvider("not-a-real-id" as ProviderId)).toBeNull();
   });
 
-  it("the webhook adapter is the only one marked implemented", () => {
-    expect(listImplementedProviders().map((p) => p.id)).toEqual(["webhook"]);
-    expect(listStubProviders().map((p) => p.id)).toEqual([
+  it("all adapters are marked implemented", () => {
+    const ids = listImplementedProviders().map((p) => p.id);
+    expect(ids).toEqual([
+      "webhook",
       "email-sendgrid",
       "sms-twilio",
       "push-fcm",
     ]);
+    expect(listStubProviders().map((p) => p.id)).toEqual([]);
   });
 
   it("every adapter has a non-empty displayName", () => {
@@ -75,28 +77,24 @@ describe("providers: registry", () => {
   });
 });
 
-describe("providers: stub honesty", () => {
-  it("each stub returns provider_key_required with a non-empty configHelp", async () => {
-    const entry = await enqueueEscalation(SAMPLE);
-    for (const stub of listStubProviders()) {
-      const outcome = await stub.deliver(entry);
-      expect(outcome.kind).toBe("provider_key_required");
-      if (outcome.kind === "provider_key_required") {
-        expect(outcome.providerName.length).toBeGreaterThan(0);
-        expect(outcome.configHelp.length).toBeGreaterThan(20);
-      }
-    }
-  });
-
-  it("stubs do not mutate the entry's signed envelope", async () => {
+describe("providers: delivery", () => {
+  it("providers do not mutate the entry's signed envelope", async () => {
     const entry = await enqueueEscalation(SAMPLE);
     const beforeSig = entry.envelope.signatureB64url;
     const beforePub = entry.envelope.publicKeyB64url;
     const beforePayload = JSON.stringify(entry.envelope.payload);
 
-    for (const stub of listStubProviders()) {
-      await stub.deliver(entry);
+    // Mock fetch so we don't actually hit the network during unit tests
+    const originalFetch = global.fetch;
+    global.fetch = async () => new Response(JSON.stringify({ ok: true, statusCode: 200 }), { status: 200 });
+
+    for (const p of listImplementedProviders()) {
+      if (p.id !== "webhook") {
+        await p.deliver(entry);
+      }
     }
+
+    global.fetch = originalFetch;
 
     expect(entry.envelope.signatureB64url).toBe(beforeSig);
     expect(entry.envelope.publicKeyB64url).toBe(beforePub);

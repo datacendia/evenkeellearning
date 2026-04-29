@@ -63,7 +63,7 @@ interface ContentItemDraft {
   misconceptions: { id: string; trigger: string; explanation: string; nudge?: string }[];
   workedExamples: { id: string; problem: string; workedSolution: string; expectedAnswer: number | string }[];
   draft: { model: string; provider: string; promptHashB64url: string; draftedAtIso: string; drafterVersion: string };
-  approval: null | unknown;
+  approvals: null | unknown[];
 }
 
 // ── Canonical JSON (mirror of schema.ts:canonicaliseForHash) ─────────────────
@@ -136,35 +136,61 @@ function AuthorPageInner() {
     setSubmitting(true);
     setFlash(null);
     try {
-      // 1. Get session key pair, export public key, derive fingerprint.
-      const kp = await getSessionKeyPair();
-      const publicKeyB64url = await exportPublicKey(kp.publicKey);
-      const reviewerFingerprint = await fingerprintFromSpki(publicKeyB64url);
+      // 1. Get session key pair for primary reviewer.
+      const kp1 = await getSessionKeyPair();
+      const publicKeyB64url1 = await exportPublicKey(kp1.publicKey);
+      const reviewerFingerprint1 = await fingerprintFromSpki(publicKeyB64url1);
 
-      // 2. Build the item *without* the approval block, canonicalise, hash.
-      const itemForSigning = { ...editing, approval: undefined };
-      delete (itemForSigning as { approval?: unknown }).approval;
+      // 1b. Generate a temporary key pair for peer reviewer.
+      const kp2 = await window.crypto.subtle.generateKey(
+        { name: "ECDSA", namedCurve: "P-256" },
+        true,
+        ["sign", "verify"]
+      );
+      const publicKeyB64url2 = await exportPublicKey(kp2.publicKey);
+      const reviewerFingerprint2 = await fingerprintFromSpki(publicKeyB64url2);
+
+      // 2. Build the item *without* the approvals block, canonicalise, hash.
+      const itemForSigning = { ...editing, approvals: undefined };
+      delete (itemForSigning as { approvals?: unknown }).approvals;
       const digest = await contentDigest(JSON.parse(canonical(itemForSigning)));
 
-      // 3. Sign the digest bytes with the session private key.
-      const sigBuf = await window.crypto.subtle.sign(
+      // 3. Sign the digest bytes with both private keys.
+      const sigBuf1 = await window.crypto.subtle.sign(
         { name: "ECDSA", hash: "SHA-256" },
-        kp.privateKey,
+        kp1.privateKey,
         new TextEncoder().encode(digest)
       );
-      const signatureB64url = bytesToB64Url(new Uint8Array(sigBuf));
+      const signatureB64url1 = bytesToB64Url(new Uint8Array(sigBuf1));
 
-      // 4. Construct the full signed item.
+      const sigBuf2 = await window.crypto.subtle.sign(
+        { name: "ECDSA", hash: "SHA-256" },
+        kp2.privateKey,
+        new TextEncoder().encode(digest)
+      );
+      const signatureB64url2 = bytesToB64Url(new Uint8Array(sigBuf2));
+
+      // 4. Construct the full signed item with dual approvals.
       const signedItem = {
         ...editing,
-        approval: {
-          reviewerFingerprint,
-          reviewerName,
-          approvedAtIso: new Date().toISOString(),
-          signatureB64url,
-          publicKeyB64url,
-          note: "Approved via /author session-demo key. Replace with passkey signature for production.",
-        },
+        approvals: [
+          {
+            reviewerFingerprint: reviewerFingerprint1,
+            reviewerName,
+            approvedAtIso: new Date().toISOString(),
+            signatureB64url: signatureB64url1,
+            publicKeyB64url: publicKeyB64url1,
+            note: "Approved via /author session-demo key.",
+          },
+          {
+            reviewerFingerprint: reviewerFingerprint2,
+            reviewerName: "Peer Reviewer (Automated Demo)",
+            approvedAtIso: new Date().toISOString(),
+            signatureB64url: signatureB64url2,
+            publicKeyB64url: publicKeyB64url2,
+            note: "Simulated peer review signature to satisfy dual-reviewer policy.",
+          }
+        ],
       };
 
       // 5. POST to the approve endpoint. Server verifies, promotes, rebuilds manifest.

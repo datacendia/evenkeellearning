@@ -123,7 +123,7 @@ should not be read as claims about the shipped code.
 | 30+ jurisdictions absorbed | **Claim is unsupported by code.** 7 jurisdictions are modelled (EU, IE, GB, PE, US, BR, IN). See §5. |
 | "12-week Dublin pilot" | Marketing placeholder on `/`. No pilot infrastructure exists. |
 | Honors-prompt / Logic-Bridge push-to-class buttons | **Wired (single-direction).** Buttons in `/teacher` publish `teacher.honors.pushed` / `teacher.logic_bridge.pushed` bus events that show up on `/student` and `/parent` ledgers. There is still no scheduled curriculum delivery on the student side — the consumer is just a ledger entry. |
-| CRT signed 100% (landing stat) | **Misleading.** Compliance *conflict resolutions* are signed end-to-end with real ECDSA. **Student CRTs are not yet emitted as signed envelopes** — the chat-submit flow publishes a bus event but does not call `signPayload` over a CRT shape. Wiring is ~30 lines in `EkeChat.tsx`. |
+| CRT signed 100% (landing stat) | **True.** As of v1.5.4, Student CRTs are emitted as signed envelopes (`student.crt.signed`) on every submission via `signPayloadWithAutoPasskey`. The full session trace is also signed on unmount. |
 
 ### 2.4 What the landing page says vs the truth
 
@@ -131,7 +131,7 @@ should not be read as claims about the shipped code.
 |---|---|
 | "30+ Jurisdictions absorbed" | 7 jurisdictions modelled. **Misleading.** Should read "7 modelled · 30+ planned." I have not changed the landing-page copy without your permission, but I flag it here. |
 | "0 Biometrics ever" | **True.** No biometric capture code exists. `navigator.mediaDevices` is never called. No face/voice/fingerprint APIs are imported. |
-| "100% CRT signed" | **False as of today.** No CRTs are submitted in the demo. Can be made true once `lib/crypto/signing.ts` is wired to the chat submit. |
+| "100% CRT signed" | **True as of v1.5.4.** Every submission publishes a signed CRT envelope (`submission-crt`) to the data bus, and the full session trace is signed and persisted to the CRT bank on unmount. |
 | "12wk Dublin pilot" | Marketing placeholder. |
 | "Even Keel Learning uses biometric-free passkeys" (on `/auth`) | True for "biometric-free." False for "passkeys" — no WebAuthn call. The button says "(demo)." |
 
@@ -195,15 +195,15 @@ should not be read as claims about the shipped code.
 
 ## 4. Known bugs and limitations
 
-### 4.1 Fixed in v1.1.0 / v1.2.0
+### 4.1 Fixed in v1.1.0 / v1.2.0 / v1.5.4
 
 - `mimcryProbability` → `mimicryProbability` (typo in `lib/types/index.ts` and `ipa-analyzer.ts`). Breaking if anything imported by name.
 - `LockOpen` icon does not exist in `lucide-react` — replaced with `Unlock` in `ComprehensionGate.tsx`.
 - Decision-Gate PII regex `/password/i` matched academic content like "the password for the Spanish verb *hablar* is…". Now only triggers when the word is adjacent to what looks like a credential (`password: x`, `password=x`, or `my password is`).
+- **CRT is never actually submitted as a signed envelope.** (Fixed in v1.5.4: `EkeChat.tsx` now calls `signPayloadWithAutoPasskey` on every submission and persists the full trace to `lib/crt/bank.ts` on unmount).
 
 ### 4.2 Known, not fixed
 
-- **CRT is never actually submitted as a signed envelope.** `createCRTLogger()` is exported and the signing primitive is real, but `EkeChat.tsx` only publishes a bus event on submit — it does not call `signPayload` over a CRT shape. Wiring is ~30 lines.
 - **Subject labels are not translated.** The `SUBJECTS` array in `SubjectGrid.tsx` has English/native labels baked in. "Maths" does not flip to "Matemáticas" in Spanish. Defensible (users expect e.g. "Gaeilge" to show that label regardless of UI language) but should be a product decision.
 - **The subject picker is a UI placeholder for content that does not yet exist behind most tiles.** `SubjectGrid.tsx` advertises **64 subjects** across 9 groups (Core, Sciences, Humanities, Languages, Business, Tech, Arts, Life, Vocational). Selecting any tile updates the title label (`"WELDING · today's problem"`), but the actual problem body on `/student` is **hard-coded to a single Maths equation** (`app/student/page.tsx:93` → `"Solve for x:  2x + 5 = 17"`). The deterministic answer-checker (`lib/validation/answer-checker.ts`) is **numeric-only** with no subject branching. The parallel-problem corpus (`lib/eke/parallel-problems.ts`) currently has **one populated skill family** (`linear-eq-1var`, 4 entries). The Comprehension Gate ships three hard-coded linear-equations questions by default. **In short: clicking a non-Maths tile in the picker today does not change the engine's content.** Honouring the picker requires, per subject, (a) a validator or an explicit "qualitative — no auto-check" mode, (b) a hand-written parallel-problem corpus, and (c) Comprehension Gate questions. The picker stays in the UI because the *shape* of "pick your subject" is genuinely useful and because removing 60 tiles would be a worse user experience than the honest disclosure here. A pilot proposal aimed at a non-Maths subject must be explicit that today's automatic content is Maths-only. **v1.5.0 update:** the *pipeline* to close this gap now exists end-to-end (LLM-drafted, teacher-reviewed, signed-manifest delivery). See §4.5 below. v1.5.0 ships ONE migrated and enriched skill family (`maths.linear-eq-1var`); the other 63 tiles still need a teacher to draft and approve content. The pipeline does not write content; it distributes it.
 - **RTL audit incomplete.** Arabic renders and reads right-to-left, but a handful of spacing/padding choices use `marginLeft`/`paddingLeft` explicitly. Many are via Tailwind class strings which are fine. Obvious visual flaws should be filed.

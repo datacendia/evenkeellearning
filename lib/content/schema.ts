@@ -194,8 +194,8 @@ export interface SchemaContentItem {
 
   /** LLM draft provenance. Frozen at approval. */
   draft: SchemaDraftProvenance;
-  /** Reviewer approval. Required for the item to reach a signed manifest. */
-  approval: SchemaApproval;
+  /** Reviewer approvals. Two signatures required for the item to reach a signed manifest. */
+  approvals: readonly SchemaApproval[];
 }
 
 /** A pack groups items in one skill family for distribution. */
@@ -339,11 +339,19 @@ export function validateContentItem(item: unknown): readonly string[] {
   }
 
   if (!o.draft || typeof o.draft !== "object") errs.push("draft provenance is required");
-  if (!o.approval || typeof o.approval !== "object") errs.push("approval block is required");
-  else {
-    if (!o.approval.reviewerFingerprint) errs.push("approval.reviewerFingerprint is required");
-    if (!o.approval.signatureB64url) errs.push("approval.signatureB64url is required");
-    if (!o.approval.publicKeyB64url) errs.push("approval.publicKeyB64url is required");
+  if (!Array.isArray(o.approvals) || o.approvals.length < 2) {
+    errs.push("approvals must be an array with at least two signatures");
+  } else {
+    for (let i = 0; i < o.approvals.length; i++) {
+      const app = o.approvals[i];
+      if (!app || typeof app !== "object") {
+        errs.push(`approvals[${i}] is invalid`);
+        continue;
+      }
+      if (!app.reviewerFingerprint) errs.push(`approvals[${i}].reviewerFingerprint is required`);
+      if (!app.signatureB64url) errs.push(`approvals[${i}].signatureB64url is required`);
+      if (!app.publicKeyB64url) errs.push(`approvals[${i}].publicKeyB64url is required`);
+    }
   }
 
   return errs;

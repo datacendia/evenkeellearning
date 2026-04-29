@@ -290,7 +290,7 @@ async function main() {
         draftedAtIso: new Date().toISOString(),
         drafterVersion: DRAFTER_VERSION,
       },
-      approval: null,
+      approvals: null,
     };
 
     const outPath = path.join(DRAFTS_DIR, `${id}.json`);

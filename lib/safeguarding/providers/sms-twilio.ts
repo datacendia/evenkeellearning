@@ -30,13 +30,37 @@ import type { ProviderAdapter, ProviderOutcome } from "./types";
 export const smsTwilioProvider: ProviderAdapter = {
   id: "sms-twilio",
   displayName: "SMS (Twilio relay)",
-  isImplemented: false,
-  async deliver(_entry: EscalationEntry): Promise<ProviderOutcome> {
-    return {
-      kind: "provider_key_required",
-      providerName: "Twilio",
-      configHelp:
-        "Phase 2: requires a Twilio account SID + auth token, a verified sending number, and a relay endpoint. SMS body would be a deep-link only — the signed envelope cannot fit in 160 characters. See HONESTY.md §3.2.",
-    };
+  isImplemented: true,
+  async deliver(entry: EscalationEntry): Promise<ProviderOutcome> {
+    try {
+      const res = await fetch("/api/safeguarding/dispatch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: "sms-twilio", entry }),
+      });
+      if (!res.ok) {
+        return {
+          kind: "transient_failure",
+          reason: `HTTP ${res.status}: Server dispatch failed`,
+        };
+      }
+      const data = await res.json();
+      if (!data.ok) {
+        return {
+          kind: "permanent_failure",
+          reason: data.error || "Unknown dispatch error",
+        };
+      }
+      return {
+        kind: "delivered",
+        statusCode: data.statusCode || 200,
+        deliveredAt: data.deliveredAt || Date.now(),
+      };
+    } catch (e) {
+      return {
+        kind: "transient_failure",
+        reason: String(e),
+      };
+    }
   },
 };

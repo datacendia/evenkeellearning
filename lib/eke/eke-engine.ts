@@ -303,6 +303,22 @@ export class EkeEngine {
     this.parallelServed = false;
   }
 
+  exportState() {
+    return {
+      context: this.context,
+      hints: this.hints,
+      messages: this.messages,
+      parallelServed: this.parallelServed,
+    };
+  }
+
+  importState(state: { context: EkeContext; hints: TieredHint[]; messages: EkeMessage[]; parallelServed: boolean }) {
+    this.context = state.context;
+    this.hints = state.hints;
+    this.messages = state.messages;
+    this.parallelServed = state.parallelServed;
+  }
+
   private id(): string {
     return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   }

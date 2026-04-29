@@ -32,13 +32,37 @@ import type { ProviderAdapter, ProviderOutcome } from "./types";
 export const pushFcmProvider: ProviderAdapter = {
   id: "push-fcm",
   displayName: "Push notification (FCM relay)",
-  isImplemented: false,
-  async deliver(_entry: EscalationEntry): Promise<ProviderOutcome> {
-    return {
-      kind: "provider_key_required",
-      providerName: "Firebase Cloud Messaging",
-      configHelp:
-        "Phase 2: requires a Firebase project, per-DSL device-token registration via a school PWA, and a relay endpoint. See HONESTY.md §3.2.",
-    };
+  isImplemented: true,
+  async deliver(entry: EscalationEntry): Promise<ProviderOutcome> {
+    try {
+      const res = await fetch("/api/safeguarding/dispatch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: "push-fcm", entry }),
+      });
+      if (!res.ok) {
+        return {
+          kind: "transient_failure",
+          reason: `HTTP ${res.status}: Server dispatch failed`,
+        };
+      }
+      const data = await res.json();
+      if (!data.ok) {
+        return {
+          kind: "permanent_failure",
+          reason: data.error || "Unknown dispatch error",
+        };
+      }
+      return {
+        kind: "delivered",
+        statusCode: data.statusCode || 200,
+        deliveredAt: data.deliveredAt || Date.now(),
+      };
+    } catch (e) {
+      return {
+        kind: "transient_failure",
+        reason: String(e),
+      };
+    }
   },
 };

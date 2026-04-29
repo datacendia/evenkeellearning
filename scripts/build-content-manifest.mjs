@@ -95,20 +95,27 @@ async function getReviewerKey() {
 }
 
 async function signItem(item, reviewer, reviewerName) {
-  const { approval: _drop, ...itemForSigning } = item;
+  const { approvals: _drop, ...itemForSigning } = item;
   const canon = canonical(itemForSigning);
   const digestB64url = await sha256B64Url(canon);
   const sig = await webcrypto.subtle.sign(ALG, reviewer.kp.privateKey, utf8(digestB64url));
+  const sigB64url = bytesToB64Url(new Uint8Array(sig));
+  
+  const seedApproval = {
+    reviewerFingerprint: reviewer.fingerprint,
+    reviewerName,
+    approvedAtIso: new Date().toISOString(),
+    signatureB64url: sigB64url,
+    publicKeyB64url: reviewer.publicKeyB64url,
+    note: "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout.",
+  };
+
   return {
     ...itemForSigning,
-    approval: {
-      reviewerFingerprint: reviewer.fingerprint,
-      reviewerName,
-      approvedAtIso: new Date().toISOString(),
-      signatureB64url: bytesToB64Url(new Uint8Array(sig)),
-      publicKeyB64url: reviewer.publicKeyB64url,
-      note: "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout.",
-    },
+    approvals: [
+      seedApproval,
+      { ...seedApproval, reviewerName: reviewerName + " (Peer)" }
+    ],
   };
 }
 
@@ -191,7 +198,7 @@ async function main() {
     // Sign every item (or pass through if already approved)
     const signedItems = [];
     for (const item of pack.items) {
-      if (item.approval && item.approval.signatureB64url) {
+      if (Array.isArray(item.approvals) && item.approvals.length > 0) {
         // Pre-approved (e.g. by /author); pass through unchanged.
         signedItems.push(item);
       } else {

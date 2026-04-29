@@ -12,8 +12,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useEffect, useState, type ReactNode } from "react";
-import { Lock, ShieldAlert } from "lucide-react";
+import { Lock, ShieldAlert, Fingerprint } from "lucide-react";
 import { isUnlocked, tryUnlock, lock, type ProtectedRole } from "@/lib/auth/role-guard";
+import { isPasskeySupported, signPayloadWithPasskey, PasskeyError } from "@/lib/crypto/passkey";
 
 interface Props {
   role: ProtectedRole;
@@ -29,11 +30,40 @@ export default function RoleGuard({ role, roleLabel, children, demoHint }: Props
   const [passphrase, setPassphrase] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [attempting, setAttempting] = useState(false);
+  const [passkeySupported, setPasskeySupported] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     setUnlocked(isUnlocked(role));
+    setPasskeySupported(isPasskeySupported());
   }, [role]);
+
+  async function handlePasskeyLogin() {
+    setAttempting(true);
+    setError(null);
+    try {
+      // In a real backend, we'd fetch a challenge from the server.
+      // Here we sign a local dummy payload to verify the user is present.
+      await signPayloadWithPasskey({ action: "login", role });
+      
+      // If the passkey assertion succeeds, we unlock the session.
+      // Note: We bypass the passphrase check here by forcing the session to unlock.
+      window.sessionStorage.setItem("evenkeel/role-guard/" + role, "unlocked");
+      setUnlocked(true);
+    } catch (e) {
+      if (e instanceof PasskeyError) {
+        if (e.code === "no_enrolment") {
+          setError("No passkey enrolled on this device. Please use the passphrase.");
+        } else if (e.code !== "cancelled") {
+          setError(`Passkey error: ${e.message}`);
+        }
+      } else {
+        setError("An unexpected error occurred during passkey sign-in.");
+      }
+    } finally {
+      setAttempting(false);
+    }
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -177,6 +207,41 @@ export default function RoleGuard({ role, roleLabel, children, demoHint }: Props
             {attempting ? "Checking…" : "Unlock"}
           </button>
         </form>
+
+        {passkeySupported && (
+          <div style={{ marginTop: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+              <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+              <span style={{ margin: "0 10px", fontSize: 12, color: "var(--fg-muted)" }}>OR</span>
+              <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+            </div>
+            
+            <button
+              type="button"
+              onClick={handlePasskeyLogin}
+              disabled={attempting}
+              style={{
+                width: "100%",
+                padding: "10px 14px",
+                background: "var(--bg-deep)",
+                color: "var(--fg)",
+                border: "1px solid var(--border)",
+                borderRadius: 6,
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: attempting ? "wait" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                opacity: attempting ? 0.6 : 1,
+              }}
+            >
+              <Fingerprint size={16} />
+              Sign in with Passkey
+            </button>
+          </div>
+        )}
 
         {demoHint && (
           <p

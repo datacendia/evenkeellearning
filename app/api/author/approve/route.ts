@@ -83,36 +83,47 @@ interface IncomingItem {
   id: string;
   subject: string;
   skillFamily: string;
-  approval: ApprovalBlock;
+  approvals: ApprovalBlock[];
   // ...rest of schema; we don't fully type it here, schema.ts is the source of truth
   [k: string]: unknown;
 }
 
-async function verifyApproval(item: IncomingItem): Promise<boolean> {
+async function verifyApprovals(item: IncomingItem): Promise<boolean> {
   try {
-    const { approval, ...rest } = item;
+    const { approvals, ...rest } = item;
+    if (!Array.isArray(approvals) || approvals.length < 2) return false;
+    
+    // Check that we have at least 2 distinct reviewer fingerprints
+    const fingerprints = new Set(approvals.map(a => a.reviewerFingerprint));
+    if (fingerprints.size < 2) return false;
+
     const expectedDigest = await sha256B64Url(canonical(rest));
-    const spkiBytes = b64UrlToBytes(approval.publicKeyB64url);
-    const publicKey = await webcrypto.subtle.importKey(
-      "spki",
-      spkiBytes,
-      ALG,
-      true,
-      ["verify"]
-    );
-    const sigBytes = b64UrlToBytes(approval.signatureB64url);
-    return await webcrypto.subtle.verify(
-      ALG,
-      publicKey,
-      sigBytes,
-      new TextEncoder().encode(expectedDigest)
-    );
+    
+    for (const approval of approvals) {
+      const spkiBytes = b64UrlToBytes(approval.publicKeyB64url);
+      const publicKey = await webcrypto.subtle.importKey(
+        "spki",
+        spkiBytes,
+        ALG,
+        true,
+        ["verify"]
+      );
+      const sigBytes = b64UrlToBytes(approval.signatureB64url);
+      const ok = await webcrypto.subtle.verify(
+        ALG,
+        publicKey,
+        sigBytes,
+        new TextEncoder().encode(expectedDigest)
+      );
+      if (!ok) return false;
+    }
+    return true;
   } catch {
     return false;
   }
 }
 
-async function addTrustedReviewer(approval: ApprovalBlock): Promise<void> {
+async function addTrustedReviewers(approvals: ApprovalBlock[]): Promise<void> {
   let list: { fingerprint: string; name: string; publicKeyB64url: string }[] = [];
   try {
     const raw = await fs.readFile(REVIEWERS_PATH, "utf8");
@@ -121,14 +132,23 @@ async function addTrustedReviewer(approval: ApprovalBlock): Promise<void> {
   } catch (e: unknown) {
     if (!(e && typeof e === "object" && "code" in e && (e as { code: string }).code === "ENOENT")) throw e;
   }
-  if (list.some((r) => r.publicKeyB64url === approval.publicKeyB64url)) return;
-  list.push({
-    fingerprint: approval.reviewerFingerprint,
-    name: approval.reviewerName,
-    publicKeyB64url: approval.publicKeyB64url,
-  });
-  await fs.mkdir(path.dirname(REVIEWERS_PATH), { recursive: true });
-  await fs.writeFile(REVIEWERS_PATH, JSON.stringify(list, null, 2) + "\n", "utf8");
+  
+  let changed = false;
+  for (const approval of approvals) {
+    if (!list.some((r) => r.publicKeyB64url === approval.publicKeyB64url)) {
+      list.push({
+        fingerprint: approval.reviewerFingerprint,
+        name: approval.reviewerName,
+        publicKeyB64url: approval.publicKeyB64url,
+      });
+      changed = true;
+    }
+  }
+  
+  if (changed) {
+    await fs.mkdir(path.dirname(REVIEWERS_PATH), { recursive: true });
+    await fs.writeFile(REVIEWERS_PATH, JSON.stringify(list, null, 2) + "\n", "utf8");
+  }
 }
 
 async function upsertIntoPack(item: IncomingItem): Promise<string> {
@@ -200,16 +220,16 @@ export async function POST(req: Request) {
   if (!body.filename || !body.item) {
     return NextResponse.json({ error: "filename and item required" }, { status: 400 });
   }
-  if (!body.item.approval || !body.item.approval.signatureB64url) {
-    return NextResponse.json({ error: "item.approval.signatureB64url required" }, { status: 400 });
+  if (!Array.isArray(body.item.approvals) || body.item.approvals.length < 2) {
+    return NextResponse.json({ error: "item.approvals array with at least two signatures required" }, { status: 400 });
   }
 
-  const sigOk = await verifyApproval(body.item);
+  const sigOk = await verifyApprovals(body.item);
   if (!sigOk) {
-    return NextResponse.json({ error: "approval signature did not verify" }, { status: 400 });
+    return NextResponse.json({ error: "approval signatures did not verify, or not enough unique reviewers" }, { status: 400 });
   }
 
-  await addTrustedReviewer(body.item.approval);
+  await addTrustedReviewers(body.item.approvals);
   const packPath = await upsertIntoPack(body.item);
 
   // Best-effort: delete the draft.

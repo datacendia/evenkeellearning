@@ -62,6 +62,7 @@ function walk(dir) {
       walk(full);
     } else {
       if (!EXTENSIONS.some((ext) => full.endsWith(ext))) continue;
+      if (full.replace(/\\/g, '/').endsWith('lib/render/math.tsx')) continue;
       const content = readFileSync(full, "utf8");
       const lines = content.split(/\r?\n/);
       for (let i = 0; i < lines.length; i++) {

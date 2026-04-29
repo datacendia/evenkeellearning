@@ -6,7 +6,7 @@
   "skillFamily": "linear-eq-1var",
   "metadata": {
     "version": "1.0.0",
-    "builtAtIso": "2026-04-29T04:01:20.709Z",
+    "builtAtIso": "2026-04-29T16:28:54.415Z",
     "description": "Linear equations of the form ax + b = c, solvable in two inverse operations. Migrated from the v1.4.5 hand-written parallel-problem corpus and enriched with explanations, misconceptions, and curriculum spec-point alignment."
   },
   "items": [
@@ -157,14 +157,25 @@
         "draftedAtIso": "2026-04-28T00:00:00.000Z",
         "drafterVersion": "1.5.0"
       },
-      "approval": {
-        "reviewerFingerprint": "gj0Tz-tJYvRlx67a",
-        "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
-        "approvedAtIso": "2026-04-29T04:01:20.723Z",
-        "signatureB64url": "yNUQancCzc7Q5D8cQWBw6YLiJYZYPsNu15Jevo_vG18PQD0HtejKa-YXuyek_9vPRh1HvdJMYu147_NvEFGIrg",
-        "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEnBHZCTkRaSYSGmKmjDbqiKFF8OSODYgfk9gzZIZpu2LBSUAfTsZnONzsgCk_jA49YIagvHUMBFqCfJ1mydDi-A",
-        "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
-      }
+      "approval": null,
+      "approvals": [
+        {
+          "reviewerFingerprint": "wRvHYlIq-i0jnjgW",
+          "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
+          "approvedAtIso": "2026-04-29T16:28:54.421Z",
+          "signatureB64url": "ccL-jB5oJnhVVadI4usjpsoyvABjei4CS-Jf6VK6ptffYClWyPvATf8YekLbNcXwjrxI54bKSE2h8oLvPot5Mw",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEgH5CGOXG92pP7fda7PEMI4PMznAKVRRvnkRvj1IcJaGyFIdVMz4CaNiqZqeSJRfltAy2Hfk184VJdb1-R_aj_w",
+          "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+        },
+        {
+          "reviewerFingerprint": "wRvHYlIq-i0jnjgW",
+          "reviewerName": "Build-Time Seed Reviewer (v1.5.0) (Peer)",
+          "approvedAtIso": "2026-04-29T16:28:54.421Z",
+          "signatureB64url": "ccL-jB5oJnhVVadI4usjpsoyvABjei4CS-Jf6VK6ptffYClWyPvATf8YekLbNcXwjrxI54bKSE2h8oLvPot5Mw",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEgH5CGOXG92pP7fda7PEMI4PMznAKVRRvnkRvj1IcJaGyFIdVMz4CaNiqZqeSJRfltAy2Hfk184VJdb1-R_aj_w",
+          "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+        }
+      ]
     },
     {
       "schemaVersion": "1.0.0",
@@ -261,14 +272,25 @@
         "draftedAtIso": "2026-04-28T00:00:00.000Z",
         "drafterVersion": "1.5.0"
       },
-      "approval": {
-        "reviewerFingerprint": "gj0Tz-tJYvRlx67a",
-        "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
-        "approvedAtIso": "2026-04-29T04:01:20.724Z",
-        "signatureB64url": "JoBSyHR88DjrLAneLVqaNdSNMOYWTFCSf25yI4PiSvT-5de2MwCP1KiSJIZDd_Ixqm_gH4LvoRW51tFe0nShCA",
-        "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEnBHZCTkRaSYSGmKmjDbqiKFF8OSODYgfk9gzZIZpu2LBSUAfTsZnONzsgCk_jA49YIagvHUMBFqCfJ1mydDi-A",
-        "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
-      }
+      "approval": null,
+      "approvals": [
+        {
+          "reviewerFingerprint": "wRvHYlIq-i0jnjgW",
+          "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
+          "approvedAtIso": "2026-04-29T16:28:54.422Z",
+          "signatureB64url": "as3h83yExz4e5dBVK8uxMyg8nVORACjaG9qZC1eqB3hb7CwUW3LJC58OWYQq1NgU7RosJqAifOgHpN-yRnqWwQ",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEgH5CGOXG92pP7fda7PEMI4PMznAKVRRvnkRvj1IcJaGyFIdVMz4CaNiqZqeSJRfltAy2Hfk184VJdb1-R_aj_w",
+          "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+        },
+        {
+          "reviewerFingerprint": "wRvHYlIq-i0jnjgW",
+          "reviewerName": "Build-Time Seed Reviewer (v1.5.0) (Peer)",
+          "approvedAtIso": "2026-04-29T16:28:54.422Z",
+          "signatureB64url": "as3h83yExz4e5dBVK8uxMyg8nVORACjaG9qZC1eqB3hb7CwUW3LJC58OWYQq1NgU7RosJqAifOgHpN-yRnqWwQ",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEgH5CGOXG92pP7fda7PEMI4PMznAKVRRvnkRvj1IcJaGyFIdVMz4CaNiqZqeSJRfltAy2Hfk184VJdb1-R_aj_w",
+          "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+        }
+      ]
     }
   ]
 }

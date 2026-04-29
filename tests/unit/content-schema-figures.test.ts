@@ -39,13 +39,22 @@ const baseItem = {
     draftedAtIso: "2026-04-28T00:00:00.000Z",
     drafterVersion: "1.5.0",
   },
-  approval: {
-    reviewerFingerprint: "abc",
-    reviewerName: "Test Reviewer",
-    approvedAtIso: "2026-04-28T00:00:00.000Z",
-    signatureB64url: "sig",
-    publicKeyB64url: "pub",
-  },
+  approvals: [
+    {
+      reviewerFingerprint: "abc",
+      reviewerName: "Test Reviewer",
+      approvedAtIso: "2026-04-28T00:00:00.000Z",
+      signatureB64url: "sig",
+      publicKeyB64url: "pub",
+    },
+    {
+      reviewerFingerprint: "def",
+      reviewerName: "Peer Reviewer",
+      approvedAtIso: "2026-04-28T00:00:00.000Z",
+      signatureB64url: "sig2",
+      publicKeyB64url: "pub2",
+    }
+  ],
 };
 
 describe("validateContentItem — figures integration (v1.5.3)", () => {

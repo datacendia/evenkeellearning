@@ -36,13 +36,37 @@ import type { ProviderAdapter, ProviderOutcome } from "./types";
 export const emailSendgridProvider: ProviderAdapter = {
   id: "email-sendgrid",
   displayName: "Email (SendGrid relay)",
-  isImplemented: false,
-  async deliver(_entry: EscalationEntry): Promise<ProviderOutcome> {
-    return {
-      kind: "provider_key_required",
-      providerName: "SendGrid",
-      configHelp:
-        "Phase 2: requires a SendGrid API key, a school-configured From/To address pair, and a relay endpoint to keep the key off the learner device. See HONESTY.md §3.2.",
-    };
+  isImplemented: true,
+  async deliver(entry: EscalationEntry): Promise<ProviderOutcome> {
+    try {
+      const res = await fetch("/api/safeguarding/dispatch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: "email-sendgrid", entry }),
+      });
+      if (!res.ok) {
+        return {
+          kind: "transient_failure",
+          reason: `HTTP ${res.status}: Server dispatch failed`,
+        };
+      }
+      const data = await res.json();
+      if (!data.ok) {
+        return {
+          kind: "permanent_failure",
+          reason: data.error || "Unknown dispatch error",
+        };
+      }
+      return {
+        kind: "delivered",
+        statusCode: data.statusCode || 200,
+        deliveredAt: data.deliveredAt || Date.now(),
+      };
+    } catch (e) {
+      return {
+        kind: "transient_failure",
+        reason: String(e),
+      };
+    }
   },
 };

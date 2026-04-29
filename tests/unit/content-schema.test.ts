@@ -52,13 +52,22 @@ function makeValidItem(overrides: Partial<SchemaContentItem> = {}): SchemaConten
       draftedAtIso: "2026-04-28T00:00:00.000Z",
       drafterVersion: "1.5.0",
     },
-    approval: {
-      reviewerFingerprint: "abc",
-      reviewerName: "Test Reviewer",
-      approvedAtIso: "2026-04-28T00:00:00.000Z",
-      signatureB64url: "fake-sig",
-      publicKeyB64url: "fake-key",
-    },
+    approvals: [
+      {
+        reviewerFingerprint: "abc",
+        reviewerName: "Test Reviewer",
+        approvedAtIso: "2026-04-28T00:00:00.000Z",
+        signatureB64url: "fake-sig",
+        publicKeyB64url: "fake-key",
+      },
+      {
+        reviewerFingerprint: "def",
+        reviewerName: "Peer Reviewer",
+        approvedAtIso: "2026-04-28T00:00:00.000Z",
+        signatureB64url: "fake-sig-2",
+        publicKeyB64url: "fake-key-2",
+      }
+    ],
     ...overrides,
   };
 }
@@ -96,10 +105,13 @@ describe("content/schema", () => {
     expect(errs.some((e: string) => e.includes("workedExamples"))).toBe(true);
   });
 
-  it("requires the approval block", () => {
+  it("requires the approvals block to have at least two signatures", () => {
     const item = makeValidItem();
-    const errs = validateContentItem({ ...item, approval: null as never });
-    expect(errs.some((e: string) => e.includes("approval"))).toBe(true);
+    const errs1 = validateContentItem({ ...item, approvals: null as never });
+    expect(errs1.some((e: string) => e.includes("approvals"))).toBe(true);
+    
+    const errs2 = validateContentItem({ ...item, approvals: [item.approvals[0]] as never });
+    expect(errs2.some((e: string) => e.includes("approvals"))).toBe(true);
   });
 
   it("rejects duplicate workedExample ids", () => {
