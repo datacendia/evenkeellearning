@@ -1,0 +1,234 @@
+{
+  "$schema": "./kcsie-2025-prevent-duty-map.schema.json",
+  "title": "KCSIE 2025 / Prevent Duty / DfE Filtering & Monitoring control map",
+  "version": "1.0.1",
+  "publishedAt": "2026-04-27",
+  "engineVersion": "evenkeel@1.4.9",
+  "scope": "Phase-1 (v1.4.8) of the Even Keel Learning platform. This map pins each named control to verifiable evidence in the codebase. It is not a substitute for a school's own safeguarding policy or a registered Designated Safeguarding Lead (DSL).",
+  "honestyContract": "Every `claim` field in this document must be supported by code at the cited `path`. CI step `node scripts/audit.mjs --strict` checks that every `path` exists. Drift between the map and the codebase MUST fail audit.",
+  "phase1Limitations": [
+    "Out-of-band delivery (email / SMS to a DSL) is not built. Escalations are signed and queued locally; HTTPS POST to a school-configured endpoint is supported, but no email/SMS provider integration exists.",
+    "DSL identity is not authenticated cryptographically — the Compliance Officer surface is gated by passphrase only. WebAuthn passkeys are Phase 2.",
+    "The KCSIE/Prevent map is a documentation artefact; it does not enforce policy. A school must still complete its own DPIA, ROPA, and DSL referral procedure."
+  ],
+  "controls": [
+    {
+      "id": "KCSIE_2025_Part_1_Mental_Health",
+      "framework": "KCSIE_2025",
+      "clause": "Part 1, paragraphs on mental health and wellbeing",
+      "summary": "Staff are well placed to observe pupils day-to-day and identify those whose behaviour suggests they may be experiencing or at risk of a mental health problem.",
+      "phase1Status": "supported",
+      "evidence": [
+        {
+          "path": "lib/regulatory-absorb/decision-gate.ts",
+          "claim": "17-pattern crisis lexicon detects direct, temporal, indirect-distress, acronym, and emoji+affect markers in real time before any reply is shown to the learner."
+        },
+        {
+          "path": "tests/unit/decision-gate.test.ts",
+          "claim": "Each pattern family has dedicated test coverage including false-positive guards (Shakespeare, recipe contexts)."
+        }
+      ],
+      "phase2Gap": null
+    },
+    {
+      "id": "KCSIE_2025_Part_1_Childline_Signposting",
+      "framework": "KCSIE_2025",
+      "clause": "Part 1 — duty to signpost trusted external services",
+      "summary": "When a child shows distress, staff should signpost to trusted services (Childline, Samaritans, NSPCC).",
+      "phase1Status": "supported",
+      "evidence": [
+        {
+          "path": "lib/regulatory-absorb/decision-gate.ts",
+          "claim": "Crisis blocks return a Childline-signposting message (1800 66 66 66 in Ireland) instead of a generic refusal."
+        }
+      ],
+      "phase2Gap": "Per-jurisdiction signposting (Childline UK 0800 1111 vs IE 1800 66 66 66 vs international equivalents) is hard-coded; localisation is Phase 2."
+    },
+    {
+      "id": "KCSIE_2025_Part_2_DSL_Escalation",
+      "framework": "KCSIE_2025",
+      "clause": "Part 2 — Designated Safeguarding Lead (DSL) responsibilities; Annex C",
+      "summary": "The DSL must take lead responsibility for safeguarding; staff must know how to escalate concerns to the DSL without delay.",
+      "phase1Status": "partial",
+      "evidence": [
+        {
+          "path": "lib/safeguarding/escalation-queue.ts",
+          "claim": "Crisis events are signed (ECDSA P-256) and queued locally for DSL delivery. Each entry is verifiable offline by anyone holding the envelope."
+        },
+        {
+          "path": "lib/safeguarding/webhook-config.ts",
+          "claim": "A school configures one HTTPS endpoint for its pastoral / MIS system; signed envelopes are POSTed there."
+        },
+        {
+          "path": "app/compliance/page.tsx",
+          "claim": "The Compliance Officer surface displays the queue with delivery state per entry."
+        }
+      ],
+      "phase2Gap": "Email / SMS to a named DSL is not built. The Phase-1 contract is HTTPS-only with the school's chosen ingest endpoint."
+    },
+    {
+      "id": "KCSIE_2025_Annex_B_Online_Safety",
+      "framework": "KCSIE_2025",
+      "clause": "Annex B — online safety and harms",
+      "summary": "Schools must protect pupils from harmful online content and behaviour, including content concerning self-harm, suicide, and harassment.",
+      "phase1Status": "supported",
+      "evidence": [
+        {
+          "path": "lib/regulatory-absorb/decision-gate.ts",
+          "claim": "PII / credential-shaped patterns are intercepted before reaching the learner-facing surface; cyberbullying acronym `kys` is in the crisis lexicon."
+        },
+        {
+          "path": "lib/eke/eke-engine.ts",
+          "claim": "No LLM is in the learner-facing path. The 'no answer-generation' property is structural, provable by grep, and removes a class of harmful-content vectors entirely."
+        }
+      ],
+      "phase2Gap": null
+    },
+    {
+      "id": "KCSIE_2025_Annex_C_DSL_Records",
+      "framework": "KCSIE_2025",
+      "clause": "Annex C — DSL must maintain detailed, accurate, secure written records",
+      "summary": "The DSL must keep written records of safeguarding concerns, decisions taken, and the reasons for them.",
+      "phase1Status": "partial",
+      "evidence": [
+        {
+          "path": "lib/safeguarding/escalation-queue.ts",
+          "claim": "Every escalation carries a signed envelope, an ISO-8601 timestamp, the trigger category, jurisdiction, and tab-context id. Tamper-evident by signature."
+        },
+        {
+          "path": "tests/unit/escalation-queue.test.ts",
+          "claim": "Test pins the privacy contract: stored payloads contain no learner free-form text and no PII beyond self-declared age band."
+        }
+      ],
+      "phase2Gap": "Long-term retention with WORM (write-once-read-many) semantics is not built; queue is bounded at 200 entries with oldest-first eviction."
+    },
+    {
+      "id": "KCSIE_2025_Part_5_Peer_On_Peer",
+      "framework": "KCSIE_2025",
+      "clause": "Part 5 — child-on-child sexual violence and harassment",
+      "summary": "Schools must recognise and respond to allegations of child-on-child abuse.",
+      "phase1Status": "phase2",
+      "evidence": [
+        {
+          "path": "SAFEGUARDING.md",
+          "claim": "Phase-1 platform is single-learner-only. There is no multi-user chat surface that could host peer-on-peer interactions; this control is not relevant to the v1.4.8 architecture."
+        }
+      ],
+      "phase2Gap": "If/when teacher-supervised classroom features are added, a separate control surface with explicit peer-interaction monitoring will be required. Tier-3 anti-list explicitly excludes leaderboards / public peer comparison for this reason."
+    },
+    {
+      "id": "Prevent_Duty_Risk_Assessment",
+      "framework": "Prevent_Duty",
+      "clause": "Counter-Terrorism and Security Act 2015, s.26 — risk assessment",
+      "summary": "Schools must assess the risk of pupils being drawn into terrorism, including support for extremist ideas.",
+      "phase1Status": "phase2",
+      "evidence": [
+        {
+          "path": "lib/regulatory-absorb/decision-gate.ts",
+          "claim": "The Decision Gate's pattern set does not currently include radicalisation indicators. The crisis lexicon focuses on self-harm and acute distress."
+        }
+      ],
+      "phase2Gap": "A radicalisation-indicator pattern set, drafted in consultation with a Designated Senior Lead and Prevent regional coordinator, is on the Phase 2 roadmap. Phase-1 honesty: this control is documented as a known gap, not silently absent."
+    },
+    {
+      "id": "Prevent_Duty_IT_Policies",
+      "framework": "Prevent_Duty",
+      "clause": "Statutory guidance — IT policies (filtering and monitoring)",
+      "summary": "Schools must ensure children are safe from terrorist and extremist material when accessing the internet.",
+      "phase1Status": "supported",
+      "evidence": [
+        {
+          "path": "lib/eke/eke-engine.ts",
+          "claim": "The platform itself does not generate free-text replies; there is no surface for the engine to emit extremist or harmful content because no LLM is in the learner-facing path."
+        }
+      ],
+      "phase2Gap": "The platform does not provide network-layer filtering; that is the school's IT responsibility. Documentation of this boundary is in SAFEGUARDING.md §3."
+    },
+    {
+      "id": "Prevent_Duty_Building_Resilience",
+      "framework": "Prevent_Duty",
+      "clause": "Statutory guidance — building children's resilience to radicalisation",
+      "summary": "Schools should provide a safe space for pupils to discuss issues including extremism and challenge ideas.",
+      "phase1Status": "phase2",
+      "evidence": [
+        {
+          "path": "SAFEGUARDING.md",
+          "claim": "Out of v1.4.8 scope. The platform's Socratic engine is constrained to curriculum problems; broader pastoral discussion is the school's domain."
+        }
+      ],
+      "phase2Gap": "A teacher-mediated discussion surface with explicit DSL involvement is the only ethically viable route, and it is gated behind WebAuthn + multi-tenant config — both Phase 2."
+    },
+    {
+      "id": "DfE_Filtering_Monitoring_Standard_1",
+      "framework": "DfE_F_M_2023",
+      "clause": "Standard 1 — Identify and assign roles and responsibilities",
+      "summary": "Schools must assign clear roles for filtering and monitoring decisions.",
+      "phase1Status": "supported",
+      "evidence": [
+        {
+          "path": "lib/auth/role-guard.ts",
+          "claim": "Privileged surfaces (/teacher, /compliance) are wrapped in RoleGuard; the Compliance Officer (Principal-equivalent) is the only role authorised to configure the DSL endpoint."
+        }
+      ],
+      "phase2Gap": "Role assignment is currently passphrase-gated and demo-grade (acknowledged in SAFEGUARDING.md §3). WebAuthn-bound roles are Phase 2."
+    },
+    {
+      "id": "DfE_Filtering_Monitoring_Standard_3",
+      "framework": "DfE_F_M_2023",
+      "clause": "Standard 3 — Block harmful and inappropriate content",
+      "summary": "Schools must block harmful content; filtering must work for the age range.",
+      "phase1Status": "supported",
+      "evidence": [
+        {
+          "path": "lib/regulatory-absorb/decision-gate.ts",
+          "claim": "PII patterns block credential sharing; crisis patterns block self-harm content from receiving an engine reply."
+        },
+        {
+          "path": "lib/eke/tiered-hints.ts",
+          "claim": "The hintContainsAnswer guard prevents the engine from leaking a problem's expected value through a hint reply (no-answer-leak invariant)."
+        }
+      ],
+      "phase2Gap": null
+    },
+    {
+      "id": "DfE_Filtering_Monitoring_Standard_4",
+      "framework": "DfE_F_M_2023",
+      "clause": "Standard 4 — Have effective monitoring strategies",
+      "summary": "Schools must monitor system use to identify users at risk and take appropriate action.",
+      "phase1Status": "partial",
+      "evidence": [
+        {
+          "path": "app/teacher/page.tsx",
+          "claim": "The Teacher Integrity Ledger streams every learner event in real time, with practice-mode events filtered to category-only. The Compliance Officer surface receives safeguarding escalations."
+        },
+        {
+          "path": "lib/data-bus.ts",
+          "claim": "All safeguarding-relevant events flow on a single typed bus (`safeguarding.escalation.requested`); a school's monitoring tooling can subscribe via the configured DSL webhook."
+        }
+      ],
+      "phase2Gap": "There is no SIEM integration; webhook delivery is to a single endpoint without retry-on-schedule. A school's central monitoring strategy must integrate the configured endpoint into its own SIEM."
+    },
+    {
+      "id": "GDPR_Art_25_Privacy_By_Design",
+      "framework": "GDPR_UK",
+      "clause": "Article 25 — Data protection by design and by default",
+      "summary": "Controllers must implement appropriate technical and organisational measures to ensure data protection principles are met by design.",
+      "phase1Status": "supported",
+      "evidence": [
+        {
+          "path": "lib/safeguarding/escalation-queue.ts",
+          "claim": "The escalation payload type makes learner free-form text structurally impossible to include — the EnqueueInput interface accepts no `text` field."
+        },
+        {
+          "path": "lib/data-bus.ts",
+          "claim": "Bus event payloads carry category-only metadata; learner free-form text never reaches the bus."
+        },
+        {
+          "path": "HONESTY.md",
+          "claim": "Privacy contract changes require a CHANGELOG entry; the discipline is procedural, not just architectural."
+        }
+      ],
+      "phase2Gap": null
+    }
+  ]
+}

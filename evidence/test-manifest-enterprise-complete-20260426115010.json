@@ -1,0 +1,249 @@
+{
+  "executedBy": "Stu",
+  "generatedAt": "2026-04-26T11:50:10.433-0500",
+  "hostname": "DESKTOP-A3P0U3U",
+  "platform": "win32 10.0.26200 x64",
+  "repoRoot": "C:\\Users\\Stu\\New folder",
+  "counters": {
+    "totalPassed": 9,
+    "totalFailed": 6,
+    "buildChecks": 8,
+    "httpTests": 0,
+    "inlineAssertions": 6
+  },
+  "manifest": [
+    {
+      "testId": "build-a649e843",
+      "type": "build",
+      "method": "CHECK",
+      "category": "build",
+      "name": "TypeScript Compilation (tsc --noEmit)",
+      "endpoint": "N/A",
+      "status": "failed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.8,A.8.32",
+      "details": {
+        "exitCode": 2,
+        "stderr": "npm warn Unknown cli config \"--noEmit\". This will stop working in the next major version of npm.\n"
+      }
+    },
+    {
+      "testId": "build-d72381e7",
+      "type": "build",
+      "method": "CHECK",
+      "category": "build",
+      "name": "Dependency Lock Integrity",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.8,A.8.32",
+      "details": {
+        "lockfilePresent": true
+      }
+    },
+    {
+      "testId": "build-0c1d55f2",
+      "type": "build",
+      "method": "CHECK",
+      "category": "governance",
+      "name": "Required governance files present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC1.2,A.5.2",
+      "details": {
+        "required": [
+          "HONESTY.md",
+          "SECURITY.md",
+          "CHANGELOG.md",
+          "README.md",
+          "KEELLEARN_BIBLE.md"
+        ],
+        "missing": []
+      }
+    },
+    {
+      "testId": "build-8016de85",
+      "type": "build",
+      "method": "CHECK",
+      "category": "security",
+      "name": "RFC 9116 security.txt present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC2.3,A.5.5",
+      "details": {
+        "path": "public/.well-known/security.txt"
+      }
+    },
+    {
+      "testId": "build-d13f1cfd",
+      "type": "build",
+      "method": "CHECK",
+      "category": "privacy",
+      "name": "No biometric API call anywhere in src",
+      "endpoint": "N/A",
+      "status": "failed",
+      "evidenceRecorded": true,
+      "complianceTags": "gdpr,coppa,iso27001",
+      "controls": "GDPR-Art.9,COPPA-§312.5,A.5.34",
+      "details": {
+        "exitCode": 255,
+        "snippet": ""
+      }
+    },
+    {
+      "testId": "build-7fae6986",
+      "type": "build",
+      "method": "CHECK",
+      "category": "privacy",
+      "name": "No advertising / tracking scripts present",
+      "endpoint": "N/A",
+      "status": "failed",
+      "evidenceRecorded": true,
+      "complianceTags": "gdpr,coppa",
+      "controls": "GDPR-Art.5(1)(b),COPPA-§312.5",
+      "details": {
+        "exitCode": 255,
+        "snippet": ""
+      }
+    },
+    {
+      "testId": "build-7970d0d2",
+      "type": "build",
+      "method": "CHECK",
+      "category": "security",
+      "name": "No dangerouslySetInnerHTML in source",
+      "endpoint": "N/A",
+      "status": "failed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.6,A.8.27",
+      "details": {
+        "exitCode": 1,
+        "snippet": ""
+      }
+    },
+    {
+      "testId": "build-ff17b5dd",
+      "type": "build",
+      "method": "CHECK",
+      "category": "code-quality",
+      "name": "ESLint (no warnings)",
+      "endpoint": "N/A",
+      "status": "failed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC8.1,A.8.28",
+      "details": {
+        "exitCode": 1,
+        "stdout": ""
+      }
+    },
+    {
+      "testId": "test-5b20d81d",
+      "type": "test",
+      "method": "CHECK",
+      "category": "unit-tests",
+      "name": "Vitest unit suite",
+      "endpoint": "N/A",
+      "status": "skipped",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC4.1,A.8.29",
+      "details": {
+        "reason": "vitest binary not installed; run `npm install` first"
+      }
+    },
+    {
+      "testId": "inline-d62b572c",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Project name is 'keellearn'",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC1.2",
+      "details": {
+        "name": "keellearn"
+      }
+    },
+    {
+      "testId": "inline-74f29175",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Version follows SemVer",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC8.1",
+      "details": {
+        "version": "1.1.0"
+      }
+    },
+    {
+      "testId": "inline-640515e5",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "HONESTY.md mentions data-bus",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC1.2",
+      "details": null
+    },
+    {
+      "testId": "inline-04ccf8d8",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "WebCrypto signing module present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.1,A.8.24",
+      "details": {
+        "hashPrefix": "XQq_y7VWx2ej5sAs"
+      }
+    },
+    {
+      "testId": "inline-5ff3890f",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Decision Gate present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "gdpr,coppa",
+      "controls": "GDPR-Art.32,COPPA-§312.5",
+      "details": {
+        "hashPrefix": "y692Bi3h1RniX3Fg"
+      }
+    },
+    {
+      "testId": "inline-959eef05",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "i18n dictionary covers 9 locales",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "iso27001",
+      "controls": "A.5.34",
+      "details": null
+    }
+  ]
+}

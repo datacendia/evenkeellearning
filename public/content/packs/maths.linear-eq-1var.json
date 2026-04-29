@@ -1,0 +1,274 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "maths.linear-eq-1var",
+  "title": "Linear equations: one variable, two operations",
+  "subject": "maths",
+  "skillFamily": "linear-eq-1var",
+  "metadata": {
+    "version": "1.0.0",
+    "builtAtIso": "2026-04-29T04:01:20.709Z",
+    "description": "Linear equations of the form ax + b = c, solvable in two inverse operations. Migrated from the v1.4.5 hand-written parallel-problem corpus and enriched with explanations, misconceptions, and curriculum spec-point alignment."
+  },
+  "items": [
+    {
+      "schemaVersion": "1.0.0",
+      "id": "ie-jc-maths-linear-eq-001",
+      "skillFamily": "linear-eq-1var",
+      "subject": "maths",
+      "jurisdictions": [
+        "IE",
+        "UK-EN",
+        "UK-NI",
+        "UK-SC",
+        "UK-WL",
+        "INTL"
+      ],
+      "difficulty": "core",
+      "prerequisites": [
+        "arithmetic-integers",
+        "inverse-operations"
+      ],
+      "specPoints": [
+        {
+          "framework": "DES-JC-Maths-2024",
+          "code": "AF.1",
+          "label": "Solve linear equations in one variable"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "A17",
+          "label": "Solve linear equations in one unknown algebraically"
+        }
+      ],
+      "problem": "Solve for x:  2x + 5 = 17.  Show your reasoning, not just the answer.",
+      "expectedAnswer": 6,
+      "hints": [
+        {
+          "tier": 1,
+          "text": "What's the very first move you'd make to get x on its own?"
+        },
+        {
+          "tier": 2,
+          "text": "Could you undo the +5 first, then deal with the 2 multiplying x?"
+        },
+        {
+          "tier": 3,
+          "text": "Two inverse operations in the right order isolate the variable. Which operation undoes addition? Which undoes multiplication?"
+        }
+      ],
+      "explanation": "The aim is to get x by itself on one side of the equals sign. Two things are currently being done to x: it is being multiplied by 2, then 5 is being added. To undo them we apply the inverse operations in reverse order: first subtract 5 (undoing the +5), then divide by 2 (undoing the ×2). Subtract 5 from both sides:  2x = 12. Divide both sides by 2:  x = 6. Check by substitution:  2 × 6 + 5 = 12 + 5 = 17 ✓.",
+      "misconceptions": [
+        {
+          "id": "off-by-one-arithmetic-slip",
+          "trigger": "off_by_one",
+          "explanation": "An off-by-one usually means a small arithmetic slip when subtracting on one side. The method is right; check 17 − 5 carefully.",
+          "nudge": "Re-do the subtraction step on a fresh line and compare."
+        },
+        {
+          "id": "sign-flipped-direction",
+          "trigger": "sign_flipped",
+          "explanation": "A flipped sign usually means the inverse operation went the wrong way — adding instead of subtracting, or vice versa. The clue is in the original equation: there is +5, so to undo it you subtract.",
+          "nudge": "Write the operation you're applying in words next to each step."
+        },
+        {
+          "id": "doubled-skipped-divide",
+          "trigger": "doubled",
+          "explanation": "An answer of double the expected value usually means the division-by-2 step was skipped. After subtracting 5 you have 2x = 12, not x = 12.",
+          "nudge": "What's still attached to x after the subtraction step?"
+        },
+        {
+          "id": "halved-divided-too-early",
+          "trigger": "halved",
+          "explanation": "A half-of-expected answer usually means dividing by 2 was applied to one side only, or applied before the subtraction. Inverse operations must be applied to *both* sides, in the right order.",
+          "nudge": "Apply each step to the whole left side AND the whole right side."
+        }
+      ],
+      "workedExamples": [
+        {
+          "id": "linear-eq-1var-simpler-001",
+          "problem": "Solve for x:  x + 5 = 12  (one-step warm-up)",
+          "workedSolution": "This is the SAME shape as 2x + 5 = 17, but with the multiplication-by-2 removed so we can focus on the inverse-operation idea by itself.\nStep 1. Subtract 5 from both sides to undo the +5.\n        x + 5 − 5 = 12 − 5\n        x = 7\nCheck: 7 + 5 = 12 ✓\nNow the original problem (2x + 5 = 17) adds ONE more step on top: after subtracting 5 from both sides you get 2x = 12, and then you divide by 2.",
+          "expectedAnswer": 7
+        },
+        {
+          "id": "linear-eq-1var-simpler-002",
+          "problem": "Solve for x:  2x = 14  (one-step warm-up)",
+          "workedSolution": "This is also the same shape as 2x + 5 = 17, but with the +5 removed so we can focus on the divide-by-the-coefficient idea by itself.\nStep 1. Divide both sides by 2 to undo the ×2.\n        2x ÷ 2 = 14 ÷ 2\n        x = 7\nCheck: 2 × 7 = 14 ✓\nPutting both warm-ups together gives the full method for 2x + 5 = 17: first undo the +5 (subtract 5), then undo the ×2 (divide by 2).",
+          "expectedAnswer": 7
+        },
+        {
+          "id": "linear-eq-1var-001",
+          "problem": "Solve for x:  3x − 4 = 11",
+          "workedSolution": "Step 1. Add 4 to both sides to isolate the term with x.\n        3x − 4 + 4 = 11 + 4\n        3x = 15\nStep 2. Divide both sides by 3 to leave x alone.\n        3x ÷ 3 = 15 ÷ 3\n        x = 5\nCheck: 3 × 5 − 4 = 15 − 4 = 11 ✓",
+          "expectedAnswer": 5
+        },
+        {
+          "id": "linear-eq-1var-002",
+          "problem": "Solve for y:  4y + 2 = 18",
+          "workedSolution": "Step 1. Subtract 2 from both sides to isolate the term with y.\n        4y + 2 − 2 = 18 − 2\n        4y = 16\nStep 2. Divide both sides by 4.\n        4y ÷ 4 = 16 ÷ 4\n        y = 4\nCheck: 4 × 4 + 2 = 16 + 2 = 18 ✓",
+          "expectedAnswer": 4
+        },
+        {
+          "id": "linear-eq-1var-003",
+          "problem": "Solve for m:  5m − 3 = 22",
+          "workedSolution": "Step 1. Add 3 to both sides.\n        5m − 3 + 3 = 22 + 3\n        5m = 25\nStep 2. Divide both sides by 5.\n        5m ÷ 5 = 25 ÷ 5\n        m = 5\nCheck: 5 × 5 − 3 = 25 − 3 = 22 ✓",
+          "expectedAnswer": 5
+        },
+        {
+          "id": "linear-eq-1var-004",
+          "problem": "Solve for k:  2k + 9 = 17",
+          "workedSolution": "Step 1. Subtract 9 from both sides.\n        2k + 9 − 9 = 17 − 9\n        2k = 8\nStep 2. Divide both sides by 2.\n        2k ÷ 2 = 8 ÷ 2\n        k = 4\nCheck: 2 × 4 + 9 = 8 + 9 = 17 ✓",
+          "expectedAnswer": 4
+        }
+      ],
+      "figures": [
+        {
+          "id": "linear-eq-001-figure-lhs-graph",
+          "title": "Graph of y = 2x + 5",
+          "alt": "A coordinate plane showing the line y equals two x plus five. The line slopes upward, crossing the y-axis at five and rising steeply through the visible window.",
+          "boundingBox": [
+            -2,
+            22,
+            10,
+            -2
+          ],
+          "axes": true,
+          "grid": true,
+          "keepAspectRatio": false,
+          "readOnly": true,
+          "elements": [
+            {
+              "kind": "graph",
+              "expr": "2*x + 5",
+              "label": "y = 2x + 5",
+              "color": "#2a64bd",
+              "domain": [
+                -2,
+                10
+              ]
+            }
+          ]
+        }
+      ],
+      "draft": {
+        "model": "manual-migration-v1.5.0",
+        "provider": "human-author",
+        "promptHashB64url": "MIGRATION_NO_PROMPT",
+        "draftedAtIso": "2026-04-28T00:00:00.000Z",
+        "drafterVersion": "1.5.0"
+      },
+      "approval": {
+        "reviewerFingerprint": "gj0Tz-tJYvRlx67a",
+        "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
+        "approvedAtIso": "2026-04-29T04:01:20.723Z",
+        "signatureB64url": "yNUQancCzc7Q5D8cQWBw6YLiJYZYPsNu15Jevo_vG18PQD0HtejKa-YXuyek_9vPRh1HvdJMYu147_NvEFGIrg",
+        "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEnBHZCTkRaSYSGmKmjDbqiKFF8OSODYgfk9gzZIZpu2LBSUAfTsZnONzsgCk_jA49YIagvHUMBFqCfJ1mydDi-A",
+        "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+      }
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "id": "ie-jc-maths-linear-eq-002",
+      "skillFamily": "linear-eq-1var",
+      "subject": "maths",
+      "jurisdictions": [
+        "IE",
+        "UK-EN",
+        "UK-NI",
+        "UK-SC",
+        "UK-WL",
+        "INTL"
+      ],
+      "difficulty": "stretch",
+      "prerequisites": [
+        "arithmetic-integers",
+        "inverse-operations",
+        "negative-numbers"
+      ],
+      "specPoints": [
+        {
+          "framework": "DES-JC-Maths-2024",
+          "code": "AF.1",
+          "label": "Solve linear equations in one variable"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "A17",
+          "label": "Solve linear equations in one unknown algebraically"
+        }
+      ],
+      "problem": "Solve for x:  −3x − 7 = 5.  Show your reasoning, not just the answer.",
+      "expectedAnswer": -4,
+      "hints": [
+        {
+          "tier": 1,
+          "text": "What's currently being done to x, and in what order?"
+        },
+        {
+          "tier": 2,
+          "text": "There are two things attached to x — a multiplication and a subtraction. Which inverse goes first?"
+        },
+        {
+          "tier": 3,
+          "text": "When the coefficient is negative, dividing by a negative flips the sign. The order is: undo the constant, then undo the coefficient."
+        }
+      ],
+      "explanation": "Two operations are happening to x: it is being multiplied by −3, then 7 is being subtracted. Undo them in reverse order. First add 7 to both sides:  −3x = 12. Now divide both sides by −3:  x = 12 ÷ (−3) = −4. Negative ÷ negative = positive; positive ÷ negative = negative. Here we are dividing positive 12 by negative 3, so the result is negative. Check by substitution:  −3 × (−4) − 7 = 12 − 7 = 5 ✓.",
+      "misconceptions": [
+        {
+          "id": "sign-flipped-negative-coefficient",
+          "trigger": "sign_flipped",
+          "explanation": "When the coefficient is negative, it is easy to forget that dividing by a negative changes the sign of the result. 12 ÷ (−3) is −4, not 4.",
+          "nudge": "After you isolate the −3x, write the division step out in full and pay attention to the sign rules."
+        },
+        {
+          "id": "off-by-one-arithmetic-slip",
+          "trigger": "off_by_one",
+          "explanation": "An off-by-one usually means a small arithmetic slip. Re-check the addition step: 5 + 7 = 12, not 11 or 13.",
+          "nudge": "Re-do the addition on a fresh line and compare."
+        },
+        {
+          "id": "doubled-skipped-divide",
+          "trigger": "doubled",
+          "explanation": "An answer of double the expected magnitude usually means the division-by-(−3) step was skipped. After adding 7 you have −3x = 12, not x = 12.",
+          "nudge": "What's still attached to x after the addition step?"
+        },
+        {
+          "id": "wrong-direction-subtracted",
+          "trigger": "wrong",
+          "explanation": "Subtracting 7 instead of adding 7 is a common slip when the constant is itself negative. The original equation has −7 on the left; to undo it we add 7 to both sides.",
+          "nudge": "Write the inverse operation in words next to each step before doing the arithmetic."
+        }
+      ],
+      "workedExamples": [
+        {
+          "id": "linear-eq-1var-stretch-001",
+          "problem": "Solve for x:  −2x + 3 = −5",
+          "workedSolution": "Step 1. Subtract 3 from both sides.\n        −2x + 3 − 3 = −5 − 3\n        −2x = −8\nStep 2. Divide both sides by −2. Negative ÷ negative = positive.\n        −2x ÷ (−2) = −8 ÷ (−2)\n        x = 4\nCheck: −2 × 4 + 3 = −8 + 3 = −5 ✓",
+          "expectedAnswer": 4
+        },
+        {
+          "id": "linear-eq-1var-stretch-002",
+          "problem": "Solve for y:  −5y − 2 = 13",
+          "workedSolution": "Step 1. Add 2 to both sides.\n        −5y − 2 + 2 = 13 + 2\n        −5y = 15\nStep 2. Divide both sides by −5. Positive ÷ negative = negative.\n        −5y ÷ (−5) = 15 ÷ (−5)\n        y = −3\nCheck: −5 × (−3) − 2 = 15 − 2 = 13 ✓",
+          "expectedAnswer": -3
+        }
+      ],
+      "draft": {
+        "model": "manual-migration-v1.5.0",
+        "provider": "human-author",
+        "promptHashB64url": "MIGRATION_NO_PROMPT",
+        "draftedAtIso": "2026-04-28T00:00:00.000Z",
+        "drafterVersion": "1.5.0"
+      },
+      "approval": {
+        "reviewerFingerprint": "gj0Tz-tJYvRlx67a",
+        "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
+        "approvedAtIso": "2026-04-29T04:01:20.724Z",
+        "signatureB64url": "JoBSyHR88DjrLAneLVqaNdSNMOYWTFCSf25yI4PiSvT-5de2MwCP1KiSJIZDd_Ixqm_gH4LvoRW51tFe0nShCA",
+        "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEnBHZCTkRaSYSGmKmjDbqiKFF8OSODYgfk9gzZIZpu2LBSUAfTsZnONzsgCk_jA49YIagvHUMBFqCfJ1mydDi-A",
+        "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+      }
+    }
+  ]
+}

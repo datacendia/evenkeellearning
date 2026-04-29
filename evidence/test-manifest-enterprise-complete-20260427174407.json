@@ -1,0 +1,487 @@
+{
+  "executedBy": "Stu",
+  "generatedAt": "2026-04-27T17:44:07.434-0500",
+  "hostname": "DESKTOP-A3P0U3U",
+  "platform": "win32 10.0.26200 x64",
+  "repoRoot": "C:\\Users\\Stu\\New folder",
+  "counters": {
+    "totalPassed": 28,
+    "totalFailed": 0,
+    "totalSkipped": 0,
+    "buildChecks": 9,
+    "httpTests": 10,
+    "inlineAssertions": 8
+  },
+  "manifest": [
+    {
+      "testId": "build-8bcbe409",
+      "type": "build",
+      "method": "CHECK",
+      "category": "build",
+      "name": "TypeScript Compilation (tsc --noEmit)",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.8,A.8.32",
+      "details": {
+        "exitCode": 0,
+        "stderr": ""
+      }
+    },
+    {
+      "testId": "build-2b043493",
+      "type": "build",
+      "method": "CHECK",
+      "category": "build",
+      "name": "Dependency Lock Integrity",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.8,A.8.32",
+      "details": {
+        "lockfilePresent": true
+      }
+    },
+    {
+      "testId": "build-5a1c79c2",
+      "type": "build",
+      "method": "CHECK",
+      "category": "governance",
+      "name": "Required governance files present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC1.2,A.5.2",
+      "details": {
+        "required": [
+          "HONESTY.md",
+          "SECURITY.md",
+          "CHANGELOG.md",
+          "README.md",
+          "EVEN_KEEL_BIBLE.md",
+          "SAFEGUARDING.md",
+          "docs/PROPOSAL_TRUTH_PACK.md",
+          "docs/PROPOSAL_REWRITER_NOTES.md"
+        ],
+        "missing": []
+      }
+    },
+    {
+      "testId": "build-6adf57cc",
+      "type": "build",
+      "method": "CHECK",
+      "category": "security",
+      "name": "RFC 9116 security.txt present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC2.3,A.5.5",
+      "details": {
+        "path": "public/.well-known/security.txt"
+      }
+    },
+    {
+      "testId": "build-a4e8ce04",
+      "type": "build",
+      "method": "CHECK",
+      "category": "privacy",
+      "name": "No biometric API call anywhere in src",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "gdpr,coppa,iso27001",
+      "controls": "GDPR-Art.9,COPPA-§312.5,A.5.34",
+      "details": {
+        "exitCode": 0,
+        "snippet": ""
+      }
+    },
+    {
+      "testId": "build-a5a4b7d8",
+      "type": "build",
+      "method": "CHECK",
+      "category": "privacy",
+      "name": "No advertising / tracking scripts present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "gdpr,coppa",
+      "controls": "GDPR-Art.5(1)(b),COPPA-§312.5",
+      "details": {
+        "exitCode": 0,
+        "snippet": ""
+      }
+    },
+    {
+      "testId": "build-9136863a",
+      "type": "build",
+      "method": "CHECK",
+      "category": "security",
+      "name": "No dangerouslySetInnerHTML in source",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.6,A.8.27",
+      "details": {
+        "exitCode": 0,
+        "snippet": ""
+      }
+    },
+    {
+      "testId": "build-153cd862",
+      "type": "build",
+      "method": "CHECK",
+      "category": "code-quality",
+      "name": "ESLint (no warnings)",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC8.1,A.8.28",
+      "details": {
+        "exitCode": 0,
+        "stdout": "✔ No ESLint warnings or errors\n",
+        "stderr": ""
+      }
+    },
+    {
+      "testId": "test-443a1cef",
+      "type": "test",
+      "method": "CHECK",
+      "category": "unit-tests",
+      "name": "Vitest unit suite",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC4.1,A.8.29",
+      "details": {
+        "exitCode": 0,
+        "stdout": "\n\u001b[7m\u001b[1m\u001b[36m RUN \u001b[39m\u001b[22m\u001b[27m \u001b[36mv1.6.1\u001b[39m \u001b[90mC:/Users/Stu/New folder\u001b[39m\n\n \u001b[32m✓\u001b[39m tests/unit/kcsie-control-map.test.ts \u001b[2m (\u001b[22m\u001b[2m9 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 10\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/answer-checker.test.ts \u001b[2m (\u001b[22m\u001b[2m14 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 9\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/a11y-settings.test.ts \u001b[2m (\u001b[22m\u001b[2m8 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 10\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/scheduler.test.ts \u001b[2m (\u001b[22m\u001b[2m20 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 12\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/parallel-problems.test.ts \u001b[2m (\u001b[22m\u001b[2m12 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 8\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/prioritizer.test.ts \u001b[2m (\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/speech.test.ts \u001b[2m (\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 20\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/age-band.test.ts \u001b[2m (\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 6\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/webhook-config.test.ts \u001b[2m (\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 8\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/decision-gate.test.ts \u001b[2m (\u001b[22m\u001b[2m16 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 11\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/error-bank.test.ts \u001b[2m (\u001b[22m\u001b[2m13 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 15\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/crypto-signing.test.ts \u001b[2m (\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 21\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/learning-receipt.test.ts \u001b[2m (\u001b[22m\u001b[2m15 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 56\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/eke-engine.test.ts \u001b[2m (\u001b[22m\u001b[2m15 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 12\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/retry-scheduler.test.ts \u001b[2m (\u001b[22m\u001b[2m14 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 29\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/practice-mode.test.ts \u001b[2m (\u001b[22m\u001b[2m12 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 14\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/validators.test.ts \u001b[2m (\u001b[22m\u001b[2m7 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 12\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/ipa-analyzer.test.ts \u001b[2m (\u001b[22m\u001b[2m9 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 12\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/escalation-queue.test.ts \u001b[2m (\u001b[22m\u001b[2m21 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 189\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/transparency-bundle.test.ts \u001b[2m (\u001b[22m\u001b[2m11 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 215\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/providers.test.ts \u001b[2m (\u001b[22m\u001b[2m7 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 46\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/crypto-hash.test.ts \u001b[2m (\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 12\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/data-bus.test.ts \u001b[2m (\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 18\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/role-guard.test.ts \u001b[2m (\u001b[22m\u001b[2m7 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 828\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/repro-manifest.test.ts \u001b[2m (\u001b[22m\u001b[2m20 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1797\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m25 passed\u001b[39m\u001b[22m\u001b[90m (25)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m269 passed\u001b[39m\u001b[22m\u001b[90m (269)\u001b[39m\n\u001b[2m   Start at \u001b[22m 17:44:02\n\u001b[2m   Duration \u001b[22m 3.93s\u001b[2m (transform 6.96s, setup 3ms, collect 9.90s, tests 3.38s, environment 13.62s, prepare 7.18s)\u001b[22m\n\n",
+        "stderr": "\u001b[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.\u001b[39m\n\u001b[90mstderr\u001b[2m | tests/unit/data-bus.test.ts\u001b[2m > \u001b[22m\u001b[2mdata-bus\u001b[2m > \u001b[22m\u001b[2ma misbehaving listener does not poison the channel\u001b[22m\u001b[39m\n[data-bus] listener threw: Error: boom\n    at \u001b[90mC:\\Users\\Stu\\New folder\\\u001b[39mtests\\unit\\data-bus.test.ts:39:13\n    at \u001b[90mC:\\Users\\Stu\\New folder\\\u001b[39mlib\\data-bus.ts:142:7\n    at Set.forEach (<anonymous>)\n    at dispatch \u001b[90m(C:\\Users\\Stu\\New folder\\\u001b[39mlib\\data-bus.ts:140:13\u001b[90m)\u001b[39m\n    at Module.publish \u001b[90m(C:\\Users\\Stu\\New folder\\\u001b[39mlib\\data-bus.ts:195:3\u001b[90m)\u001b[39m\n    at \u001b[90mC:\\Users\\Stu\\New folder\\\u001b[39mtests\\unit\\data-bus.test.ts:42:5\n    at \u001b[90mfile:///C:/Users/Stu/New%20folder/\u001b[39mnode_modules/\u001b[4m@vitest/runner\u001b[24m/dist/index.js:135:14\n    at \u001b[90mfile:///C:/Users/Stu/New%20folder/\u001b[39mnode_modules/\u001b[4m@vitest/runner\u001b[24m/dist/index.js:60:26\n    at runTest \u001b[90m(file:///C:/Users/Stu/New%20folder/\u001b[39mnode_modules/\u001b[4m@vitest/runner\u001b[24m/dist/index.js:781:17\u001b[90m)\u001b[39m\n    at runSuite \u001b[90m(file:///C:/Users/Stu/New%20folder/\u001b[39mnode_modules/\u001b[4m@vitest/runner\u001b[24m/dist/index.js:909:15\u001b[90m)\u001b[39m\n\n"
+      }
+    },
+    {
+      "testId": "build-d3172d65",
+      "type": "build",
+      "method": "CHECK",
+      "category": "documentation-integrity",
+      "name": "Proposal truth-pack section markers balanced",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC2.2,A.5.34",
+      "details": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "",
+        "file": "docs/PROPOSAL_TRUTH_PACK.md"
+      }
+    },
+    {
+      "testId": "inline-db4f8d98",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Project name is 'even-keel-learning'",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC1.2",
+      "details": {
+        "name": "even-keel-learning"
+      }
+    },
+    {
+      "testId": "inline-23fb3cd9",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Version follows SemVer",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC8.1",
+      "details": {
+        "version": "1.4.10"
+      }
+    },
+    {
+      "testId": "inline-9ec436f8",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "HONESTY.md mentions data-bus",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC1.2",
+      "details": null
+    },
+    {
+      "testId": "inline-5faa9577",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "WebCrypto signing module present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.1,A.8.24",
+      "details": {
+        "hashPrefix": "XQq_y7VWx2ej5sAs"
+      }
+    },
+    {
+      "testId": "inline-3f618a1f",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Decision Gate present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "gdpr,coppa",
+      "controls": "GDPR-Art.32,COPPA-§312.5",
+      "details": {
+        "hashPrefix": "dmrv9w-HyI5r8-hO"
+      }
+    },
+    {
+      "testId": "inline-46501d73",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "i18n dictionary covers 9 locales",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "iso27001",
+      "controls": "A.5.34",
+      "details": null
+    },
+    {
+      "testId": "inline-2bbae8a2",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Transparency bundle present and verifies (build-time signed)",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001,gdpr",
+      "controls": "CC2.2,A.5.34,GDPR-Art.25",
+      "details": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "testId": "inline-b460f1d9",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "KCSIE 2025 / Prevent / DfE F&M control map: every cited evidence path exists",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001,gdpr",
+      "controls": "CC2.2,A.5.34,GDPR-Art.25",
+      "details": {
+        "controlsChecked": 13,
+        "missingPaths": []
+      }
+    },
+    {
+      "testId": "http-a43d32c1",
+      "type": "http",
+      "method": "GET",
+      "category": "landing",
+      "name": "Landing page",
+      "endpoint": "/",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC7.2",
+      "details": {
+        "httpStatus": 200,
+        "expected": 200,
+        "durationMs": 220,
+        "error": null
+      }
+    },
+    {
+      "testId": "http-555087d5",
+      "type": "http",
+      "method": "GET",
+      "category": "learner",
+      "name": "Student surface",
+      "endpoint": "/student",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,coppa",
+      "controls": "CC7.2,COPPA-§312.5",
+      "details": {
+        "httpStatus": 200,
+        "expected": 200,
+        "durationMs": 80,
+        "error": null
+      }
+    },
+    {
+      "testId": "http-172b3b7c",
+      "type": "http",
+      "method": "GET",
+      "category": "operator",
+      "name": "Teacher surface",
+      "endpoint": "/teacher",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC7.2",
+      "details": {
+        "httpStatus": 200,
+        "expected": 200,
+        "durationMs": 71,
+        "error": null
+      }
+    },
+    {
+      "testId": "http-e9fd674c",
+      "type": "http",
+      "method": "GET",
+      "category": "guardian",
+      "name": "Parent surface",
+      "endpoint": "/parent",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,coppa",
+      "controls": "CC7.2,COPPA-§312.5",
+      "details": {
+        "httpStatus": 200,
+        "expected": 200,
+        "durationMs": 70,
+        "error": null
+      }
+    },
+    {
+      "testId": "http-10e36cda",
+      "type": "http",
+      "method": "GET",
+      "category": "compliance",
+      "name": "Compliance surface",
+      "endpoint": "/compliance",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC7.2,A.5.31",
+      "details": {
+        "httpStatus": 200,
+        "expected": 200,
+        "durationMs": 82,
+        "error": null
+      }
+    },
+    {
+      "testId": "http-06f7810c",
+      "type": "http",
+      "method": "GET",
+      "category": "learner",
+      "name": "Adult learner surface",
+      "endpoint": "/adult",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC7.2",
+      "details": {
+        "httpStatus": 200,
+        "expected": 200,
+        "durationMs": 64,
+        "error": null
+      }
+    },
+    {
+      "testId": "http-c6e14bcd",
+      "type": "http",
+      "method": "GET",
+      "category": "learner",
+      "name": "Apprentice surface",
+      "endpoint": "/trades",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC7.2",
+      "details": {
+        "httpStatus": 200,
+        "expected": 200,
+        "durationMs": 48,
+        "error": null
+      }
+    },
+    {
+      "testId": "http-2c5c8b74",
+      "type": "http",
+      "method": "GET",
+      "category": "auth",
+      "name": "Auth surface",
+      "endpoint": "/auth",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC6.1",
+      "details": {
+        "httpStatus": 200,
+        "expected": 200,
+        "durationMs": 61,
+        "error": null
+      }
+    },
+    {
+      "testId": "http-12a36be2",
+      "type": "http",
+      "method": "GET",
+      "category": "security",
+      "name": "RFC 9116 security.txt served",
+      "endpoint": "/.well-known/security.txt",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC2.3,A.5.5",
+      "details": {
+        "httpStatus": 200,
+        "expected": 200,
+        "durationMs": 8,
+        "error": null
+      }
+    },
+    {
+      "testId": "http-b6ffa7fd",
+      "type": "http",
+      "method": "GET",
+      "category": "errors",
+      "name": "404 handler",
+      "endpoint": "/this-is-not-a-route",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC7.1",
+      "details": {
+        "httpStatus": 404,
+        "expected": 404,
+        "durationMs": 69,
+        "error": null
+      }
+    }
+  ]
+}

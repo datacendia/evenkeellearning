@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "uk-en-english-eng-paper1-q3-structure-1777421348772-1",
+  "skillFamily": "eng-paper1-q3-structure",
+  "subject": "english",
+  "jurisdictions": [
+    "UK-EN"
+  ],
+  "difficulty": "core",
+  "prerequisites": [],
+  "specPoints": [
+    {
+      "framework": "free-form",
+      "code": "AQA English Lang P1Q3 — structure",
+      "label": "AQA English Lang P1Q3 — structure"
+    }
+  ],
+  "problem": "[MOCK DRAFT — REWRITE BEFORE APPROVAL] Sample problem for \"AQA English Lang P1Q3 — structure\". Replace this with a real english task aligned to the spec point above.",
+  "expectedAnswer": 0,
+  "hints": [
+    {
+      "tier": 1,
+      "text": "[MOCK DRAFT — REWRITE BEFORE APPROVAL] Tier-1 nudge: ask the learner to restate the task in their own words."
+    },
+    {
+      "tier": 2,
+      "text": "[MOCK DRAFT — REWRITE BEFORE APPROVAL] Tier-2 nudge: ask them to break it into smaller steps."
+    },
+    {
+      "tier": 3,
+      "text": "[MOCK DRAFT — REWRITE BEFORE APPROVAL] Tier-3 nudge: name the underlying concept (\"eng-paper1-q3-structure\") without giving the answer."
+    }
+  ],
+  "explanation": "[MOCK DRAFT — REWRITE BEFORE APPROVAL] Plain-English walkthrough. Replace this paragraph with a substantive explanation of how a core-difficulty english learner should approach this spec point. At least 20 characters of real content is required by the schema.",
+  "misconceptions": [
+    {
+      "id": "mock-misconception-1",
+      "trigger": "wrong",
+      "explanation": "[MOCK DRAFT — REWRITE BEFORE APPROVAL] Common misconception placeholder. Describe one specific error a learner makes here, and why.",
+      "nudge": "[MOCK DRAFT — REWRITE BEFORE APPROVAL] Nudge text — what to try instead."
+    }
+  ],
+  "workedExamples": [
+    {
+      "id": "eng-paper1-q3-structure-mock-001",
+      "problem": "[MOCK DRAFT — REWRITE BEFORE APPROVAL] Parallel problem for eng-paper1-q3-structure.",
+      "workedSolution": "[MOCK DRAFT — REWRITE BEFORE APPROVAL] Step 1. Replace this with a fully-worked solution.\n[MOCK DRAFT — REWRITE BEFORE APPROVAL] Step 2. Different numbers/text from the main problem.",
+      "expectedAnswer": 0
+    }
+  ],
+  "draft": {
+    "model": "mock-deterministic",
+    "provider": "mock",
+    "promptHashB64url": "mwqSaoE5iClSdj4Y78yQEQmbuCoGwXTswyQlArS9_HI",
+    "draftedAtIso": "2026-04-29T00:09:08.772Z",
+    "drafterVersion": "1.5.0"
+  },
+  "approval": null
+}

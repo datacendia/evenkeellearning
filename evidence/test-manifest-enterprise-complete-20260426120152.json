@@ -1,0 +1,251 @@
+{
+  "executedBy": "Stu",
+  "generatedAt": "2026-04-26T12:01:52.211-0500",
+  "hostname": "DESKTOP-A3P0U3U",
+  "platform": "win32 10.0.26200 x64",
+  "repoRoot": "C:\\Users\\Stu\\New folder",
+  "counters": {
+    "totalPassed": 12,
+    "totalFailed": 2,
+    "totalSkipped": 1,
+    "buildChecks": 8,
+    "httpTests": 0,
+    "inlineAssertions": 6
+  },
+  "manifest": [
+    {
+      "testId": "build-3ac195e3",
+      "type": "build",
+      "method": "CHECK",
+      "category": "build",
+      "name": "TypeScript Compilation (tsc --noEmit)",
+      "endpoint": "N/A",
+      "status": "failed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.8,A.8.32",
+      "details": {
+        "exitCode": 1,
+        "stderr": ""
+      }
+    },
+    {
+      "testId": "build-86818e93",
+      "type": "build",
+      "method": "CHECK",
+      "category": "build",
+      "name": "Dependency Lock Integrity",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.8,A.8.32",
+      "details": {
+        "lockfilePresent": true
+      }
+    },
+    {
+      "testId": "build-e06165dd",
+      "type": "build",
+      "method": "CHECK",
+      "category": "governance",
+      "name": "Required governance files present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC1.2,A.5.2",
+      "details": {
+        "required": [
+          "HONESTY.md",
+          "SECURITY.md",
+          "CHANGELOG.md",
+          "README.md",
+          "KEELLEARN_BIBLE.md"
+        ],
+        "missing": []
+      }
+    },
+    {
+      "testId": "build-bb10c7e4",
+      "type": "build",
+      "method": "CHECK",
+      "category": "security",
+      "name": "RFC 9116 security.txt present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC2.3,A.5.5",
+      "details": {
+        "path": "public/.well-known/security.txt"
+      }
+    },
+    {
+      "testId": "build-46e269da",
+      "type": "build",
+      "method": "CHECK",
+      "category": "privacy",
+      "name": "No biometric API call anywhere in src",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "gdpr,coppa,iso27001",
+      "controls": "GDPR-Art.9,COPPA-§312.5,A.5.34",
+      "details": {
+        "exitCode": 0,
+        "snippet": ""
+      }
+    },
+    {
+      "testId": "build-7c5de32b",
+      "type": "build",
+      "method": "CHECK",
+      "category": "privacy",
+      "name": "No advertising / tracking scripts present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "gdpr,coppa",
+      "controls": "GDPR-Art.5(1)(b),COPPA-§312.5",
+      "details": {
+        "exitCode": 0,
+        "snippet": ""
+      }
+    },
+    {
+      "testId": "build-584be7b8",
+      "type": "build",
+      "method": "CHECK",
+      "category": "security",
+      "name": "No dangerouslySetInnerHTML in source",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.6,A.8.27",
+      "details": {
+        "exitCode": 0,
+        "snippet": ""
+      }
+    },
+    {
+      "testId": "build-fe8a7b39",
+      "type": "build",
+      "method": "CHECK",
+      "category": "code-quality",
+      "name": "ESLint (no warnings)",
+      "endpoint": "N/A",
+      "status": "failed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC8.1,A.8.28",
+      "details": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "\n./app/compliance/page.tsx\n128:94  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities\n\n./app/parent/page.tsx\n73:40  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities\n100:54  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities\n146:22  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities\n197:52  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities\n312:45  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities\n\n./app/student/page.tsx\n116:58  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities\n\n./app/teacher/page.tsx\n120:108  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities\n\n./app/trades/page.tsx\n124:20  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities\n128:56  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities\n\n./lib/vertolearn/hardware-ghost.ts\n72:5  Warning: Unexpected console statement.  no-console\n78:5  Warning: Unexpected console statement.  no-console\n171:5  Warning: Unexpected console statement.  no-console\n176:5  Warning: Unexpected console statement.  no-console\n\ninfo  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules\n"
+      }
+    },
+    {
+      "testId": "test-991497e5",
+      "type": "test",
+      "method": "CHECK",
+      "category": "unit-tests",
+      "name": "Vitest unit suite",
+      "endpoint": "N/A",
+      "status": "skipped",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC4.1,A.8.29",
+      "details": {
+        "reason": "vitest binary not installed; run `npm install` first"
+      }
+    },
+    {
+      "testId": "inline-15ae5537",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Project name is 'keellearn'",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC1.2",
+      "details": {
+        "name": "keellearn"
+      }
+    },
+    {
+      "testId": "inline-8e6af503",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Version follows SemVer",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC8.1",
+      "details": {
+        "version": "1.1.0"
+      }
+    },
+    {
+      "testId": "inline-4599c841",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "HONESTY.md mentions data-bus",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC1.2",
+      "details": null
+    },
+    {
+      "testId": "inline-4a7ee871",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "WebCrypto signing module present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.1,A.8.24",
+      "details": {
+        "hashPrefix": "XQq_y7VWx2ej5sAs"
+      }
+    },
+    {
+      "testId": "inline-7192bdbd",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Decision Gate present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "gdpr,coppa",
+      "controls": "GDPR-Art.32,COPPA-§312.5",
+      "details": {
+        "hashPrefix": "y692Bi3h1RniX3Fg"
+      }
+    },
+    {
+      "testId": "inline-b9ce987e",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "i18n dictionary covers 9 locales",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "iso27001",
+      "controls": "A.5.34",
+      "details": null
+    }
+  ]
+}

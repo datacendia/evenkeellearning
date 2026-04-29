@@ -1,0 +1,659 @@
+{
+  "schemaVersion": 1,
+  "hashAlgorithm": "SHA-256",
+  "generatedAtIso": "2026-04-28T03:14:37.675Z",
+  "aggregateSha256": "YZtr4D4iEXuNNh2AVtzFixrdyA4B92vzcnjecK8hvU0",
+  "dependency": {
+    "packageName": "even-keel-learning",
+    "packageVersion": "1.4.11",
+    "enginesNode": ">=20",
+    "declaredDependencies": 12,
+    "declaredDevDependencies": 17,
+    "packageJsonSha256": "vqtEHE6n9sc26VAgAk03v4nZX_bcs37Bv0vA6zeyIUw",
+    "lockfilePresent": true,
+    "lockfileSha256": "e9EpyiFiB6_prnI5_waHWli_PQS3FEBptQ-G6EvHoZ4",
+    "resolvedPackages": 566
+  },
+  "audit": {
+    "filename": "test-manifest-enterprise-complete-20260427213244.json",
+    "sha256": "My2OEyIOHNNHSOLYXfJpXvaRX__4gNfOptfThEcaZbg",
+    "counters": {
+      "totalPassed": 28,
+      "totalFailed": 0,
+      "totalSkipped": 0,
+      "buildChecks": 9,
+      "httpTests": 10,
+      "inlineAssertions": 8
+    }
+  },
+  "git": null,
+  "governance": [
+    {
+      "path": "README.md",
+      "present": true,
+      "sha256": "krnANSPkBNgD0iTk5w2V1XmQR14Vbx38mUXoCI0HIvo"
+    },
+    {
+      "path": "HONESTY.md",
+      "present": true,
+      "sha256": "U9ccvfdRkEWihrqjHF9KAqW_rxJ8YxdPlsQLHLzMpqU"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "present": true,
+      "sha256": "7iAgEjDlvtfB6021wn3i5Yd73y6kGkUruZuNTcCcX4s"
+    },
+    {
+      "path": "EVEN_KEEL_BIBLE.md",
+      "present": true,
+      "sha256": "4tFZpmrazI62Pcy40mc5duqk5hk2KavAuZUStpeXrUE"
+    },
+    {
+      "path": "SAFEGUARDING.md",
+      "present": true,
+      "sha256": "Bir0YfLJhiqd_X194fsOqGewiyd2tLP-9YHqPs__adE"
+    },
+    {
+      "path": "docs/PROPOSAL_TRUTH_PACK.md",
+      "present": true,
+      "sha256": "NOSmcewZIY3tQlBgeReXa0O0_hwcROCloZfxvkoD9wQ"
+    },
+    {
+      "path": "docs/PROPOSAL_REWRITER_NOTES.md",
+      "present": true,
+      "sha256": "hO9izAKYMahDcgJSR00Gg5R8uiNJ0zupHF9qvxaUjyg"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/adult/page.tsx",
+      "bytes": 4602,
+      "sha256": "uyalxCsG5hsRL-PE8Y86kURQsgGiinTz2bbDwkAdMMY"
+    },
+    {
+      "path": "app/auth/page.tsx",
+      "bytes": 4366,
+      "sha256": "wdTTzQwnvyxG-SPljpGCYyc5tdT2-qHlPPtuJ-ZQznw"
+    },
+    {
+      "path": "app/compliance/page.tsx",
+      "bytes": 18487,
+      "sha256": "2IzpYZ8xg5-RsP-aaHj3V40NmZ0DuXmttCa8yF_3mMM"
+    },
+    {
+      "path": "app/globals.css",
+      "bytes": 14796,
+      "sha256": "seE8fjdd98JC-pYRmQmM8f9K3cGFBs9Sp5G-qKHcr9g"
+    },
+    {
+      "path": "app/layout.tsx",
+      "bytes": 1507,
+      "sha256": "kBVPldHRmk6DOgFLBlaKte1LAszll7DTVptbfQhoAWg"
+    },
+    {
+      "path": "app/loading.tsx",
+      "bytes": 2950,
+      "sha256": "Loi0QMQIANBBzqWnwwBp0NGdTVRtBMlVtj62zXwdXm8"
+    },
+    {
+      "path": "app/not-found.tsx",
+      "bytes": 3747,
+      "sha256": "7MOtVI-kGPCjtOPLxwkEWhj1hhZySXJnV1aSeMfNvV8"
+    },
+    {
+      "path": "app/page.tsx",
+      "bytes": 8372,
+      "sha256": "89bNKFsBMg2x1YE2B877YrsfOaKJevfTPpgBsOrrIlo"
+    },
+    {
+      "path": "app/parent/page.tsx",
+      "bytes": 15227,
+      "sha256": "isDvk-3iQmgpv2gjKITvChxqX3CN-YM7aa0_VKJASXA"
+    },
+    {
+      "path": "app/receipt/[id]/page.tsx",
+      "bytes": 17698,
+      "sha256": "nXgdvry8BjsfDp8-1grTLdOV5zARGEcQr5AiBEjuQIY"
+    },
+    {
+      "path": "app/student/page.tsx",
+      "bytes": 9919,
+      "sha256": "sjcugoKmQzh0VlkO4tpBqUtCaTlkiGMlMWYm93LQ4_A"
+    },
+    {
+      "path": "app/teacher/page.tsx",
+      "bytes": 16815,
+      "sha256": "FH4oxOJFXKbyLF7e5FhRcA9_E9XwIO7h9i4XAzvlp5U"
+    },
+    {
+      "path": "app/trades/page.tsx",
+      "bytes": 7128,
+      "sha256": "x20nTbEEdLnqMBzW2BDXkgci9N249d-V35oILzP255A"
+    },
+    {
+      "path": "components/shared/AccessibilityProvider.tsx",
+      "bytes": 3759,
+      "sha256": "byhGGW7tUOxY61TIcbtQmyKY_YEMVN4G1L-1FfUf_U4"
+    },
+    {
+      "path": "components/shared/AccessibilitySettingsPanel.tsx",
+      "bytes": 10518,
+      "sha256": "vJh63t2SD-D1PZ7iDXZ52WHf1ZRyNqiADTGuRxaSTC4"
+    },
+    {
+      "path": "components/shared/AgeBandGate.tsx",
+      "bytes": 8949,
+      "sha256": "X2Gf39GvbfQQsUECL7KZP4iHbHV4OVGeC3Ri_0L4c8Y"
+    },
+    {
+      "path": "components/shared/BoxInBoxNode.tsx",
+      "bytes": 2826,
+      "sha256": "z9-bS-qoEjmo_ZNbDz87igAfSev27vC5vChOxX-wF3c"
+    },
+    {
+      "path": "components/shared/BrandMark.tsx",
+      "bytes": 1513,
+      "sha256": "da_TfSNJ2fDwgsawtSmO3mSPJau95V0TRacdPxijEgI"
+    },
+    {
+      "path": "components/shared/ComingBackCard.tsx",
+      "bytes": 6107,
+      "sha256": "SNu9cVJAGpde4dSRSYt6kyQzdVHitfb-oG3pWZSkOAI"
+    },
+    {
+      "path": "components/shared/ComprehensionGate.tsx",
+      "bytes": 8937,
+      "sha256": "fZ1cL9eYu4vhCothvH5wC0pBEbQ6Ew6jpIYBzE3dZB8"
+    },
+    {
+      "path": "components/shared/CurriculumPicker.tsx",
+      "bytes": 1930,
+      "sha256": "RD_rujwVPdi8ZVlPogdUqNNnVpE8xLH1_ClF3nBs2Ro"
+    },
+    {
+      "path": "components/shared/EkeChat.tsx",
+      "bytes": 28147,
+      "sha256": "w3iiHUQyx0Q-2O-BNTTKXfQ1DE2Z3Xc9hVXKcMMJqew"
+    },
+    {
+      "path": "components/shared/IssueReceiptCard.tsx",
+      "bytes": 17787,
+      "sha256": "L0aX-Ma4PQV-0s0lQZN-aKBv4Uc5etouiv0gv1g3nq8"
+    },
+    {
+      "path": "components/shared/JsonViewer.tsx",
+      "bytes": 3668,
+      "sha256": "XM9EfszRtSIqONEdKcQ9EnNJtuykHB9d2MSrOlixvwk"
+    },
+    {
+      "path": "components/shared/LanguageSwitcher.tsx",
+      "bytes": 3437,
+      "sha256": "_1UX8BeKJS0Pq06VH27ndWNJRYlD5VYeEmwn5bDwyH4"
+    },
+    {
+      "path": "components/shared/MyPatternsCard.tsx",
+      "bytes": 7182,
+      "sha256": "Y0qKtajsv8oOM-jrq1DM8chOtKYTVyHryu5NEe8F6_4"
+    },
+    {
+      "path": "components/shared/PasskeyEnrolCard.tsx",
+      "bytes": 9297,
+      "sha256": "MjQd3zrCkP_zeFRG8ZcuRi38E3Woxx4lQrKx4puxDJE"
+    },
+    {
+      "path": "components/shared/PracticeModeBar.tsx",
+      "bytes": 6241,
+      "sha256": "C1HLyHgo6-6VPX35EsXI6o_bKO5SooLGv7GB1C3VyyU"
+    },
+    {
+      "path": "components/shared/RoleGuard.tsx",
+      "bytes": 6520,
+      "sha256": "vMxvPzS2U42hTqFaPYE2IM8v_hSW_z2cQ3UNcr1RMbg"
+    },
+    {
+      "path": "components/shared/SafeguardingEscalationsCard.tsx",
+      "bytes": 13676,
+      "sha256": "unLq6Z0P3p-li9iOLvZjcuqofyS7AfmCpw63o8BLKvE"
+    },
+    {
+      "path": "components/shared/SubjectGrid.tsx",
+      "bytes": 10255,
+      "sha256": "3vhRlVUMHdC5JLc4eonSsEh6iV16v_0jONRH0HCPZfM"
+    },
+    {
+      "path": "components/shared/SurfaceShell.tsx",
+      "bytes": 4384,
+      "sha256": "8G3qJaA5gKHjWiZafiQgYuFtfvnR_jp2aY-Kkr8D--c"
+    },
+    {
+      "path": "components/shared/ThemeProvider.tsx",
+      "bytes": 569,
+      "sha256": "99xaHqnqS7jp1HGe5f5Xx9fQmsQuyDOO3CVlf5HH2gk"
+    },
+    {
+      "path": "components/shared/TransparencyBundleCard.tsx",
+      "bytes": 12200,
+      "sha256": "yQQt-qEA2YRbw6rY12yHVVM3DIcvpWESM0zGNE-00s0"
+    },
+    {
+      "path": "lib/a11y/settings.ts",
+      "bytes": 6785,
+      "sha256": "ZwGxGkTbO3KbLsNkLFY_M2xgzjA0t0HYZtH9zGlKvVU"
+    },
+    {
+      "path": "lib/a11y/speech.ts",
+      "bytes": 3569,
+      "sha256": "gBLlj0DuUp5psNOsh6ujsh0xqvbcxF_kZ4CaYT68lFc"
+    },
+    {
+      "path": "lib/auth/age-band.ts",
+      "bytes": 2255,
+      "sha256": "DeaFucPViPCK-HDqXvA10TyLnesA4vJZ_qYByRqz8vw"
+    },
+    {
+      "path": "lib/auth/role-guard.ts",
+      "bytes": 4992,
+      "sha256": "MqHelGgN493BEsrJiTxVywVneZemueXAevZ2v15sOUM"
+    },
+    {
+      "path": "lib/career/trace-to-trait.ts",
+      "bytes": 9507,
+      "sha256": "0SWR498_3dK8W3V3E3FTwdr58Dilc9HSw_uYsfhqYjk"
+    },
+    {
+      "path": "lib/crypto/cbor-min.ts",
+      "bytes": 10962,
+      "sha256": "PuLQ8ob03BUf4UbTafTZHJdBIcmyPyCT9tUW87PT8rs"
+    },
+    {
+      "path": "lib/crypto/cose-to-spki.ts",
+      "bytes": 5011,
+      "sha256": "2Rh-qTLxjDvmKn9L-AaXvmqa__mfoABni4BrxGWXoyc"
+    },
+    {
+      "path": "lib/crypto/hash.ts",
+      "bytes": 1547,
+      "sha256": "7O8HedQy9ARpzAxvJaUYSJJqNCLeWobXyPaIHzt3D-s"
+    },
+    {
+      "path": "lib/crypto/passkey.ts",
+      "bytes": 27275,
+      "sha256": "6wwI_2_hYp6SaiEFB3E2QfByUW28SwfhuEpuWKkZDM8"
+    },
+    {
+      "path": "lib/crypto/signing.ts",
+      "bytes": 14143,
+      "sha256": "b_vSpDAz4F7gTet5LkyWTkWQJ4GjvT2-Kd5yvz2SFzQ"
+    },
+    {
+      "path": "lib/data-bus.ts",
+      "bytes": 9241,
+      "sha256": "s02J1TlfYMS8VspAnfCn2R-BY9VPTngpIjvbvsCiUgI"
+    },
+    {
+      "path": "lib/eke/eke-engine.ts",
+      "bytes": 9892,
+      "sha256": "A8LzL4SMEDLesx3VCWayYmWlwEI_ylHkSF5DBbES3eE"
+    },
+    {
+      "path": "lib/eke/error-bank.ts",
+      "bytes": 10120,
+      "sha256": "zjqRy6c316JwvoXBMbyZx0J8GmEZ2afdiSr8ldrZpqs"
+    },
+    {
+      "path": "lib/eke/parallel-problems.ts",
+      "bytes": 8425,
+      "sha256": "1JVsmNojR65bMpzDxRn3U4MLBntlrDaJjT4psipzsgU"
+    },
+    {
+      "path": "lib/eke/personality.ts",
+      "bytes": 2311,
+      "sha256": "V1FlcThJmQOvfogBDgEvzav2EZaR-Do_Qa1kWtR4njg"
+    },
+    {
+      "path": "lib/eke/practice-mode.ts",
+      "bytes": 7560,
+      "sha256": "aFxSJwZNECyxsI11MDM-ifAygR_P0a_lxXRUvqEKBVc"
+    },
+    {
+      "path": "lib/eke/scheduler.ts",
+      "bytes": 9785,
+      "sha256": "qh_4wNgz9ZazWBTPmrrmGHmjZM-n1WKjXf2oYPOdl0s"
+    },
+    {
+      "path": "lib/eke/tiered-hints.ts",
+      "bytes": 2659,
+      "sha256": "7OgGGbvbcaruTVlf255sCjtk5KdWiBkxDRWpwIb7eyE"
+    },
+    {
+      "path": "lib/hooks/useLiveTrust.ts",
+      "bytes": 3432,
+      "sha256": "byPcMMEPM_jOMGrMwTFNusvqdSWeiCggrRs33_c0eVs"
+    },
+    {
+      "path": "lib/i18n/dictionary.ts",
+      "bytes": 37719,
+      "sha256": "Db6lsPpNg677rB3EA-DobR_E67qR32ZQIcDmR60eXLY"
+    },
+    {
+      "path": "lib/i18n/I18nProvider.tsx",
+      "bytes": 2937,
+      "sha256": "1xzHzVzU1LVgPBowzs8vBOB-Dq0XYTIPon4RC5C7iFc"
+    },
+    {
+      "path": "lib/receipts/learning-receipt.ts",
+      "bytes": 11832,
+      "sha256": "j99Cx6_ONVB8YNg824Z3gWCa5Ir0tITs3telvnRAvv4"
+    },
+    {
+      "path": "lib/regulatory-absorb/adapter-mock.ts",
+      "bytes": 8959,
+      "sha256": "xXNh9frcaa0B1LabK_zs2ES6bNQynn9ZW6VEXIpQkaw"
+    },
+    {
+      "path": "lib/regulatory-absorb/decision-gate.ts",
+      "bytes": 9493,
+      "sha256": "dmrv9w-HyI5r8-hOwa4CNdAVQH_ltZE3LUaS-Oss4VQ"
+    },
+    {
+      "path": "lib/regulatory-absorb/jurisdictions.ts",
+      "bytes": 1599,
+      "sha256": "GE5j2dke977WcIwq9TgZM9dnH4W_bj5l6BrYVuvcLCk"
+    },
+    {
+      "path": "lib/regulatory-absorb/prioritizer.ts",
+      "bytes": 3215,
+      "sha256": "-PcT6g4HQZe-AAEoV63xV6XoKBTEqpqPOpfQN-fSUCE"
+    },
+    {
+      "path": "lib/regulatory-absorb/types.ts",
+      "bytes": 4295,
+      "sha256": "cqDFl7sIBwF0zrr65MKhC-khoZTD2d6TkQpBjN6UQXc"
+    },
+    {
+      "path": "lib/safeguarding/escalation-queue.ts",
+      "bytes": 21861,
+      "sha256": "nI2oJR4yaT8iTjjE0lJhZn3xQWduD0hvTshSTVJQXj0"
+    },
+    {
+      "path": "lib/safeguarding/providers/email-sendgrid.ts",
+      "bytes": 2652,
+      "sha256": "e1HfR-J1xVp96sSCfduGvqrHkSZ_MlgCuvPqahX6Iuw"
+    },
+    {
+      "path": "lib/safeguarding/providers/index.ts",
+      "bytes": 2119,
+      "sha256": "ADdvBHR2FTW0It4YI6Liu-LfnlhcU_hQTU5zbKjXmbU"
+    },
+    {
+      "path": "lib/safeguarding/providers/push-fcm.ts",
+      "bytes": 2322,
+      "sha256": "PTppQr14N2mcyLqjFF4rG758Gg-wmRUjPKk1_GTIhQs"
+    },
+    {
+      "path": "lib/safeguarding/providers/sms-twilio.ts",
+      "bytes": 2343,
+      "sha256": "BTyiyy_oAK4XFkJM2YyAN1ACCECjH1xhHiQzECd7fVE"
+    },
+    {
+      "path": "lib/safeguarding/providers/types.ts",
+      "bytes": 3573,
+      "sha256": "eRbSIKLYvJunelnZP1db9O7_iXwYijyt5lCbXRAv094"
+    },
+    {
+      "path": "lib/safeguarding/providers/webhook.ts",
+      "bytes": 2345,
+      "sha256": "-Mc0zD0J4e0UVXNF5Es-AnsnrNe9CFZZfCqCkWAccEQ"
+    },
+    {
+      "path": "lib/safeguarding/retry-scheduler.ts",
+      "bytes": 9187,
+      "sha256": "tLhMl55yVMieNv175YrYcJoEwj3zVKRgERY12F-8jJY"
+    },
+    {
+      "path": "lib/safeguarding/webhook-config.ts",
+      "bytes": 4114,
+      "sha256": "FNa0vvlll2VbCn0VFkjP8USCpzaewgzylu1ZLNRA4_I"
+    },
+    {
+      "path": "lib/types/index.ts",
+      "bytes": 4357,
+      "sha256": "GGLbjNBv3AaBZpYBsLDQE2ZsjZJaQKaRkWJVStnUN1o"
+    },
+    {
+      "path": "lib/validation/answer-checker.ts",
+      "bytes": 7107,
+      "sha256": "6eLQ9i0eYJnIWymiQZI1kdScp0jSdGP_ZUHByiqm7vk"
+    },
+    {
+      "path": "lib/validators.ts",
+      "bytes": 10002,
+      "sha256": "tNBCUzh9SskzcSiT1FHlV72Tv7rsEhOZySCYAfI1PWc"
+    },
+    {
+      "path": "lib/vertolearn/crt-logger.ts",
+      "bytes": 4280,
+      "sha256": "UqIVhwSjHMRynMgNa4VDP1M7Rb65nKi76p44OFK6ac4"
+    },
+    {
+      "path": "lib/vertolearn/hardware-ghost.ts",
+      "bytes": 6624,
+      "sha256": "NgeYhKKla7-rN19SSWM98EL13S4sttEPBlC1HSnx0xc"
+    },
+    {
+      "path": "lib/vertolearn/ipa-analyzer.ts",
+      "bytes": 6857,
+      "sha256": "lePB9LH7Nvz5WH_ep34aZ8E_RGR51uazhTx_PMxoKgQ"
+    },
+    {
+      "path": "lib/vertolearn/neutrality-shield.ts",
+      "bytes": 7047,
+      "sha256": "qLlq5f1beQdEWOieGKTCN9rmUkJ_xIb-FpV1jnDxGUY"
+    },
+    {
+      "path": "lib/vertolearn/slmscaffolding.ts",
+      "bytes": 4182,
+      "sha256": "UsbGVfj_eOMHwTgugSI54n4dhYpcmZ-YoOSWH88261U"
+    },
+    {
+      "path": "lib/zero-knowledge/aggregator.ts",
+      "bytes": 3924,
+      "sha256": "zIPAk1vBdC7Uv9mUy7QG0avLPpy5PTdcwA-NX2P9X3o"
+    },
+    {
+      "path": "scripts/audit-report.mjs",
+      "bytes": 4767,
+      "sha256": "cbHYdLqPso_gF7vTrZgtgX4UVy4olPfdYolmRke86gw"
+    },
+    {
+      "path": "scripts/audit.mjs",
+      "bytes": 23263,
+      "sha256": "s4QmxrFUEe-G3cAiKfSMi9zxjHIYNjDaDwL8kT-egM0"
+    },
+    {
+      "path": "scripts/build-repro-manifest.mjs",
+      "bytes": 13264,
+      "sha256": "1eNwH-Nmhipd0BikLJpNsmn57SaHqOy7adiF64RGw08"
+    },
+    {
+      "path": "scripts/build-transparency-bundle.mjs",
+      "bytes": 14303,
+      "sha256": "v9bc2tnWwSsUk05-Ny0L2bhYiDmh3oIpKX8qiGgdpHM"
+    },
+    {
+      "path": "scripts/extract-truth-pack-section.mjs",
+      "bytes": 4811,
+      "sha256": "R7Rk4rmMEnXT6waJKfdRA3TN6v-iP7hns6YEa0cC5dI"
+    },
+    {
+      "path": "scripts/grep-anti-pattern.mjs",
+      "bytes": 3247,
+      "sha256": "JTW3qqK3pMfHiw24MGOavHXYzLUuZ--1qKm_7f8R3ug"
+    },
+    {
+      "path": "scripts/md-to-pdf.mjs",
+      "bytes": 5168,
+      "sha256": "J7mOCuBjXE8SPi4rkLnd9ZB1f1_g72L1zjLLf5V1d3U"
+    },
+    {
+      "path": "scripts/rename-evenkeel.mjs",
+      "bytes": 3832,
+      "sha256": "SpyTdJnKDKi6Wu50wCBXAIeUH8UhDTtHrVTsERAUXWY"
+    },
+    {
+      "path": "scripts/verify-repro-manifest.mjs",
+      "bytes": 8163,
+      "sha256": "9Qcvq5N4-C8rfGptzINE2nzfpjTMl1NIUK25RRWqzPE"
+    },
+    {
+      "path": "scripts/verify-transparency-bundle.mjs",
+      "bytes": 8373,
+      "sha256": "ph3kqOOB5VGaOrKKp8-7KNnoVWOvYb4jqj2ahM8KqDY"
+    },
+    {
+      "path": "tests/e2e/a11y.spec.ts",
+      "bytes": 2950,
+      "sha256": "LoJrisOYAtpS27z8LFLUByaZmBsLz713724Pwzdg5N4"
+    },
+    {
+      "path": "tests/e2e/smoke.spec.ts",
+      "bytes": 1399,
+      "sha256": "oFZb6zwecgRwZferpxKkQy3NIIXTfw7PA05Am8MO3yk"
+    },
+    {
+      "path": "tests/unit/a11y-settings.test.ts",
+      "bytes": 4848,
+      "sha256": "EljL3XbHGQYW9vXRPGft4GLih3THuDcfG8S2setOUms"
+    },
+    {
+      "path": "tests/unit/age-band.test.ts",
+      "bytes": 2010,
+      "sha256": "OGHhS78M1UKs0OJVwNT4kmE7G656st3VAVqC55uTq9k"
+    },
+    {
+      "path": "tests/unit/answer-checker.test.ts",
+      "bytes": 4588,
+      "sha256": "ePk7IadVwqNcAEqMtPiRS8xjoA15Kelmli_dR8bVAFc"
+    },
+    {
+      "path": "tests/unit/cbor-cose.test.ts",
+      "bytes": 11036,
+      "sha256": "9rDsf4WzhL2HkxND1CQEXc83z0hgTyEfB6bj3zzbCPA"
+    },
+    {
+      "path": "tests/unit/crypto-hash.test.ts",
+      "bytes": 1864,
+      "sha256": "CbBBl2R-8VOBdq650cPqHiq1w00wIEm6xq0JSC9JNoM"
+    },
+    {
+      "path": "tests/unit/crypto-signing.test.ts",
+      "bytes": 2320,
+      "sha256": "WIf5SldHf8BaWIHbjRxOtKnayehojK8K5UxqpBMNMA0"
+    },
+    {
+      "path": "tests/unit/data-bus.test.ts",
+      "bytes": 1468,
+      "sha256": "mW_fJBoxFRnMZopOqxzoxqaxbnhOHhKSVOxCho8Lerc"
+    },
+    {
+      "path": "tests/unit/decision-gate.test.ts",
+      "bytes": 6802,
+      "sha256": "e8yvlE7ELos3MEYPysqsiqmu6b_dwn9N0rC4av-zXEE"
+    },
+    {
+      "path": "tests/unit/eke-engine.test.ts",
+      "bytes": 7227,
+      "sha256": "kt8utE8LD2jK9I6dmzomVpS5-2mIG2_CMsQJUNMzN1o"
+    },
+    {
+      "path": "tests/unit/error-bank.test.ts",
+      "bytes": 6556,
+      "sha256": "tXei5OGbyxiqOXt5fcKfRWqzYCcc7Nql307VJlcrBvA"
+    },
+    {
+      "path": "tests/unit/escalation-queue.test.ts",
+      "bytes": 13416,
+      "sha256": "WfxBBWdfqx4IuudilUARwhp4uR22dqUyz9qSN5xUigo"
+    },
+    {
+      "path": "tests/unit/ipa-analyzer.test.ts",
+      "bytes": 4185,
+      "sha256": "6SrV54k1SOpZh_v4Z-g0tWvRRT4wSw-9fBezGMtHhD0"
+    },
+    {
+      "path": "tests/unit/kcsie-control-map.test.ts",
+      "bytes": 5026,
+      "sha256": "fGhO1OWi656HBaana2eMDDdj-qfCvXGu_fD0a9SUIHc"
+    },
+    {
+      "path": "tests/unit/learning-receipt.test.ts",
+      "bytes": 7949,
+      "sha256": "IdEoIIG_THUiI8WBsQETWOW7iIQgCi62iUtHtRcWU0c"
+    },
+    {
+      "path": "tests/unit/parallel-problems.test.ts",
+      "bytes": 4952,
+      "sha256": "sacg3fR-kkNxVdczMLaZII1UEbTIlSLY3Rw7OmR_EpI"
+    },
+    {
+      "path": "tests/unit/passkey.test.ts",
+      "bytes": 17988,
+      "sha256": "mjP4hFq5xWUb2_ZV8_3iK5mqB3F5BcpplOMmPjIvYeU"
+    },
+    {
+      "path": "tests/unit/practice-mode.test.ts",
+      "bytes": 4387,
+      "sha256": "LcY8Y--GGtJ5V62hQLWzhwXHBCeg7mzmDCd_MprKEkI"
+    },
+    {
+      "path": "tests/unit/prioritizer.test.ts",
+      "bytes": 1941,
+      "sha256": "8VOftKj-JZzKubaEQ2raiZ0YwbY32XtME-V7kZ_lnRA"
+    },
+    {
+      "path": "tests/unit/providers.test.ts",
+      "bytes": 4253,
+      "sha256": "sU0bD26u66-RVF-UNz3SeNwXs8DcjjHflihEC9fYCzo"
+    },
+    {
+      "path": "tests/unit/repro-manifest.test.ts",
+      "bytes": 11480,
+      "sha256": "jkamYyoN7tLfocxophzM8hj-eEvsHjkJ1NkCo5pMxTE"
+    },
+    {
+      "path": "tests/unit/retry-scheduler.test.ts",
+      "bytes": 10122,
+      "sha256": "fiC3nDuTuhqQAVGrhpJJ3iDYBqDG7DBrm3aH_Ptpn28"
+    },
+    {
+      "path": "tests/unit/role-guard.test.ts",
+      "bytes": 3078,
+      "sha256": "CjcAuq388gsTzDuDZtl4LluKVNy9v6HNn1O3hTvkzJg"
+    },
+    {
+      "path": "tests/unit/scheduler.test.ts",
+      "bytes": 8235,
+      "sha256": "irRSbsuRFS_slKZutEGXdi0erXx86BACroJCmwOJVj4"
+    },
+    {
+      "path": "tests/unit/speech.test.ts",
+      "bytes": 5589,
+      "sha256": "Ta9-T4HM3yXNZ1NLf7gi2D9-gok3C9pMxMt23_wUpYI"
+    },
+    {
+      "path": "tests/unit/transparency-bundle.test.ts",
+      "bytes": 9276,
+      "sha256": "3tY7PdoZVieRChFHKcjY5Sn4yZMsYlykIKT_I_rmjRs"
+    },
+    {
+      "path": "tests/unit/validators.test.ts",
+      "bytes": 2291,
+      "sha256": "qPtbjYECuiwqjCdtWCNjtTVKaQRxMqM2VFbrY1SHWzo"
+    },
+    {
+      "path": "tests/unit/webhook-config.test.ts",
+      "bytes": 3711,
+      "sha256": "mRLFEJaRp3jfFiYJIw2ZWS8vyK6Uecl3eJBop-z9RB0"
+    }
+  ]
+}

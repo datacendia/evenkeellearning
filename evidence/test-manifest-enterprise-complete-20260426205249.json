@@ -1,0 +1,274 @@
+{
+  "executedBy": "Stu",
+  "generatedAt": "2026-04-26T20:52:49.229-0500",
+  "hostname": "DESKTOP-A3P0U3U",
+  "platform": "win32 10.0.26200 x64",
+  "repoRoot": "C:\\Users\\Stu\\New folder",
+  "counters": {
+    "totalPassed": 16,
+    "totalFailed": 0,
+    "totalSkipped": 0,
+    "buildChecks": 9,
+    "httpTests": 0,
+    "inlineAssertions": 6
+  },
+  "manifest": [
+    {
+      "testId": "build-155b7f94",
+      "type": "build",
+      "method": "CHECK",
+      "category": "build",
+      "name": "TypeScript Compilation (tsc --noEmit)",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.8,A.8.32",
+      "details": {
+        "exitCode": 0,
+        "stderr": ""
+      }
+    },
+    {
+      "testId": "build-7e2229bc",
+      "type": "build",
+      "method": "CHECK",
+      "category": "build",
+      "name": "Dependency Lock Integrity",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.8,A.8.32",
+      "details": {
+        "lockfilePresent": true
+      }
+    },
+    {
+      "testId": "build-f112fbef",
+      "type": "build",
+      "method": "CHECK",
+      "category": "governance",
+      "name": "Required governance files present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC1.2,A.5.2",
+      "details": {
+        "required": [
+          "HONESTY.md",
+          "SECURITY.md",
+          "CHANGELOG.md",
+          "README.md",
+          "EVEN_KEEL_BIBLE.md",
+          "SAFEGUARDING.md",
+          "docs/PROPOSAL_TRUTH_PACK.md",
+          "docs/PROPOSAL_REWRITER_NOTES.md"
+        ],
+        "missing": []
+      }
+    },
+    {
+      "testId": "build-18907ca5",
+      "type": "build",
+      "method": "CHECK",
+      "category": "security",
+      "name": "RFC 9116 security.txt present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC2.3,A.5.5",
+      "details": {
+        "path": "public/.well-known/security.txt"
+      }
+    },
+    {
+      "testId": "build-d57b978e",
+      "type": "build",
+      "method": "CHECK",
+      "category": "privacy",
+      "name": "No biometric API call anywhere in src",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "gdpr,coppa,iso27001",
+      "controls": "GDPR-Art.9,COPPA-§312.5,A.5.34",
+      "details": {
+        "exitCode": 0,
+        "snippet": ""
+      }
+    },
+    {
+      "testId": "build-7fa3bb3b",
+      "type": "build",
+      "method": "CHECK",
+      "category": "privacy",
+      "name": "No advertising / tracking scripts present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "gdpr,coppa",
+      "controls": "GDPR-Art.5(1)(b),COPPA-§312.5",
+      "details": {
+        "exitCode": 0,
+        "snippet": ""
+      }
+    },
+    {
+      "testId": "build-6a9d596c",
+      "type": "build",
+      "method": "CHECK",
+      "category": "security",
+      "name": "No dangerouslySetInnerHTML in source",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.6,A.8.27",
+      "details": {
+        "exitCode": 0,
+        "snippet": ""
+      }
+    },
+    {
+      "testId": "build-da08267f",
+      "type": "build",
+      "method": "CHECK",
+      "category": "code-quality",
+      "name": "ESLint (no warnings)",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC8.1,A.8.28",
+      "details": {
+        "exitCode": 0,
+        "stdout": "✔ No ESLint warnings or errors\n",
+        "stderr": ""
+      }
+    },
+    {
+      "testId": "test-2ecd968b",
+      "type": "test",
+      "method": "CHECK",
+      "category": "unit-tests",
+      "name": "Vitest unit suite",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC4.1,A.8.29",
+      "details": {
+        "exitCode": 0,
+        "stdout": "\n\u001b[7m\u001b[1m\u001b[36m RUN \u001b[39m\u001b[22m\u001b[27m \u001b[36mv1.6.1\u001b[39m \u001b[90mC:/Users/Stu/New folder\u001b[39m\n\n \u001b[32m✓\u001b[39m tests/unit/crypto-signing.test.ts \u001b[2m (\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 94\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/practice-mode.test.ts \u001b[2m (\u001b[22m\u001b[2m12 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 44\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/validators.test.ts \u001b[2m (\u001b[22m\u001b[2m7 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 64\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/speech.test.ts \u001b[2m (\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 70\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/answer-checker.test.ts \u001b[2m (\u001b[22m\u001b[2m14 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 72\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/a11y-settings.test.ts \u001b[2m (\u001b[22m\u001b[2m8 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 75\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/ipa-analyzer.test.ts \u001b[2m (\u001b[22m\u001b[2m9 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 43\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/scheduler.test.ts \u001b[2m (\u001b[22m\u001b[2m20 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 108\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/error-bank.test.ts \u001b[2m (\u001b[22m\u001b[2m13 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 99\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/parallel-problems.test.ts \u001b[2m (\u001b[22m\u001b[2m12 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 43\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/decision-gate.test.ts \u001b[2m (\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 68\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/eke-engine.test.ts \u001b[2m (\u001b[22m\u001b[2m15 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 99\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/learning-receipt.test.ts \u001b[2m (\u001b[22m\u001b[2m15 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 489\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/data-bus.test.ts \u001b[2m (\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 69\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/role-guard.test.ts \u001b[2m (\u001b[22m\u001b[2m7 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 944\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/age-band.test.ts \u001b[2m (\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 12\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/prioritizer.test.ts \u001b[2m (\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m tests/unit/crypto-hash.test.ts \u001b[2m (\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 15\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m18 passed\u001b[39m\u001b[22m\u001b[90m (18)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m171 passed\u001b[39m\u001b[22m\u001b[90m (171)\u001b[39m\n\u001b[2m   Start at \u001b[22m 20:52:44\n\u001b[2m   Duration \u001b[22m 3.28s\u001b[2m (transform 6.65s, setup 4ms, collect 10.68s, tests 2.41s, environment 13.66s, prepare 5.57s)\u001b[22m\n\n",
+        "stderr": "\u001b[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.\u001b[39m\n\u001b[90mstderr\u001b[2m | tests/unit/data-bus.test.ts\u001b[2m > \u001b[22m\u001b[2mdata-bus\u001b[2m > \u001b[22m\u001b[2ma misbehaving listener does not poison the channel\u001b[22m\u001b[39m\n[data-bus] listener threw: Error: boom\n    at \u001b[90mC:\\Users\\Stu\\New folder\\\u001b[39mtests\\unit\\data-bus.test.ts:39:13\n    at \u001b[90mC:\\Users\\Stu\\New folder\\\u001b[39mlib\\data-bus.ts:141:7\n    at Set.forEach (<anonymous>)\n    at dispatch \u001b[90m(C:\\Users\\Stu\\New folder\\\u001b[39mlib\\data-bus.ts:139:13\u001b[90m)\u001b[39m\n    at Module.publish \u001b[90m(C:\\Users\\Stu\\New folder\\\u001b[39mlib\\data-bus.ts:194:3\u001b[90m)\u001b[39m\n    at \u001b[90mC:\\Users\\Stu\\New folder\\\u001b[39mtests\\unit\\data-bus.test.ts:42:5\n    at \u001b[90mfile:///C:/Users/Stu/New%20folder/\u001b[39mnode_modules/\u001b[4m@vitest/runner\u001b[24m/dist/index.js:135:14\n    at \u001b[90mfile:///C:/Users/Stu/New%20folder/\u001b[39mnode_modules/\u001b[4m@vitest/runner\u001b[24m/dist/index.js:60:26\n    at runTest \u001b[90m(file:///C:/Users/Stu/New%20folder/\u001b[39mnode_modules/\u001b[4m@vitest/runner\u001b[24m/dist/index.js:781:17\u001b[90m)\u001b[39m\n    at runSuite \u001b[90m(file:///C:/Users/Stu/New%20folder/\u001b[39mnode_modules/\u001b[4m@vitest/runner\u001b[24m/dist/index.js:909:15\u001b[90m)\u001b[39m\n\n"
+      }
+    },
+    {
+      "testId": "build-b3de5e6b",
+      "type": "build",
+      "method": "CHECK",
+      "category": "documentation-integrity",
+      "name": "Proposal truth-pack section markers balanced",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC2.2,A.5.34",
+      "details": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "",
+        "file": "docs/PROPOSAL_TRUTH_PACK.md"
+      }
+    },
+    {
+      "testId": "inline-6cbf629e",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Project name is 'even-keel-learning'",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC1.2",
+      "details": {
+        "name": "even-keel-learning"
+      }
+    },
+    {
+      "testId": "inline-cc2bbc96",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Version follows SemVer",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC8.1",
+      "details": {
+        "version": "1.4.6"
+      }
+    },
+    {
+      "testId": "inline-105ea83b",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "HONESTY.md mentions data-bus",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2",
+      "controls": "CC1.2",
+      "details": null
+    },
+    {
+      "testId": "inline-2b2831d4",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "WebCrypto signing module present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "soc2-type2,iso27001",
+      "controls": "CC6.1,A.8.24",
+      "details": {
+        "hashPrefix": "XQq_y7VWx2ej5sAs"
+      }
+    },
+    {
+      "testId": "inline-5550e2eb",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "Decision Gate present",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "gdpr,coppa",
+      "controls": "GDPR-Art.32,COPPA-§312.5",
+      "details": {
+        "hashPrefix": "iuCsj3ozxvK0WMop"
+      }
+    },
+    {
+      "testId": "inline-962880f4",
+      "type": "inline",
+      "method": "ASSERT",
+      "category": "inline-assertion",
+      "name": "i18n dictionary covers 9 locales",
+      "endpoint": "N/A",
+      "status": "passed",
+      "evidenceRecorded": true,
+      "complianceTags": "iso27001",
+      "controls": "A.5.34",
+      "details": null
+    }
+  ]
+}

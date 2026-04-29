@@ -1,0 +1,33 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "ignorePatterns": [
+    "node_modules/",
+    ".next/",
+    "out/",
+    "evidence/",
+    "reports/",
+    "playwright-report/",
+    "test-results/",
+    "scripts/grep-anti-pattern.mjs",
+    "scripts/audit.mjs"
+  ],
+  "rules": {
+    "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
+    "@next/next/no-html-link-for-pages": "off",
+    "react/no-unescaped-entities": "off"
+  },
+  "overrides": [
+    {
+      "files": ["tests/**/*.{ts,tsx}"],
+      "rules": {
+        "no-console": "off"
+      }
+    },
+    {
+      "files": ["lib/vertolearn/hardware-ghost.ts"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# RFC 9116 security.txt — Even Keel Learning vulnerability disclosure metadata.
+# Served at /.well-known/security.txt on the production host.
+
+Contact: mailto:security@evenkeel.example
+Expires: 2027-04-26T00:00:00.000Z
+Encryption: https://evenkeel.example/.well-known/pgp-key.txt
+Acknowledgments: https://evenkeel.example/security/hall-of-fame
+Preferred-Languages: en, ga, fr, es, pt, de, hi, zh, ar
+Canonical: https://evenkeel.example/.well-known/security.txt
+Policy: https://evenkeel.example/SECURITY.md
+Hiring: https://evenkeel.example/careers

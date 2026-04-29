@@ -1,0 +1,398 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..800,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Hebrew:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600;700&display=swap');
+
+/* ============================================================
+   EVENKEEL — Dual Theme System
+   Paper:     warm, learner-facing (student/parent/adult/trades)
+   Sovereign: dark, institutional (teacher/compliance)
+   ============================================================ */
+
+:root,
+[data-theme="paper"] {
+  --teal: #0F6E56;
+  --teal-50: #E8F5F0;
+  --teal-100: #C7E8DA;
+  --teal-200: #94D2B5;
+  --teal-600: #128566;
+  --teal-700: #0A4F3D;
+  --teal-900: #062B22;
+  --purple: #6B46C1;
+  --purple-50: #F1ECFD;
+  --purple-100: #DFD3F9;
+  --purple-700: #523494;
+  --amber: #BA7517;
+  --amber-50: #FBF3E5;
+  --amber-100: #F4DFB1;
+  --rose: #C2185B;
+  --rose-50: #FCE4EC;
+  --ink: #0E1411;
+  --paper: #FAF7F2;
+  --paper-warm: #F4EFE6;
+  --paper-deep: #ECE5D8;
+  --slate-900: #1A2128;
+  --slate-700: #3A4754;
+  --slate-500: #4B5563;
+  --slate-300: #B8C2CB;
+  --slate-100: #E2E7EC;
+  --rule: #D9DDD4;
+  --red: #C53030;
+
+  --bg: var(--paper);
+  --bg-alt: var(--paper-warm);
+  --bg-deep: var(--paper-deep);
+  --fg: var(--ink);
+  --fg-dim: var(--slate-900);
+  --fg-faint: var(--slate-500);
+  --border: var(--rule);
+  --accent: var(--teal);
+  --accent-soft: var(--teal-100);
+  --accent-ink: var(--teal-900);
+
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Geist', -apple-system, system-ui, sans-serif;
+  --mono: 'Geist Mono', 'SF Mono', Consolas, monospace;
+}
+
+[data-theme="sovereign"] {
+  --hub-bg: #0A0E12;
+  --hub-surface: #131820;
+  --hub-surface-alt: #1B2129;
+  --hub-border: #232C36;
+  --hub-text: #E5E7EA;
+  --hub-text-dim: #8B95A1;
+  --hub-accent: #5DCAA5;
+  --hub-warning: #F5A623;
+  --hub-danger: #E5524A;
+  --hub-info: #6BA4F0;
+  --hub-purple: #A78BFA;
+
+  --bg: var(--hub-bg);
+  --bg-alt: var(--hub-surface);
+  --bg-deep: var(--hub-surface-alt);
+  --fg: var(--hub-text);
+  --fg-dim: var(--hub-text-dim);
+  --fg-faint: #5C6573;
+  --border: var(--hub-border);
+  --accent: var(--hub-accent);
+  --accent-soft: rgba(93, 202, 165, 0.12);
+  --accent-ink: #0A0E12;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Serif headlines on Paper, sans on Sovereign */
+.font-serif { font-family: var(--serif); font-variation-settings: 'opsz' 144, 'SOFT' 50; }
+.font-mono  { font-family: var(--mono); }
+
+/* ── Shared utility: Even Keel Learning brand mark ─────────────────────────── */
+.kl-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #FAF7F2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+[data-theme="sovereign"] .kl-mark { color: #0A0E12; }
+
+/* ── Status glows (used by Struggle Map, Resolution Tray) ───────── */
+.status-red    { color: var(--red); }
+.status-amber  { color: var(--amber); }
+.status-green  { color: var(--teal); }
+[data-theme="sovereign"] .status-red    { color: var(--hub-danger); }
+[data-theme="sovereign"] .status-amber  { color: var(--hub-warning); }
+[data-theme="sovereign"] .status-green  { color: var(--hub-accent); }
+
+.glow-red    { box-shadow: 0 0 24px rgba(229, 82, 74, 0.35); border-color: rgba(229, 82, 74, 0.5); }
+.glow-amber  { box-shadow: 0 0 24px rgba(245, 166, 35, 0.35); border-color: rgba(245, 166, 35, 0.5); }
+.glow-green  { box-shadow: 0 0 24px rgba(93, 202, 165, 0.35); border-color: rgba(93, 202, 165, 0.5); }
+
+/* ── Card primitive ───────────────────────────────────────────────── */
+.kl-card {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+}
+[data-theme="sovereign"] .kl-card { border-radius: 8px; }
+
+/* ── Pill / Badge ────────────────────────────────────────────────── */
+.kl-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--border);
+}
+
+/* ── JSON viewer (Box-in-Box) ────────────────────────────────────── */
+.json-key     { color: #79c0ff; }
+.json-string  { color: #a5d6ff; }
+.json-number  { color: #d2a8ff; }
+.json-boolean { color: #ff7b72; }
+
+/* ── Pulse animation for live indicators ─────────────────────────── */
+@keyframes kl-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px var(--accent-soft); }
+  50%      { box-shadow: 0 0 0 8px transparent; }
+}
+.kl-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: kl-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes kl-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.kl-fade-up { animation: kl-fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ── Box-in-Box expansion (Sovereign nodes) ──────────────────────── */
+.kl-node {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+.kl-node:hover { border-color: var(--fg-dim); }
+.kl-node.open {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 24px var(--accent-soft);
+}
+.kl-node-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease-out;
+}
+.kl-node.open .kl-node-detail { grid-template-rows: 1fr; }
+.kl-node-detail-inner { overflow: hidden; }
+.kl-chevron { transition: transform 0.3s; }
+.kl-node.open .kl-chevron { transform: rotate(180deg); color: var(--accent); }
+
+/* ── Scrollbar (Sovereign only) ───────────────────────────────────── */
+[data-theme="sovereign"] ::-webkit-scrollbar { width: 6px; height: 6px; }
+[data-theme="sovereign"] ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+[data-theme="sovereign"] ::-webkit-scrollbar-track { background: transparent; }
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+}
+
+/* ── Loading skeleton shimmer ─────────────────────────────────────── */
+/* Used by app/loading.tsx; kept here so it is reusable. */
+@keyframes kl-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.kl-shimmer {
+  animation: kl-shimmer 1.6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kl-shimmer { animation: none; opacity: 0.6; }
+}
+
+/* ============================================================
+   ACCESSIBILITY LAYER — v1.3.0
+   ───────────────────────────
+   Settings come from `lib/a11y/settings.ts` and are applied as
+   `data-a11y-*` attributes on <html> by the AccessibilityProvider.
+   System-level preferences (`prefers-reduced-motion`,
+   `prefers-contrast: more`) are honoured directly via @media.
+   ============================================================ */
+
+/* ── Reduced-motion respect (system + user setting) ─────────────── */
+/* If the OS asks for reduced motion, suppress every animation we ship.
+   Students with vestibular disorders, photosensitive epilepsy, or
+   migraine triggers benefit immediately. We override the kl-fade-up
+   intro and the kl-pulse-dot because those run on every surface. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .kl-fade-up { animation: none !important; }
+  .kl-pulse-dot { animation: none !important; box-shadow: 0 0 0 4px var(--accent-soft); }
+}
+
+/* ── Skip link visibility ──────────────────────────────────────── */
+/* Hidden off-screen by default; brought back into view when focused. */
+.kl-skip-link {
+  transform: translateY(-200%);
+  transition: transform 0.15s ease;
+}
+.kl-skip-link:focus,
+.kl-skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Focus rings (WCAG 2.4.7 + 2.4.11) ─────────────────────────── */
+/* Every interactive element gets a visible focus indicator that
+   exceeds the 3:1 contrast minimum and is at least 2 CSS pixels
+   thick on every side, satisfying SC 2.4.13 "Focus Appearance". */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Minimum hit target (WCAG 2.5.8 "Target Size — Minimum" 24×24,
+       AAA 2.5.5 "Target Size" 44×44). We aim for AAA on dedicated
+       icon-only controls. Mark them with `.kl-tap-target`. ───────── */
+.kl-tap-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* ── Dyslexia-friendly typography ──────────────────────────────── */
+/* When the user toggles "Dyslexia-friendly typeface", swap the entire
+   body and headings to Atkinson Hyperlegible (Braille Institute, free
+   for any use, designed for legibility at small sizes). Headings keep
+   their weight but lose the Fraunces serif and ligature complexity. */
+html[data-a11y-dyslexia-font="true"] body,
+html[data-a11y-dyslexia-font="true"] .font-serif {
+  font-family: 'Atkinson Hyperlegible', 'Geist', system-ui, sans-serif;
+}
+html[data-a11y-dyslexia-font="true"] .font-serif {
+  font-variation-settings: normal;
+  letter-spacing: 0.005em;
+}
+
+/* Non-Latin locale fallbacks: Atkinson Hyperlegible is Latin-only. When the
+    UI language is Arabic / Devanagari / Hebrew / Thai, switch to the matching
+    Noto Sans family under the same dyslexia toggle so glyphs remain legible.
+    For CJK scripts we prefer system fonts due to download size. */
+html[data-a11y-dyslexia-font="true"] :lang(ar) {
+  font-family: 'Noto Sans Arabic', system-ui, sans-serif;
+}
+html[data-a11y-dyslexia-font="true"] :lang(hi),
+html[data-a11y-dyslexia-font="true"] :lang(mr),
+html[data-a11y-dyslexia-font="true"] :lang(ne) {
+  font-family: 'Noto Sans Devanagari', system-ui, sans-serif;
+}
+html[data-a11y-dyslexia-font="true"] :lang(he) {
+  font-family: 'Noto Sans Hebrew', system-ui, sans-serif;
+}
+html[data-a11y-dyslexia-font="true"] :lang(th) {
+  font-family: 'Noto Sans Thai', system-ui, sans-serif;
+}
+html[data-a11y-dyslexia-font="true"] :lang(zh),
+html[data-a11y-dyslexia-font="true"] :lang(ja),
+html[data-a11y-dyslexia-font="true"] :lang(ko) {
+  font-family: system-ui, -apple-system, 'PingFang SC', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', 'Malgun Gothic', sans-serif;
+}
+
+/* ── Wider letter & line spacing ───────────────────────────────── */
+html[data-a11y-large-spacing="true"] body {
+  letter-spacing: 0.04em;
+  line-height: 1.75;
+  word-spacing: 0.08em;
+}
+
+/* ── Larger text ───────────────────────────────────────────────── */
+html[data-a11y-large-text="true"] body {
+  font-size: 17px;       /* 15px * 1.125 */
+}
+html[data-a11y-large-text="true"] {
+  --fg-dim: var(--ink);  /* tighten dim greys for legibility */
+}
+[data-theme="sovereign"] html[data-a11y-large-text="true"] {
+  --fg-dim: var(--hub-text);
+}
+
+/* ── Higher contrast (user-toggled OR OS-requested) ────────────── */
+html[data-a11y-high-contrast="true"][data-theme="paper"] {
+  --fg-dim: #1A2128;
+  --fg-faint: #3A4754;
+  --border: #1A2128;
+  --bg-deep: #ECE5D8;
+}
+html[data-a11y-high-contrast="true"][data-theme="sovereign"] {
+  --hub-text-dim: #FFFFFF;
+  --fg-dim: #FFFFFF;
+  --fg-faint: #E5E7EA;
+  --border: #FFFFFF;
+}
+@media (prefers-contrast: more) {
+  [data-theme="paper"] {
+    --fg-dim: #1A2128;
+    --fg-faint: #3A4754;
+    --border: #1A2128;
+  }
+  [data-theme="sovereign"] {
+    --hub-text-dim: #FFFFFF;
+    --fg-dim: #FFFFFF;
+    --fg-faint: #E5E7EA;
+    --border: #FFFFFF;
+  }
+}
+
+/* ── Focus mode (student surface) ──────────────────────────────── */
+/* Hides the right-rail meters, the surface badges, and the secondary
+   chrome on /student so a single problem fills the view. Components
+   that should disappear in focus mode tag themselves with
+   `data-focus-hide="true"`. */
+html[data-a11y-focus-mode="true"] [data-focus-hide="true"] {
+  display: none !important;
+}
+/* Also collapse the student page's three-column grid back to one column
+   so the chat occupies the full content width. */
+html[data-a11y-focus-mode="true"] .kl-student-grid {
+  grid-template-columns: 1fr !important;
+}
+
+/* ── Assistive-input badge surfacing ───────────────────────────── */
+/* When a learner has declared assistive-input use, EkeChat shows a
+   discreet badge so the trust meter's silence is explainable. */
+html[data-a11y-assistive-input="true"] [data-show-when-assistive="true"] {
+  display: inline-flex;
+}
+[data-show-when-assistive="true"] {
+  display: none;
+}
+
+/* ── Forced-colors (Windows High Contrast Mode) ────────────────── */
+/* SC 1.4.1 — never rely on colour alone. In forced-colors, our subtle
+   borders disappear; restore them by drawing on system tokens. */
+@media (forced-colors: active) {
+  .kl-card, .kl-node, .kl-badge {
+    border: 1px solid CanvasText;
+  }
+  .kl-skip-link:focus {
+    outline-color: Highlight;
+  }
+}

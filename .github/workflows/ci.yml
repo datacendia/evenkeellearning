@@ -1,0 +1,84 @@
+name: CI
+
+# CI gate: typecheck → lint → unit tests → audit manifest.
+# E2E (Playwright) runs on a separate workflow because it spins up the dev
+# server.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: build · lint · test · audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck (tsc --noEmit)
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint -- --max-warnings 0
+
+      - name: Unit tests
+        run: npm test -- --run
+
+      - name: Anti-pattern grep (privacy / XSS / ads)
+        run: |
+          node scripts/grep-anti-pattern.mjs "mediaDevices|userVerification\\s*:\\s*['\"]required['\"]"
+          node scripts/grep-anti-pattern.mjs "googletagmanager|google-analytics|doubleclick|facebook\\.net"
+          node scripts/grep-anti-pattern.mjs "dangerouslySetInnerHTML"
+
+      - name: Audit manifest (offline checks)
+        run: node scripts/audit.mjs --strict
+
+      - name: Upload audit manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-manifest
+          path: evidence/test-manifest-enterprise-complete-*.json
+
+  e2e:
+    name: e2e (playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: build-and-test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run e2e suite
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
