@@ -217,7 +217,7 @@ export class HardwareGhostProtocol {
 }
 
 function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 2 + 9)}`;
 }
 
 export function createHardwareGhostProtocol(): HardwareGhostProtocol {

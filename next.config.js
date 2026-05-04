@@ -37,10 +37,6 @@ const securityHeaders = [
     value: "DENY",
   },
   {
-    key: "X-XSS-Protection",
-    value: "1; mode=block",
-  },
-  {
     key: "Referrer-Policy",
     value: "strict-origin-when-cross-origin",
   },
@@ -51,8 +47,8 @@ const securityHeaders = [
     value: "camera=(), microphone=(), geolocation=()",
   },
   {
-    // HSTS: only set this once you have a stable HTTPS deployment.
-    // max-age of 1 year (31536000 seconds) plus preload eligibility.
+    // HSTS: only enable once you have a confirmed HTTPS-only deployment.
+    // max-age=31536000 (1 year) with includeSubDomains is HSTS-preload eligible.
     key: "Strict-Transport-Security",
     value: "max-age=31536000; includeSubDomains",
   },
