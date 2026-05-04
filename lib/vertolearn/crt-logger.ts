@@ -36,7 +36,7 @@ export class CRTLogger {
     this.logEvent("start", { problemId });
   }
 
-  logEvent(eventType: CRTEvent["eventType"], data?: any, duration?: number): void {
+  logEvent(eventType: CRTEvent["eventType"], data?: Record<string, unknown>, duration?: number): void {
     const event: CRTEvent = {
       id: generateHash({ sessionId: this.sessionId, timestamp: Date.now(), eventType }),
       timestamp: Date.now(),

@@ -25,9 +25,9 @@ export async function POST(req: Request) {
     // In production, we would use the specific provider's SDK (SendGrid/Twilio) here.
     // e.g., if (provider === 'sms-twilio') { await twilioClient.messages.create(...) }
     
-    console.log(`[safeguarding-dispatch] Server successfully dispatched envelope via ${provider}`);
-    console.log(`[safeguarding-dispatch] Category: ${entry.envelope.payload.crisisPatternCategory}`);
-    console.log(`[safeguarding-dispatch] ID: ${entry.envelope.payload.eventId}`);
+    console.info(`[safeguarding-dispatch] Server successfully dispatched envelope via ${provider}`);
+    console.info(`[safeguarding-dispatch] Category: ${entry.envelope.payload.crisisPatternCategory}`);
+    console.info(`[safeguarding-dispatch] ID: ${entry.envelope.payload.id}`);
 
     // Return success to the client adapter
     return NextResponse.json({ ok: true, statusCode: 200, deliveredAt: Date.now() });
