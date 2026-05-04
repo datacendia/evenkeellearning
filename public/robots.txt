@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Disallow internal API routes from indexing
+Disallow: /api/
+
+# Sitemap (update to the production domain before launch)
+# Sitemap: https://evenkeel.example/sitemap.xml

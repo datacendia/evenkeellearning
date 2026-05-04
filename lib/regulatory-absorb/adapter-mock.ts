@@ -182,13 +182,19 @@ export async function resolveConflict(
   justification: string,
   keyPair?: CryptoKeyPair
 ): Promise<RegulatoryConflict | null> {
-  const conflict = SEED_CONFLICTS.find((c) => c.id === conflictId);
-  if (!conflict) return null;
+  const idx = SEED_CONFLICTS.findIndex((c) => c.id === conflictId);
+  if (idx === -1) return null;
 
-  conflict.resolutionStatus = "RESOLVED_PRIORITY";
-  conflict.resolvedAt = Date.now();
-  conflict.resolvedBy = resolvedBy;
-  conflict.generatedJustification = justification;
+  // Work on a shallow copy so we don't mutate the shared seed object in place.
+  // Other callers (listConflicts, getAbsorptionResult) will see the updated
+  // array entry after this function returns.
+  const conflict: RegulatoryConflict = {
+    ...SEED_CONFLICTS[idx],
+    resolutionStatus: "RESOLVED_PRIORITY",
+    resolvedAt: Date.now(),
+    resolvedBy,
+    generatedJustification: justification,
+  };
 
   // Canonical payload: include conflict id, requirement ids, resolver,
   // justification and resolvedAt. Anything else is presentation.
@@ -220,6 +226,9 @@ export async function resolveConflict(
     // eslint-disable-next-line no-console
     console.warn("[adapter-mock] resolveConflict could not sign:", err);
   }
+
+  // Commit the updated copy back into the shared array.
+  SEED_CONFLICTS[idx] = conflict;
 
   return conflict;
 }

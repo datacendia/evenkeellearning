@@ -134,23 +134,23 @@ export class NeutralityShield {
   }
 
   private analyzeProblemText(text: string): Partial<FlawDetection> {
-    const lowerText = text.toLowerCase();
-    
-    // Check for common flaw indicators
-    const flawIndicators = {
-      typo: /typo|error|mistake|misprint/i,
-      missing_variable: /missing|undefined|unknown|not given/i,
-      contradiction: /but|however|although|yet/i,
-      ambiguous: /or|either|approximately|about/i,
-      unsolvable: /impossible|cannot|no solution/i,
+    // Check for explicit flaw indicators in the problem text. Patterns use
+    // word boundaries and specific phrases to avoid false positives on common
+    // English words like "or", "but", or "about".
+    const flawIndicators: Record<NonNullable<FlawDetection["flawType"]>, RegExp> = {
+      typo: /\b(typo|misprint|misspelling|misspelled)\b/i,
+      missing_variable: /\b(missing value|missing variable|not given|not provided|undefined variable)\b/i,
+      contradiction: /\b(contradicts|contradictory|inconsistent|incompatible|impossible constraint)\b/i,
+      ambiguous: /\b(unclear|ambiguous|ill-defined|not specified|not defined)\b/i,
+      unsolvable: /\b(no solution|no real solution|has no answer|impossible to solve)\b/i,
     };
 
-    for (const [flawType, pattern] of Object.entries(flawIndicators)) {
+    for (const [flawType, pattern] of Object.entries(flawIndicators) as [NonNullable<FlawDetection["flawType"]>, RegExp][]) {
       if (pattern.test(text)) {
         return {
           isFlawed: true,
           confidence: 0.5,
-          flawType: flawType as FlawDetection["flawType"],
+          flawType,
           suggestedFix: "Review problem statement for potential issues.",
         };
       }
