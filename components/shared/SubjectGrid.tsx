@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useT } from "@/lib/i18n/I18nProvider";
+import { listAvailableSubjects } from "@/lib/content/registry";
 
 interface Subject {
   id: string;
@@ -112,6 +113,40 @@ export default function SubjectGrid({ value, onChange }: Props) {
   const t = useT();
   const [query, setQuery] = useState("");
 
+  // v1.5.5 — H-4: honestly badge tiles without authored content.
+  //
+  // Before v1.5.5, every tile was identically clickable, but only the
+  // `maths` tile actually changed the learner's content (the linear-
+  // equation corpus). Selecting "Welding" or "Spanish" updated the
+  // title strip but the engine still served a linear equation. The
+  // audit called this out as the single biggest product-honesty gap.
+  //
+  // Resolution: ask the signed content registry which subjects have
+  // verified packs, and badge anything not on that list with
+  // "Content coming soon". The tile remains clickable so the picker UX
+  // is intact, but the learner immediately sees that the surface is
+  // a placeholder rather than discovering it after wasting a session.
+  //
+  // The registry includes a fallback so `maths` is always available
+  // even with no signed manifest (dev demo).
+  const [available, setAvailable] = useState<ReadonlySet<string> | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    listAvailableSubjects()
+      .then((list) => {
+        if (!cancelled) setAvailable(new Set(list));
+      })
+      .catch(() => {
+        // Registry failed to load (offline, manifest missing). Treat
+        // every tile as "unknown" — better to show no badges than to
+        // pretend "no content" when we can't tell.
+        if (!cancelled) setAvailable(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return SUBJECTS;
@@ -190,22 +225,56 @@ export default function SubjectGrid({ value, onChange }: Props) {
             <div className="grid grid-cols-2 gap-1.5">
               {grouped[g].map((s) => {
                 const active = s.id === value;
+                // `available === null` means the registry could not be
+                // queried — fall back to neutral (no badge) rather than
+                // misclaim "no content".
+                const hasContent =
+                  available === null ? true : available.has(s.id);
+                const tileTitle = hasContent
+                  ? s.label
+                  : `${s.label} — content coming soon (no signed pack yet)`;
                 return (
                   <button
                     key={s.id}
                     onClick={() => onChange(s.id)}
                     className="px-2 py-1.5 rounded-md text-[11px] flex items-center gap-1.5 transition text-left"
-                    title={s.label}
+                    title={tileTitle}
+                    aria-label={tileTitle}
                     style={{
                       background: active ? "var(--accent-soft)" : "var(--bg)",
-                      color: active ? "var(--accent)" : "var(--fg)",
+                      color: active
+                        ? "var(--accent)"
+                        : hasContent
+                          ? "var(--fg)"
+                          : "var(--fg-faint)",
                       border: "1px solid",
                       borderColor: active ? "var(--accent)" : "var(--border)",
                       fontWeight: active ? 600 : 400,
+                      opacity: hasContent ? 1 : 0.6,
                     }}
                   >
                     <span style={{ opacity: 0.7, minWidth: 14 }}>{s.icon}</span>
                     <span className="truncate">{s.label}</span>
+                    {!hasContent && (
+                      <span
+                        aria-hidden="true"
+                        title="No signed content pack yet"
+                        style={{
+                          marginLeft: "auto",
+                          fontSize: 8,
+                          letterSpacing: "0.05em",
+                          textTransform: "uppercase",
+                          color: "var(--fg-faint)",
+                          border: "1px solid var(--border)",
+                          borderRadius: 2,
+                          padding: "0 3px",
+                          lineHeight: "12px",
+                          flexShrink: 0,
+                        }}
+                      >
+                        soon
+                      </span>
+                    )}
                   </button>
                 );
               })}

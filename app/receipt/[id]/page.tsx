@@ -332,7 +332,11 @@ function ReceiptCard({
         <Field label="Max hint tier" value={`${p.hintTierMax} of 4`} />
         <Field label="Comprehension gate" value={p.gateCleared ? "cleared" : "not cleared"} />
         <Field label="Leitner box" value={`${p.leitnerBox} of 5`} />
-        <Field label="Trust score" value={`${p.trustScore} of 100`} />
+        {/* v1.5.5 — H-5: see IssueReceiptCard for rationale. The payload
+            field name stays `trustScore` because changing it would
+            invalidate every signature ever issued; the verifier UI
+            relabels it to match the issuer UI. */}
+        <Field label="Input consistency" value={`${p.trustScore} of 100`} />
         <Field label="Paste attempts" value={String(p.pasteAttempts)} />
         <Field label="Practice sessions" value={String(p.practiceSessionsCount)} />
 

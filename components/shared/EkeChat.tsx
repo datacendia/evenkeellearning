@@ -4,9 +4,17 @@
 // components/shared/EkeChat.tsx
 //
 // The chat surface that hosts the Socratic Eke engine. Responsibilities:
-//   • Render the conversation, the problem context strip and the trust badge
+//   • Render the conversation, the problem context strip and the consistency
+//     badge (a [0..100] derivation of the IPA mimicry probability)
 //   • Pump every keystroke / paste / focus-loss into the IPA analyser to keep
-//     the live trust meter honest
+//     the live consistency badge honest
+//
+// v1.5.5 — H-5: the badge was previously labelled "Trust". That framing
+// risked implying the platform decides a learner is "trustworthy" based
+// on their typing cadence — a discrimination concern for SEN, ESL, and
+// neurodivergent learners whose cadence may legitimately be unusually
+// even or staccato. The label is now "Consistency" and the tooltip is
+// explicit that this is an input-cadence signal, not a judgement.
 //   • Optionally short-circuit paste events when `zeroPaste` is on (default)
 //   • Publish learner activity (hint requested, paste blocked, submission)
 //     onto the cross-surface data bus so the parent and teacher views can
@@ -665,7 +673,11 @@ export default function EkeChat({
                 ? `Mimicry probability: ${mimicryPct}% (cadence checks suppressed; assistive input declared)`
                 : `Mimicry probability: ${mimicryPct}%`
             }
-            aria-label={`Trust score ${trust} out of 100`}
+            aria-label={
+              `Input consistency ${trust} out of 100. ` +
+              `Lower values reflect more pasting, more focus loss, or ` +
+              `more uneven typing cadence — not a judgement of the learner.`
+            }
             style={{
               background:
                 trust >= 70
@@ -681,7 +693,7 @@ export default function EkeChat({
                   : "var(--red)",
             }}
           >
-            <Activity size={10} aria-hidden="true" /> {t("eke.trust")} {trust}
+            <Activity size={10} aria-hidden="true" /> {t("eke.consistency")} {trust}
           </span>
           {zeroPaste && (
             <span className="kl-badge" aria-label="Paste blocked on this surface">

@@ -43,6 +43,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { publish } from "@/lib/data-bus";
+import { tombstoneEscalations } from "@/lib/safeguarding/escalation-queue";
 
 /**
  * Storage prefixes the app uses. Anything in these namespaces is in scope for
@@ -74,6 +75,29 @@ export const PARENT_POLICY_PREFIXES_KEEP: readonly string[] = [
   "evenkeel/role-guard/",
 ];
 
+/**
+ * v1.5.5 — keys that need *structured* erasure rather than a raw
+ * `removeItem`. The signed escalation queue is the canonical example:
+ * the queue contract pins a 90-day WORM retention on signed payloads,
+ * so Art. 17 erasure replaces every live entry with a hash-only
+ * tombstone instead of silently wiping the localStorage key.
+ *
+ * The handler MUST leave behind no signed payload, no learner-data
+ * field, and only persist what an external auditor needs to verify
+ * "an erasure happened at time T over an envelope with digest D".
+ */
+const STRUCTURED_ERASURE_HANDLERS: ReadonlyArray<{
+  /** Storage key the handler owns. Skipped by the generic remove loop. */
+  readonly key: string;
+  /** Returns the number of records that were tombstoned (>=0). */
+  readonly run: (now: Date) => number;
+}> = [
+  {
+    key: "evenkeel.safeguarding.queue.v1",
+    run: (now) => tombstoneEscalations("art17_erasure", now.getTime()),
+  },
+];
+
 export interface ErasureReport {
   /** ISO 8601 timestamp of when erasure ran. */
   at: string;
@@ -81,6 +105,12 @@ export interface ErasureReport {
   removed: string[];
   /** Storage keys that matched a project prefix but were intentionally kept. */
   kept: string[];
+  /**
+   * Storage keys handled by a structured erasure handler (e.g. the
+   * signed escalation queue, which is converted to hash-only tombstones
+   * rather than a raw removeItem). Empty when no such handlers fired.
+   */
+  tombstoned: string[];
 }
 
 /**
@@ -117,7 +147,12 @@ export function isParentPolicyKey(key: string): boolean {
  * @param now Optional clock injection for tests.
  */
 export function eraseLearnerData(now: Date = new Date()): ErasureReport {
-  const report: ErasureReport = { at: now.toISOString(), removed: [], kept: [] };
+  const report: ErasureReport = {
+    at: now.toISOString(),
+    removed: [],
+    kept: [],
+    tombstoned: [],
+  };
   if (typeof window === "undefined") return report;
 
   // Collect first, then delete — never iterate-and-delete the live store, as
@@ -137,10 +172,18 @@ export function eraseLearnerData(now: Date = new Date()): ErasureReport {
   // everything else, but other tabs already received the message in real
   // time via BroadcastChannel). Idempotent: a second call after this one
   // finds nothing to remove.
+  // v1.5.5 — keys with a structured erasure handler are diverted from
+  // the generic remove loop. They are still "in scope for Art. 17" but
+  // the handler decides how (e.g. signed escalation queue → hash-only
+  // tombstones). Skipping them here ensures the generic removeItem
+  // can't silently violate a domain contract (WORM, immutable receipts).
+  const structuredKeys = new Set(STRUCTURED_ERASURE_HANDLERS.map((h) => h.key));
+
   const toRemove: string[] = [];
   const toKeep: string[] = [];
   for (const k of allKeys) {
     if (!isProjectKey(k)) continue;
+    if (structuredKeys.has(k)) continue; // handled below
     if (isParentPolicyKey(k)) toKeep.push(k);
     else toRemove.push(k);
   }
@@ -173,6 +216,35 @@ export function eraseLearnerData(now: Date = new Date()): ErasureReport {
       report.removed.push(k);
     } catch {
       // Quota / privacy mode — best-effort; don't throw mid-erasure.
+    }
+  }
+
+  // v1.5.5 — run structured erasure handlers. Each handler is responsible
+  // for replacing its key's contents with audit-only tombstones rather
+  // than a raw removeItem. Reports the handled key under `tombstoned`
+  // when at least one record was converted; otherwise (empty queue, no
+  // live entries) cleans up the key under `removed` so the report still
+  // reflects what the audit surface sees in localStorage.
+  for (const handler of STRUCTURED_ERASURE_HANDLERS) {
+    // Was the key present before the handler ran? Influences which
+    // bucket of the report we end up reporting it under.
+    const wasPresent = window.localStorage.getItem(handler.key) !== null;
+    try {
+      const n = handler.run(now);
+      if (n > 0) {
+        report.tombstoned.push(handler.key);
+      } else if (wasPresent) {
+        // No live entries to tombstone, but the key existed (e.g. `[]`).
+        // Treat it as a normal removal so it shows up in the report.
+        try {
+          window.localStorage.removeItem(handler.key);
+          report.removed.push(handler.key);
+        } catch {
+          /* best-effort */
+        }
+      }
+    } catch {
+      /* never let a handler fault stop the rest of the erase */
     }
   }
 

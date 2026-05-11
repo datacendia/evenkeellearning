@@ -277,7 +277,11 @@ export default function IssueReceiptCard({
       />
       <SummaryRow label="Max hint tier" value={`${hintTierMax}/4`} />
       <SummaryRow label="Errors caught" value={String(errorTotal)} />
-      <SummaryRow label="Trust score" value={`${trustScore}/100`} />
+      {/* v1.5.5 — H-5: label renamed from "Trust score" to "Input consistency".
+          The underlying field on the signed receipt payload stays
+          `trustScore` for back-compat (it is part of the verified
+          signature surface; renaming would break every issued receipt). */}
+      <SummaryRow label="Input consistency" value={`${trustScore}/100`} />
       <SummaryRow label="Practice sessions" value={String(practiceSessionsCount)} />
 
       {!issued ? (

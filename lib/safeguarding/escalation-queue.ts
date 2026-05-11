@@ -344,10 +344,139 @@ export function clearEscalations(): void {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.removeItem(STORAGE_KEY);
+    window.localStorage.removeItem(TOMBSTONE_KEY);
   } catch {
     // ignore
   }
   notify();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tombstones (v1.5.5) — reconciling WORM with GDPR Art. 17.
+//
+// The original v1.4.10 contract said signed escalation payloads are
+// immutable for 90 days. The v1.5.4 GDPR Art. 17 erasure path then wiped
+// the queue's localStorage key wholesale via namespace matching — which
+// quietly violated the WORM contract. The escalation queue and the
+// erasure path were both correct in isolation; the contradiction was at
+// the seam.
+//
+// v1.5.5 resolves it by introducing a *tombstone*: a hash-only audit row
+// that records "an entry with envelope-digest D existed and was erased
+// at time T", but contains NO signed payload, NO crisis category, NO
+// jurisdiction, NO student age band — only what the audit needs.
+//
+// Properties:
+//   • A future regulator can verify "an erasure happened" without us
+//     retaining anything that re-identifies the learner.
+//   • The signed envelope itself is gone — Art. 17 satisfied.
+//   • The 90-day WORM window applied while the entry was live, so the
+//     contract holds for entries that age out naturally.
+//   • Tombstones are themselves prunable on a separate 365-day window
+//     (longer than the live retention; they're tiny and audit-relevant).
+//
+// Wired from `lib/safety/erasure.ts` via `tombstoneEscalations()`.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const TOMBSTONE_KEY = "evenkeel.safeguarding.tombstones.v1";
+
+/** Tombstones live longer than the live retention — they're audit-only. */
+export const TOMBSTONE_RETENTION_DAYS = 365;
+const TOMBSTONE_RETENTION_MS = TOMBSTONE_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+
+/**
+ * Audit-only marker that a signed escalation entry used to exist on
+ * this device and has since been erased. Contains the envelope's
+ * content digest (so an external party with a copy of the original
+ * envelope could prove it's the one that was erased), the original
+ * `detectedAt` (so the WORM window can be inspected post-hoc), and
+ * the `erasedAt` timestamp. **No signed payload, no category, no
+ * jurisdiction, no age band.**
+ */
+export interface EscalationTombstone {
+  /** Mirrors the original entry id, for cross-referencing only. */
+  id: string;
+  /** Original `payload.detectedAt`, so retention windows can be audited. */
+  detectedAt: number;
+  /** Epoch ms at which the entry was tombstoned. */
+  erasedAt: number;
+  /** Original envelope content digest, base64url. Unsigned, audit-only. */
+  envelopeDigestB64url: string;
+  /** Why the entry left the queue. */
+  reason: "art17_erasure" | "admin_clear";
+}
+
+function readTombstones(): EscalationTombstone[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(TOMBSTONE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (x): x is EscalationTombstone =>
+        !!x &&
+        typeof x === "object" &&
+        typeof (x as EscalationTombstone).id === "string" &&
+        typeof (x as EscalationTombstone).envelopeDigestB64url === "string" &&
+        typeof (x as EscalationTombstone).detectedAt === "number" &&
+        typeof (x as EscalationTombstone).erasedAt === "number",
+    );
+  } catch {
+    return [];
+  }
+}
+
+function writeTombstones(rows: EscalationTombstone[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(TOMBSTONE_KEY, JSON.stringify(rows));
+  } catch {
+    /* quota / private mode — best-effort */
+  }
+}
+
+/** All tombstones, oldest-first. Exposed for the audit surface. */
+export function listTombstones(): EscalationTombstone[] {
+  return readTombstones();
+}
+
+/**
+ * Replace every live entry with a tombstone row. Intended to be called
+ * from the GDPR Art. 17 erasure path. Idempotent — calling twice in a
+ * row with no live entries between calls writes no new tombstones.
+ *
+ * Returns the number of entries that were converted.
+ */
+export function tombstoneEscalations(
+  reason: EscalationTombstone["reason"] = "art17_erasure",
+  now: number = Date.now(),
+): number {
+  if (typeof window === "undefined") return 0;
+  const live = readStore();
+  if (live.length === 0) return 0;
+  const existing = readTombstones();
+  const newRows: EscalationTombstone[] = live.map((e) => ({
+    id: e.id,
+    detectedAt: e.detectedAt,
+    erasedAt: now,
+    envelopeDigestB64url: e.envelope.contentDigestB64url,
+    reason,
+  }));
+  // Prune any tombstones older than the tombstone-retention window while
+  // we're here, so the store stays bounded.
+  const survivors = [...existing, ...newRows].filter(
+    (t) => now - t.erasedAt <= TOMBSTONE_RETENTION_MS,
+  );
+  writeTombstones(survivors);
+  // Remove the signed payloads themselves.
+  try {
+    window.localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+  notify();
+  return newRows.length;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

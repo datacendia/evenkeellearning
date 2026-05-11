@@ -87,6 +87,8 @@ describe("safety/erasure — eraseLearnerData", () => {
     seedAllKnownKeys();
     const report = eraseLearnerData();
 
+    // Keys handled by the generic `removeItem` loop — these appear in
+    // `report.removed`.
     const expectRemoved = [
       "evenkeel.bus.log",
       "evenkeel.eke.errorBank",
@@ -94,7 +96,6 @@ describe("safety/erasure — eraseLearnerData", () => {
       "evenkeel.eke.practiceMode",
       "evenkeel.receipts.bank",
       "evenkeel.passkey.enrolment.v1",
-      "evenkeel.safeguarding.queue.v1",
       "evenkeel.safeguarding.tabContextId.v1",
       "evenkeel/age-band",
       "evenkeel/a11y/v1",
@@ -109,6 +110,16 @@ describe("safety/erasure — eraseLearnerData", () => {
       expect(window.localStorage.getItem(k), `expected ${k} removed`).toBeNull();
       expect(report.removed).toContain(k);
     }
+
+    // The signed escalation queue is in scope for Art. 17 but goes
+    // through a STRUCTURED handler (hash-only tombstones) to honour its
+    // 90-day WORM contract. With an empty queue (seed is "[]"), the
+    // handler converts no records, so the key falls through to a normal
+    // removal — see the dedicated "hash-only tombstone" test below for
+    // the live-entries path.
+    expect(window.localStorage.getItem("evenkeel.safeguarding.queue.v1")).toBeNull();
+    expect(report.removed).toContain("evenkeel.safeguarding.queue.v1");
+    expect(report.tombstoned).not.toContain("evenkeel.safeguarding.queue.v1");
   });
 
   it("keeps parent-set policy keys", () => {
@@ -156,6 +167,49 @@ describe("safety/erasure — eraseLearnerData", () => {
     expect(report.removed).toHaveLength(0);
     expect(report.kept).toHaveLength(0);
     expect(window.localStorage.getItem("foreign")).toBe("value");
+  });
+
+  // v1.5.5 — H-3 regression: structured erasure for the signed
+  // escalation queue. The previous behaviour wiped the queue's
+  // localStorage key wholesale via namespace matching, which silently
+  // violated the queue's 90-day WORM contract. The fix converts every
+  // live entry to a hash-only tombstone (no signed payload, no learner
+  // category) and reports the key under `report.tombstoned` rather than
+  // `report.removed`.
+  it("converts signed escalations to hash-only tombstones rather than wiping them", async () => {
+    // Lazy-imported so the test file's existing surface stays untouched.
+    const { enqueueEscalation, clearEscalations, listTombstones } =
+      await import("@/lib/safeguarding/escalation-queue");
+    clearEscalations();
+    const entry = await enqueueEscalation({
+      triggerType: "crisis_response",
+      crisisPatternCategory: "direct_self_harm",
+      jurisdiction: "IE",
+    });
+
+    const report = eraseLearnerData();
+
+    // The queue key must be reported as tombstoned, NOT as removed —
+    // the distinction is the whole point of H-3.
+    expect(report.tombstoned).toContain("evenkeel.safeguarding.queue.v1");
+    expect(report.removed).not.toContain("evenkeel.safeguarding.queue.v1");
+
+    // The signed payload is gone from the live queue.
+    const liveRaw = window.localStorage.getItem("evenkeel.safeguarding.queue.v1");
+    expect(liveRaw).toBeNull();
+
+    // A tombstone exists carrying the envelope digest, but NO category,
+    // NO jurisdiction, NO signed payload.
+    const tombs = listTombstones();
+    expect(tombs).toHaveLength(1);
+    expect(tombs[0]!.id).toBe(entry.id);
+    expect(tombs[0]!.envelopeDigestB64url).toBe(entry.envelope.contentDigestB64url);
+    expect(tombs[0]!.reason).toBe("art17_erasure");
+    // Privacy contract — these fields MUST NOT exist on a tombstone.
+    expect(tombs[0] as Record<string, unknown>).not.toHaveProperty("crisisPatternCategory");
+    expect(tombs[0] as Record<string, unknown>).not.toHaveProperty("jurisdiction");
+    expect(tombs[0] as Record<string, unknown>).not.toHaveProperty("payload");
+    expect(tombs[0] as Record<string, unknown>).not.toHaveProperty("envelope");
   });
 
   // v1.5.5 — regression for the C-3 defect.

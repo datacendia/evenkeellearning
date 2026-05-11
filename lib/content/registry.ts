@@ -250,6 +250,31 @@ export async function getFamilyItems(
 }
 
 /**
+ * v1.5.5 — set of subject ids that have at least one verified content
+ * pack registered. Used by `SubjectGrid` to badge tiles honestly: a
+ * "Welding" tile that has no pack is shown as "no content yet" rather
+ * than as a clickable problem-source (audit finding H-4).
+ *
+ * Always-on fallback: `linear-eq-1var` has a hand-written corpus in
+ * `lib/eke/parallel-problems.ts` that pre-dates the signed-pack
+ * pipeline. We treat `maths` as available whenever the registry is
+ * empty (manifest missing in dev) so the existing demo flow keeps
+ * working without a signed manifest.
+ */
+export async function listAvailableSubjects(): Promise<readonly string[]> {
+  const state = await loadContentRegistry();
+  const subjects = new Set<string>();
+  for (const pack of state.packs.values()) {
+    if (pack.pack.subject && pack.pack.items.length > 0) {
+      subjects.add(pack.pack.subject);
+    }
+  }
+  // Always-on fallback for the hand-written linear-eq-1var corpus.
+  if (subjects.size === 0) subjects.add("maths");
+  return Array.from(subjects);
+}
+
+/**
  * Returns the misconception for a given (skillFamily, itemId, trigger).
  * Used by EkeChat to surface a teaching message after a categorised
  * wrong attempt. Returns null if no matching misconception exists.
