@@ -6,7 +6,7 @@
   "skillFamily": "eng-paper1-q3-structure",
   "metadata": {
     "version": "1.0.0",
-    "builtAtIso": "2026-05-11T12:28:11.159Z",
+    "builtAtIso": "2026-05-11T12:34:56.019Z",
     "description": "AQA English Language Paper 1, Question 3 (structure). Authoring-pipeline proof-of-scope: a non-numeric, qualitative skill family rendered through the v1.5.0 schema. Awaits the qualitative-checker for full runtime categorisation; the explanation and worked-example pathways already work via the registry."
   },
   "items": [
@@ -82,19 +82,19 @@
       "approval": null,
       "approvals": [
         {
-          "reviewerFingerprint": "mmRf-yjm8lLRDIfS",
+          "reviewerFingerprint": "cyd7JG_hrG4XkpUC",
           "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
-          "approvedAtIso": "2026-05-11T12:28:11.161Z",
-          "signatureB64url": "a8efiR2gIrjsP5dAPHtBoIXSvnkP1tvkzPkY4BHLt72h8n07vT4oErCYgv07je2yRiEmWh-rwlTDJN9LSVCDow",
-          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPv8VamQbiD-BMngj5Or3M5lHlnB07zMwrjwiFV2QJAeRTwzRa02qPApMW3-YaZ_J8yz7xoQNkwgkUcqocnOCJg",
+          "approvedAtIso": "2026-05-11T12:34:56.029Z",
+          "signatureB64url": "GDfedKIvVVM2zSSuKWwfQq1XyRYlGz4cXKQLQ16EJeuLzpBDeDupwQPbh82JvRlOLn8Cl0TmeU6OmvK0ZF2aIQ",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3HtClTDBVJmJZ6XrGP_wppUp5HVxcXxGiG8BT-fOQSgpE5YN42R_nnIujNqdPlO4Eu66cwihEeXo-LNRZWmhNQ",
           "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
         },
         {
-          "reviewerFingerprint": "mmRf-yjm8lLRDIfS",
+          "reviewerFingerprint": "cyd7JG_hrG4XkpUC",
           "reviewerName": "Build-Time Seed Reviewer (v1.5.0) (Peer)",
-          "approvedAtIso": "2026-05-11T12:28:11.161Z",
-          "signatureB64url": "a8efiR2gIrjsP5dAPHtBoIXSvnkP1tvkzPkY4BHLt72h8n07vT4oErCYgv07je2yRiEmWh-rwlTDJN9LSVCDow",
-          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPv8VamQbiD-BMngj5Or3M5lHlnB07zMwrjwiFV2QJAeRTwzRa02qPApMW3-YaZ_J8yz7xoQNkwgkUcqocnOCJg",
+          "approvedAtIso": "2026-05-11T12:34:56.029Z",
+          "signatureB64url": "GDfedKIvVVM2zSSuKWwfQq1XyRYlGz4cXKQLQ16EJeuLzpBDeDupwQPbh82JvRlOLn8Cl0TmeU6OmvK0ZF2aIQ",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3HtClTDBVJmJZ6XrGP_wppUp5HVxcXxGiG8BT-fOQSgpE5YN42R_nnIujNqdPlO4Eu66cwihEeXo-LNRZWmhNQ",
           "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
         }
       ]

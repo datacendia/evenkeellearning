@@ -1,28 +1,37 @@
 {
   "schemaVersion": "1.0.0",
   "version": "1.0.0",
-  "builtAtIso": "2026-05-11T12:28:11.159Z",
+  "builtAtIso": "2026-05-11T12:34:56.019Z",
   "trustedReviewers": [
     {
-      "fingerprint": "mmRf-yjm8lLRDIfS",
+      "fingerprint": "cyd7JG_hrG4XkpUC",
       "name": "Build-Time Seed Reviewer (v1.5.0)",
-      "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPv8VamQbiD-BMngj5Or3M5lHlnB07zMwrjwiFV2QJAeRTwzRa02qPApMW3-YaZ_J8yz7xoQNkwgkUcqocnOCJg"
+      "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3HtClTDBVJmJZ6XrGP_wppUp5HVxcXxGiG8BT-fOQSgpE5YN42R_nnIujNqdPlO4Eu66cwihEeXo-LNRZWmhNQ"
     }
   ],
   "entries": [
     {
       "packId": "english.aqa-paper1-q3-structure",
       "path": "packs/english.aqa-paper1-q3-structure.json",
-      "contentHashB64url": "oe6BZojmvA2nW8AllUSbMnrr9x4ieRL3teNQFjczQIQ",
+      "contentHashB64url": "jP-M4e44Q5ALsxa9fTEX--e9vz_Q8j5JLQwws3qc_Gg",
       "version": "1.0.0",
       "subject": "english",
       "skillFamily": "eng-paper1-q3-structure",
       "itemCount": 1
     },
     {
+      "packId": "maths.fractions-arith",
+      "path": "packs/maths.fractions-arith.json",
+      "contentHashB64url": "VVIw5Wuj4vFaS5vRVlaik_1CBGKN_juMTtHQWTlg234",
+      "version": "1.0.0",
+      "subject": "maths",
+      "skillFamily": "fractions-arith",
+      "itemCount": 4
+    },
+    {
       "packId": "maths.linear-eq-1var",
       "path": "packs/maths.linear-eq-1var.json",
-      "contentHashB64url": "FA68SYJfbphk87whivQhMituqGlQh3AJG9OENaOnfQ4",
+      "contentHashB64url": "0sU0tdD6FbJmiS4BQp3WelpEnz-Qldhf2eDMQ2mFm-E",
       "version": "1.0.0",
       "subject": "maths",
       "skillFamily": "linear-eq-1var",
@@ -31,7 +40,7 @@
     {
       "packId": "maths.quadratic-eq-1var",
       "path": "packs/maths.quadratic-eq-1var.json",
-      "contentHashB64url": "oMpU1u5jN7sjOMGy0gDKn-8U8_XlFQf0eJCMjRMsU9o",
+      "contentHashB64url": "pgePYagFu0UbERA8aYLdecuaKfpejtG9thrwz2aViI4",
       "version": "1.0.0",
       "subject": "maths",
       "skillFamily": "quadratic-eq-1var",
