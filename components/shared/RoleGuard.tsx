@@ -3,18 +3,24 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // components/shared/RoleGuard.tsx
 //
-// Client-side passphrase gate for the privileged surfaces. Wraps the page
-// content and shows a challenge screen until the tab is unlocked.
+// v1.6.0 — audit H-1. Challenge screen for the privileged surfaces.
+// Below the hood this component now talks to `/api/auth/role-*` via the
+// helpers in `lib/auth/role-guard.ts`; the server sets an HttpOnly signed
+// cookie and the Edge middleware in `middleware.ts` does the actual
+// gating. This component is display-only UX — it does NOT itself decide
+// who is authorised.
 //
-// Labelled "(demo gate)" in the UI because it is exactly that — not WebAuthn,
-// not OAuth, not SSO. See `lib/auth/role-guard.ts` for the contract and
-// SAFEGUARDING.md §3 for why it is not a substitute for real authentication.
+// The passkey button is currently disabled with an explanatory tooltip:
+// passkey sign-in requires server-side public-key enrolment (a backend),
+// which arrives with todo d1-backend. The previous v1.5.x implementation
+// forged a local unlock by writing sessionStorage from the browser; that
+// was the exact bypass path H-1 flagged and it has been removed.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useEffect, useState, type ReactNode } from "react";
 import { Lock, ShieldAlert, Fingerprint } from "lucide-react";
 import { isUnlocked, tryUnlock, lock, type ProtectedRole } from "@/lib/auth/role-guard";
-import { isPasskeySupported, signPayloadWithPasskey, PasskeyError } from "@/lib/crypto/passkey";
+import { isPasskeySupported } from "@/lib/crypto/passkey";
 
 interface Props {
   role: ProtectedRole;
@@ -33,36 +39,28 @@ export default function RoleGuard({ role, roleLabel, children, demoHint }: Props
   const [passkeySupported, setPasskeySupported] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     setMounted(true);
-    setUnlocked(isUnlocked(role));
     setPasskeySupported(isPasskeySupported());
+    // isUnlocked() now hits /api/auth/role-status. Safe to call on mount;
+    // the endpoint is cheap and returns a single boolean per role.
+    (async () => {
+      const ok = await isUnlocked(role);
+      if (!cancelled) setUnlocked(ok);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [role]);
 
-  async function handlePasskeyLogin() {
-    setAttempting(true);
-    setError(null);
-    try {
-      // In a real backend, we'd fetch a challenge from the server.
-      // Here we sign a local dummy payload to verify the user is present.
-      await signPayloadWithPasskey({ action: "login", role });
-      
-      // If the passkey assertion succeeds, we unlock the session.
-      // Note: We bypass the passphrase check here by forcing the session to unlock.
-      window.sessionStorage.setItem("evenkeel/role-guard/" + role, "unlocked");
-      setUnlocked(true);
-    } catch (e) {
-      if (e instanceof PasskeyError) {
-        if (e.code === "no_enrolment") {
-          setError("No passkey enrolled on this device. Please use the passphrase.");
-        } else if (e.code !== "cancelled") {
-          setError(`Passkey error: ${e.message}`);
-        }
-      } else {
-        setError("An unexpected error occurred during passkey sign-in.");
-      }
-    } finally {
-      setAttempting(false);
-    }
+  function handlePasskeyLogin() {
+    // v1.6.0 — audit H-1. The previous passkey path set sessionStorage
+    // directly, which let a child bypass the gate via devtools. True
+    // passkey sign-in requires the server to hold the credential public
+    // key and challenge/verify it, which lands with todo d1-backend.
+    setError(
+      "Passkey sign-in arrives with the multi-tenant backend (v1.7). For now please use the passphrase.",
+    );
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -74,14 +72,20 @@ export default function RoleGuard({ role, roleLabel, children, demoHint }: Props
     if (ok) {
       setUnlocked(true);
       setPassphrase("");
+      // Reload so the Edge middleware re-evaluates and the privileged
+      // route actually renders. (`unlocked = true` alone would render
+      // the children tree only on this tab, but a refresh also picks
+      // up any server-rendered role-specific data.)
+      window.location.reload();
     } else {
       setError("Incorrect passphrase.");
     }
   }
 
-  function onLock() {
-    lock(role);
+  async function onLock() {
+    await lock(role);
     setUnlocked(false);
+    window.location.reload();
   }
 
   // Avoid SSR/CSR mismatch for sessionStorage-dependent UI.
@@ -148,9 +152,9 @@ export default function RoleGuard({ role, roleLabel, children, demoHint }: Props
         </div>
 
         <p style={{ fontSize: 13, color: "var(--fg-muted)", marginBottom: 20, lineHeight: 1.55 }}>
-          This surface is for authorised personnel only. The demo uses a
-          passphrase gate; production deployments must replace this with
-          WebAuthn passkeys. See <code>SAFEGUARDING.md</code>.
+          This surface is for authorised personnel only. Passphrase is
+          verified on the server and a short-lived HttpOnly cookie is set
+          on success; see <code>SAFEGUARDING.md</code> §3.
         </p>
 
         <form onSubmit={onSubmit}>
@@ -256,9 +260,9 @@ export default function RoleGuard({ role, roleLabel, children, demoHint }: Props
               border: "1px dashed var(--border)",
             }}
           >
-            <strong>Demo hint:</strong> {demoHint}. Replace this with a real
-            passphrase via <code>NEXT_PUBLIC_{role.toUpperCase()}_PASSPHRASE</code>{" "}
-            before deploying.
+            <strong>Demo hint:</strong> {demoHint}. Override in production
+            via <code>ROLE_GUARD_{role.toUpperCase()}_PASSPHRASE</code> and
+            set <code>ROLE_GUARD_SECRET</code> (32+ bytes) before deploying.
           </p>
         )}
       </div>

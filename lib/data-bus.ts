@@ -25,9 +25,13 @@
 // ───────
 // • Scope: one browser, one device. This is not a network. If you want two
 //   laptops to see each other, you need a server — see EVENKEEL_BIBLE.md §8.
-// • Payloads are plain JSON and are NOT encrypted. Anything written here is
-//   readable by any JavaScript on the same origin — treat it like session
-//   storage.
+// • v1.6.0 — audit M-3: the localStorage ring buffer is now AES-GCM
+//   encrypted with a non-extractable device key stored in IndexedDB.
+//   See `lib/bus-at-rest.ts` for the threat model. The in-memory mirror
+//   and the cross-tab BroadcastChannel are still plaintext JSON (they
+//   live in process memory on the same origin — encryption there would
+//   be theatre). The at-rest encryption closes the profile-dump, backup-
+//   leak, and shared-device threat vectors.
 // • Subscribers are called synchronously on receipt. Do not block.
 //
 // TYPED EVENT CATALOGUE
@@ -36,6 +40,12 @@
 // consumers. Add new events there. Everything else is schema-validated by
 // TypeScript at compile time.
 // ─────────────────────────────────────────────────────────────────────────────
+
+import {
+  BUS_LOG_STORAGE_KEY,
+  readBusLog,
+  writeBusLog,
+} from "@/lib/bus-at-rest";
 
 /**
  * All event types that flow on the bus. Add new members here rather than
@@ -99,7 +109,6 @@ export interface BusEvent<P = Record<string, unknown>> {
 type Listener = (event: BusEvent) => void;
 
 const CHANNEL_NAME = "evenkeel.bus";
-const LOG_STORAGE_KEY = "evenkeel.bus.log";
 const MAX_LOG_ENTRIES = 50;
 
 // ─── Runtime state ───────────────────────────────────────────────────────────
@@ -110,6 +119,22 @@ let initialised = false;
 const listeners = new Set<Listener>();
 
 /**
+ * In-memory mirror of the encrypted on-disk ring buffer. Exists so that
+ * `recentEvents()` can stay synchronous even though the on-disk read
+ * path is async (AES-GCM decrypt + IndexedDB fetch). Hydrated during
+ * init(); written-through on every publish().
+ *
+ * On first load this starts empty and backfills after hydration — the
+ * window is typically <50ms and the only observable effect is that the
+ * parent feed flashes "no recent events" briefly. Consumers that need
+ * the hydrated log synchronously should `await whenReady()` first.
+ */
+let memoryMirror: BusEvent[] = [];
+let hydrationPromise: Promise<void> | null = null;
+/** Serialises the async flush queue so concurrent publishes don't race. */
+let flushChain: Promise<void> = Promise.resolve();
+
+/**
  * One-time localStorage key migration from the legacy `keellearn.*`
  * namespace to `evenkeel.*` (rename in v1.4.1). Runs idempotently and
  * silently — failure is ignored because demo state is non-essential.
@@ -118,8 +143,8 @@ function migrateLegacyKeys(): void {
   if (typeof window === "undefined") return;
   try {
     const legacy = window.localStorage.getItem("keellearn.bus.log");
-    if (legacy && !window.localStorage.getItem(LOG_STORAGE_KEY)) {
-      window.localStorage.setItem(LOG_STORAGE_KEY, legacy);
+    if (legacy && !window.localStorage.getItem(BUS_LOG_STORAGE_KEY)) {
+      window.localStorage.setItem(BUS_LOG_STORAGE_KEY, legacy);
     }
     if (legacy !== null) {
       window.localStorage.removeItem("keellearn.bus.log");
@@ -134,27 +159,66 @@ function init(): void {
   initialised = true;
   migrateLegacyKeys();
 
+  // Hydrate the in-memory mirror from encrypted storage. If a legacy
+  // plaintext log exists we read it once and re-persist encrypted.
+  hydrationPromise = (async () => {
+    try {
+      const { events, wasLegacyPlaintext } = await readBusLog<BusEvent>();
+      memoryMirror = events.slice(-MAX_LOG_ENTRIES);
+      if (wasLegacyPlaintext) {
+        await writeBusLog(memoryMirror);
+      }
+    } catch {
+      // Decryption / storage failed — the bus still works in-memory,
+      // the ring buffer just doesn't rehydrate. Honest degradation.
+      memoryMirror = [];
+    }
+  })();
+
   // Primary transport: BroadcastChannel.
   try {
     if (typeof BroadcastChannel !== "undefined") {
       bc = new BroadcastChannel(CHANNEL_NAME);
-      bc.onmessage = (ev: MessageEvent<BusEvent>) => dispatch(ev.data);
+      bc.onmessage = (ev: MessageEvent<BusEvent>) => {
+        // Mirror cross-tab events locally so recentEvents() reflects them.
+        memoryMirror.push(ev.data);
+        while (memoryMirror.length > MAX_LOG_ENTRIES) memoryMirror.shift();
+        dispatch(ev.data);
+      };
     }
   } catch {
     bc = null;
   }
 
-  // Fallback transport: localStorage storage events across tabs.
+  // Fallback transport: storage events. The value is an encrypted
+  // envelope, so we kick off an async re-hydrate and dispatch the delta
+  // on completion.
   window.addEventListener("storage", (ev) => {
-    if (ev.key !== LOG_STORAGE_KEY || !ev.newValue) return;
-    try {
-      const parsed = JSON.parse(ev.newValue) as BusEvent[];
-      const last = parsed[parsed.length - 1];
-      if (last) dispatch(last);
-    } catch {
-      // corrupt log — ignore
-    }
+    if (ev.key !== BUS_LOG_STORAGE_KEY || !ev.newValue) return;
+    void (async () => {
+      try {
+        const { events } = await readBusLog<BusEvent>();
+        const seen = new Set(memoryMirror.map((e) => e.id));
+        const fresh = events.filter((e) => !seen.has(e.id));
+        if (fresh.length === 0) return;
+        memoryMirror = events.slice(-MAX_LOG_ENTRIES);
+        for (const e of fresh) dispatch(e);
+      } catch {
+        // corrupt or unreadable — ignore
+      }
+    })();
   });
+}
+
+/**
+ * Resolves once the encrypted on-disk ring buffer has been decrypted
+ * into the in-memory mirror. Safe to call before init() — it triggers
+ * init() and then waits. Useful for tests and for consumers that want
+ * to backfill a feed only after hydration.
+ */
+export function whenReady(): Promise<void> {
+  init();
+  return hydrationPromise ?? Promise.resolve();
 }
 
 /**
@@ -173,20 +237,28 @@ function dispatch(event: BusEvent): void {
 }
 
 /**
- * Appends the event to the bounded localStorage ring buffer so late-mounting
- * surfaces can replay history. Bounded to `MAX_LOG_ENTRIES`.
+ * Appends the event to the in-memory mirror (sync, authoritative for
+ * this tab) and schedules an async flush to the encrypted localStorage
+ * ring buffer. Flushes are serialised through `flushChain` so two
+ * concurrent publishes can't clobber each other's write.
+ *
+ * Bounded to `MAX_LOG_ENTRIES` in both the mirror and the on-disk log.
  */
 function appendToLog(event: BusEvent): void {
+  memoryMirror.push(event);
+  while (memoryMirror.length > MAX_LOG_ENTRIES) memoryMirror.shift();
   if (typeof window === "undefined") return;
-  try {
-    const raw = window.localStorage.getItem(LOG_STORAGE_KEY);
-    const current: BusEvent[] = raw ? JSON.parse(raw) : [];
-    current.push(event);
-    while (current.length > MAX_LOG_ENTRIES) current.shift();
-    window.localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(current));
-  } catch {
-    // quota exceeded or disabled — ignore; transport still works
-  }
+
+  flushChain = flushChain.then(async () => {
+    try {
+      // Take a snapshot of the mirror at flush time. We do NOT read
+      // back from disk here — the mirror is authoritative for this tab,
+      // and cross-tab merges happen via the `storage` event listener.
+      await writeBusLog(memoryMirror.slice());
+    } catch {
+      // Encryption / storage failed — the bus still works in-memory.
+    }
+  });
 }
 
 // ─── Public API ──────────────────────────────────────────────────────────────
@@ -236,30 +308,26 @@ export function subscribe(listener: Listener): () => void {
 }
 
 /**
- * Returns the current ring-buffer of recent events, newest last. Useful for
- * surfaces that mount *after* something interesting happened and want to
- * backfill a feed with the last N events.
+ * Returns the current ring-buffer of recent events, newest last. Served
+ * synchronously from the in-memory mirror. On cold start the mirror may
+ * be empty for the ~50ms window between `init()` and hydration complete;
+ * callers that must have the hydrated log should `await whenReady()`.
  */
 export function recentEvents(limit = MAX_LOG_ENTRIES): BusEvent[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(LOG_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as BusEvent[];
-    return parsed.slice(-limit);
-  } catch {
-    return [];
-  }
+  init();
+  return memoryMirror.slice(-limit);
 }
 
 /**
  * Clears the ring buffer. Useful for tests and for a future "reset demo"
- * button. Does not cancel in-flight subscribers.
+ * button. Does not cancel in-flight subscribers. Flushes the cleared
+ * state to encrypted storage so a subsequent reload sees the same view.
  */
 export function clearHistory(): void {
+  memoryMirror = [];
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.removeItem(LOG_STORAGE_KEY);
+    window.localStorage.removeItem(BUS_LOG_STORAGE_KEY);
   } catch {
     // ignore
   }
