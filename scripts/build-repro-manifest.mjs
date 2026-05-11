@@ -130,9 +130,15 @@ export function fileExt(p) {
   return m ? m[1].toLowerCase() : "";
 }
 
-/** Normalises a path to forward-slash form for stable cross-OS hashing. */
+/**
+ * Normalises a path to forward-slash form for stable cross-OS hashing.
+ * Replaces BOTH separators so a path built on Windows and a path built
+ * on Linux hash to the same bytes. Splitting on the platform `sep` only
+ * works on the platform that produced the path — which is exactly the
+ * thing this function exists to undo.
+ */
 export function toPosix(p) {
-  return p.split(sep).join(posix.sep);
+  return p.replace(/[\\/]+/g, posix.sep);
 }
 
 /**
