@@ -15,7 +15,7 @@ export interface CRTEvent {
   timestamp: number;
   eventType: "start" | "pause" | "deletion" | "pivot" | "submission" | "hint_request" | "focus_gain" | "focus_loss";
   duration?: number;
-  data?: any;
+  data?: Record<string, unknown>;
   hash: string;
 }
 

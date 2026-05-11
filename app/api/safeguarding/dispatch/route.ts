@@ -35,7 +35,10 @@ export async function POST(_req: Request) {
       error:
         "Server-side safeguarding dispatch is not implemented in v1.5.4. " +
         "Use the configured HTTPS webhook provider, or wait for the Phase-2 " +
-        "server-side relay. See SAFEGUARDING.md §1.",
+        "server-side relay. See SAFEGUARDING.md §1. " +
+        "Note (v1.7.1 merge): the production-ready replacement now lives in " +
+        "the Cloudflare Worker at cloudflare-worker/dispatch/ — signed " +
+        "envelope verification, allowlist + rate-limit, structured receipts.",
     },
     { status: 501 },
   );

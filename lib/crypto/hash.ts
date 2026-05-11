@@ -185,15 +185,13 @@ export function generateHash(data: unknown): string {
   return sha256(jsonString);
 }
 
-export function generateProofOfWork(events: unknown[]): string {
-  const sortedEvents = [...events].sort(
-    (a, b) => ((a as { timestamp: number }).timestamp) - ((b as { timestamp: number }).timestamp),
-  );
+export function generateProofOfWork(events: ReadonlyArray<{ timestamp: number }>): string {
+  const sortedEvents = [...events].sort((a, b) => a.timestamp - b.timestamp);
   const eventHashes = sortedEvents.map((e) => generateHash(e));
   return generateHash(eventHashes);
 }
 
-export function verifyProofOfWork(events: unknown[], claimedHash: string): boolean {
+export function verifyProofOfWork(events: ReadonlyArray<{ timestamp: number }>, claimedHash: string): boolean {
   const computedHash = generateProofOfWork(events);
   return computedHash === claimedHash;
 }
