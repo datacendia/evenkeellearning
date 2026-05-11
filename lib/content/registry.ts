@@ -134,7 +134,17 @@ async function doLoad(): Promise<RegistryState> {
         const itemErrs = validateContentItem(item);
         if (itemErrs.length) continue;
 
-        if (!trusted.has(item.approval.publicKeyB64url)) continue;
+        // v1.5.5 — schema is `approvals` (plural, dual-reviewer); the
+        // earlier registry referenced the pre-dual-reviewer singular
+        // `approval` field. Reject anything where any approval is not
+        // on the trusted list.
+        if (
+          !Array.isArray(item.approvals) ||
+          item.approvals.length === 0 ||
+          item.approvals.some((a) => !trusted.has(a.publicKeyB64url))
+        ) {
+          continue;
+        }
 
         const ok = await verifyItemSignature(item);
         if (!ok) continue;
@@ -169,18 +179,27 @@ async function doLoad(): Promise<RegistryState> {
 
 async function verifyItemSignature(item: SchemaContentItem): Promise<boolean> {
   try {
-    const { approval, ...rest } = item;
-    // Signature was computed over base64url(SHA-256(canonical(itemSansApproval))),
+    const { approvals, ...rest } = item;
+    if (!Array.isArray(approvals) || approvals.length === 0) return false;
+
+    // Signature was computed over base64url(SHA-256(canonical(itemSansApprovals))),
     // mirroring the build-time signing path in scripts/build-content-manifest.mjs.
+    // v1.5.5 — dual-reviewer schema: EVERY approval must verify against
+    // the same digest. A single bad signature rejects the item.
     const expectedDigest = await sha256B64Url(canonicaliseForHash(rest));
-    const publicKey = await importPublicKey(approval.publicKeyB64url);
-    const sigBytes = base64UrlToBytes(approval.signatureB64url);
-    return await window.crypto.subtle.verify(
-      SIGNING_ALG,
-      publicKey,
-      toArrayBuffer(sigBytes),
-      toArrayBuffer(new TextEncoder().encode(expectedDigest))
-    );
+    const digestBuf = toArrayBuffer(new TextEncoder().encode(expectedDigest));
+    for (const approval of approvals) {
+      const publicKey = await importPublicKey(approval.publicKeyB64url);
+      const sigBytes = base64UrlToBytes(approval.signatureB64url);
+      const ok = await window.crypto.subtle.verify(
+        SIGNING_ALG,
+        publicKey,
+        toArrayBuffer(sigBytes),
+        digestBuf,
+      );
+      if (!ok) return false;
+    }
+    return true;
   } catch {
     return false;
   }

@@ -43,6 +43,77 @@ const REVIEWERS_PATH = path.join(ROOT, "content", "trusted-reviewers.json");
 const SCHEMA_VERSION = "1.0.0";
 const ALG = { name: "ECDSA", namedCurve: "P-256", hash: "SHA-256" } as const;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// v1.5.5 — Hardening pass.
+//
+// Pre-v1.5.5, this route accepted any POST body whose `approvals` array
+// contained two valid ECDSA signatures from two distinct keys. There was
+// no session, no API key, no allowlist of trusted reviewer fingerprints,
+// and no path-traversal protection on `subject`, `skillFamily`, or
+// `filename`. Anyone who could reach the endpoint could:
+//   • generate two ECDSA keypairs locally
+//   • add themselves to content/trusted-reviewers.json
+//   • write a pack JSON anywhere on the filesystem `path.join` would
+//     resolve (e.g. subject="../../public" → escape RAW_DIR)
+//   • delete any file under DRAFTS_DIR via the same traversal in `filename`
+//   • spawn `node scripts/build-content-manifest.mjs` arbitrarily
+//
+// This pass adds three concentric defences:
+//
+//   1. Production refusal. If NODE_ENV === "production", the route
+//      returns 404. The /author flow is a development tool today; until
+//      a real reviewer-passkey-bound session ships, it MUST NOT be
+//      reachable in a deployed app.
+//   2. Input validation. `subject`, `skillFamily`, `id`, and `filename`
+//      must match conservative slug patterns. Path traversal characters
+//      are rejected outright.
+//   3. Trust-on-first-use with audit. If trusted-reviewers.json already
+//      contains entries, every approval must come from a key already on
+//      that list. The first time a reviewer approves anything, the file
+//      is created with their keys; subsequent approvals from unknown
+//      keys are rejected with 403.
+//
+// Phase-2 work tracked in HONESTY.md §4.3: replace defence (1) with a
+// server session bound to the reviewer's enrolled WebAuthn passkey.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const SLUG_RE = /^[a-z][a-z0-9-]*$/;
+const FILENAME_RE = /^[a-z0-9][a-z0-9._-]*\.json$/i;
+
+function isProductionRuntime(): boolean {
+  return process.env.NODE_ENV === "production";
+}
+
+function isValidSlug(s: unknown): s is string {
+  return typeof s === "string" && s.length > 0 && s.length <= 64 && SLUG_RE.test(s);
+}
+
+function isValidFilename(s: unknown): s is string {
+  return (
+    typeof s === "string" &&
+    s.length > 0 &&
+    s.length <= 128 &&
+    FILENAME_RE.test(s) &&
+    !s.includes("..") &&
+    !s.includes("/") &&
+    !s.includes("\\")
+  );
+}
+
+/**
+ * Resolve `child` under `parent`, then verify the result has not escaped
+ * the parent directory. Returns the resolved path on success, null on
+ * any traversal attempt. Belt-and-braces over the slug regex above.
+ */
+function safeJoin(parent: string, child: string): string | null {
+  const resolved = path.resolve(parent, child);
+  const parentResolved = path.resolve(parent) + path.sep;
+  if (!resolved.startsWith(parentResolved) && resolved !== path.resolve(parent)) {
+    return null;
+  }
+  return resolved;
+}
+
 // ── Helpers ─────────────────────────────────────────────────────────────────
 function bytesToB64Url(bytes: Uint8Array): string {
   return Buffer.from(bytes).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -123,6 +194,28 @@ async function verifyApprovals(item: IncomingItem): Promise<boolean> {
   }
 }
 
+/**
+ * Read the current trusted-reviewers list. Returns `null` (distinct from
+ * empty array) iff the file does not yet exist — the caller treats this
+ * as "trust-on-first-use" and seeds the list with the inbound approvals.
+ * Any other read / parse failure throws.
+ */
+async function readTrustedReviewers(): Promise<
+  Array<{ fingerprint: string; name: string; publicKeyB64url: string }> | null
+> {
+  try {
+    const raw = await fs.readFile(REVIEWERS_PATH, "utf8");
+    const list = JSON.parse(raw);
+    if (!Array.isArray(list)) return [];
+    return list;
+  } catch (e: unknown) {
+    if (e && typeof e === "object" && "code" in e && (e as { code: string }).code === "ENOENT") {
+      return null;
+    }
+    throw e;
+  }
+}
+
 async function addTrustedReviewers(approvals: ApprovalBlock[]): Promise<void> {
   let list: { fingerprint: string; name: string; publicKeyB64url: string }[] = [];
   try {
@@ -154,7 +247,13 @@ async function addTrustedReviewers(approvals: ApprovalBlock[]): Promise<void> {
 async function upsertIntoPack(item: IncomingItem): Promise<string> {
   await fs.mkdir(RAW_DIR, { recursive: true });
   const packId = `${item.subject}.${item.skillFamily}`;
-  const packPath = path.join(RAW_DIR, `${packId}.json`);
+  // Defence-in-depth: even though `subject` and `skillFamily` are slug-
+  // validated by the POST handler, refuse anything that doesn't resolve
+  // back under RAW_DIR. Cheap, catches future regressions to the regex.
+  const packPath = safeJoin(RAW_DIR, `${packId}.json`);
+  if (packPath === null) {
+    throw new Error("pack id resolved outside RAW_DIR");
+  }
   let pack: {
     schemaVersion: string;
     id: string;
@@ -211,6 +310,11 @@ interface ApproveBody {
 }
 
 export async function POST(req: Request) {
+  // Defence (1): production refusal. See file header.
+  if (isProductionRuntime()) {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
+
   let body: ApproveBody;
   try {
     body = (await req.json()) as ApproveBody;
@@ -220,23 +324,81 @@ export async function POST(req: Request) {
   if (!body.filename || !body.item) {
     return NextResponse.json({ error: "filename and item required" }, { status: 400 });
   }
+
+  // Defence (2): input validation. Reject anything that looks like a
+  // traversal attempt or an over-long / non-slug identifier.
+  if (!isValidFilename(body.filename)) {
+    return NextResponse.json(
+      { error: "filename must be a simple <slug>.json with no path separators" },
+      { status: 400 },
+    );
+  }
+  if (!isValidSlug(body.item.subject)) {
+    return NextResponse.json(
+      { error: "item.subject must match /^[a-z][a-z0-9-]*$/" },
+      { status: 400 },
+    );
+  }
+  if (!isValidSlug(body.item.skillFamily)) {
+    return NextResponse.json(
+      { error: "item.skillFamily must match /^[a-z][a-z0-9-]*$/" },
+      { status: 400 },
+    );
+  }
+  if (typeof body.item.id !== "string" || body.item.id.length === 0 || body.item.id.length > 128) {
+    return NextResponse.json({ error: "item.id must be a non-empty string" }, { status: 400 });
+  }
+
   if (!Array.isArray(body.item.approvals) || body.item.approvals.length < 2) {
-    return NextResponse.json({ error: "item.approvals array with at least two signatures required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "item.approvals array with at least two signatures required" },
+      { status: 400 },
+    );
   }
 
   const sigOk = await verifyApprovals(body.item);
   if (!sigOk) {
-    return NextResponse.json({ error: "approval signatures did not verify, or not enough unique reviewers" }, { status: 400 });
+    return NextResponse.json(
+      { error: "approval signatures did not verify, or not enough unique reviewers" },
+      { status: 400 },
+    );
+  }
+
+  // Defence (3): trust-on-first-use. If trusted-reviewers.json already
+  // exists, every approval must come from a key already on that list.
+  // First-time reviewers can seed an empty list, but cannot piggy-back on
+  // an existing trust set with newly-minted keys.
+  const trusted = await readTrustedReviewers();
+  if (trusted !== null && trusted.length > 0) {
+    const trustedKeys = new Set(trusted.map((r) => r.publicKeyB64url));
+    for (const approval of body.item.approvals) {
+      if (!trustedKeys.has(approval.publicKeyB64url)) {
+        return NextResponse.json(
+          {
+            error:
+              "one or more approval keys are not on the trusted-reviewers list; " +
+              "have an existing reviewer add them, or remove " +
+              "content/trusted-reviewers.json to re-seed",
+          },
+          { status: 403 },
+        );
+      }
+    }
   }
 
   await addTrustedReviewers(body.item.approvals);
   const packPath = await upsertIntoPack(body.item);
 
-  // Best-effort: delete the draft.
-  try {
-    await fs.unlink(path.join(DRAFTS_DIR, body.filename));
-  } catch {
-    /* draft may already be gone; not fatal */
+  // Best-effort: delete the draft. Defence-in-depth — `safeJoin` rejects
+  // any path that escapes DRAFTS_DIR even if the regex above were ever
+  // relaxed.
+  const draftPath = safeJoin(DRAFTS_DIR, body.filename);
+  if (draftPath !== null) {
+    try {
+      await fs.unlink(draftPath);
+    } catch {
+      /* draft may already be gone; not fatal */
+    }
   }
 
   const built = await runManifestBuild();

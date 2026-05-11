@@ -59,15 +59,38 @@ describe("providers: registry", () => {
     expect(getProvider("not-a-real-id" as ProviderId)).toBeNull();
   });
 
-  it("all adapters are marked implemented", () => {
-    const ids = listImplementedProviders().map((p) => p.id);
-    expect(ids).toEqual([
-      "webhook",
+  // v1.5.5 — regression test for the "fake delivery" defect.
+  //
+  // An earlier version of this test pinned the WRONG contract: all four
+  // adapters as `isImplemented: true`. The three non-webhook adapters
+  // POSTed to a server route that console.log'd and returned ok, which
+  // they then reported back as a successful `delivered` outcome. A DSL
+  // would have seen a green badge for a crisis escalation that no human
+  // ever received. This test now pins the contract that the file
+  // headers always claimed: only the webhook adapter is real; sms /
+  // email / push are stubs until a real server-side relay ships.
+  it("only the webhook adapter is implemented; sms/email/push are honest stubs", () => {
+    expect(listImplementedProviders().map((p) => p.id)).toEqual(["webhook"]);
+    expect(listStubProviders().map((p) => p.id)).toEqual([
       "email-sendgrid",
       "sms-twilio",
       "push-fcm",
     ]);
-    expect(listStubProviders().map((p) => p.id)).toEqual([]);
+  });
+
+  it("each stub returns provider_key_required with non-empty configHelp", async () => {
+    const stubIds: ProviderId[] = ["email-sendgrid", "sms-twilio", "push-fcm"];
+    const entry = await enqueueEscalation(SAMPLE);
+    for (const id of stubIds) {
+      const adapter = getProvider(id);
+      expect(adapter).not.toBeNull();
+      const outcome = await adapter!.deliver(entry);
+      expect(outcome.kind).toBe("provider_key_required");
+      if (outcome.kind === "provider_key_required") {
+        expect(outcome.providerName.length).toBeGreaterThan(0);
+        expect(outcome.configHelp.length).toBeGreaterThan(20);
+      }
+    }
   });
 
   it("every adapter has a non-empty displayName", () => {

@@ -29,40 +29,22 @@
 import type { EscalationEntry } from "../escalation-queue";
 import type { ProviderAdapter, ProviderOutcome } from "./types";
 
+// v1.5.5 — HONEST STUB. See sms-twilio.ts for the rationale; this file had
+// the same defect (POSTed to a fake server route and reported `delivered`).
 export const pushFcmProvider: ProviderAdapter = {
   id: "push-fcm",
   displayName: "Push notification (FCM relay)",
-  isImplemented: true,
-  async deliver(entry: EscalationEntry): Promise<ProviderOutcome> {
-    try {
-      const res = await fetch("/api/safeguarding/dispatch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: "push-fcm", entry }),
-      });
-      if (!res.ok) {
-        return {
-          kind: "transient_failure",
-          reason: `HTTP ${res.status}: Server dispatch failed`,
-        };
-      }
-      const data = await res.json();
-      if (!data.ok) {
-        return {
-          kind: "permanent_failure",
-          reason: data.error || "Unknown dispatch error",
-        };
-      }
-      return {
-        kind: "delivered",
-        statusCode: data.statusCode || 200,
-        deliveredAt: data.deliveredAt || Date.now(),
-      };
-    } catch (e) {
-      return {
-        kind: "transient_failure",
-        reason: String(e),
-      };
-    }
+  isImplemented: false,
+  async deliver(_entry: EscalationEntry): Promise<ProviderOutcome> {
+    return {
+      kind: "provider_key_required",
+      providerName: "Firebase Cloud Messaging",
+      configHelp:
+        "Configure a Firebase project + FCM server key on a server-side " +
+        "relay, plus a per-DSL device-token registration flow. The signed " +
+        "envelope rides as a JSON `data` field; the displayed notification " +
+        "body is category-only metadata — never learner text. Not built " +
+        "in v1.5.4; tracked under SAFEGUARDING.md §1.",
+    };
   },
 };

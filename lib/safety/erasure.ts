@@ -146,15 +146,24 @@ export function eraseLearnerData(now: Date = new Date()): ErasureReport {
   }
   report.kept = toKeep;
 
-  // Notify the rest of the app first; a SafetyGate in another tab can react.
-  try {
-    publish(
-      "parent.erasure.completed",
-      { removedCount: toRemove.length, keptCount: toKeep.length },
-      "parent",
-    );
-  } catch {
-    // Bus may be unavailable in tests; the erasure itself proceeds.
+  // v1.5.5 — only publish + sweep bus.log when there's actually
+  // learner data to remove. Two reasons:
+  //   (a) preserves idempotency — a second erasure on an already-clean
+  //       store does nothing observable;
+  //   (b) preserves the "empty report when no project keys exist"
+  //       contract — `publish()` writes to localStorage as a side-
+  //       effect, which would otherwise surface as a phantom removal.
+  if (toRemove.length > 0) {
+    // Notify the rest of the app first; a SafetyGate in another tab can react.
+    try {
+      publish(
+        "parent.erasure.completed",
+        { removedCount: toRemove.length, keptCount: toKeep.length },
+        "parent",
+      );
+    } catch {
+      // Bus may be unavailable in tests; the erasure itself proceeds.
+    }
   }
 
   // Now do the actual removals.
@@ -164,6 +173,23 @@ export function eraseLearnerData(now: Date = new Date()): ErasureReport {
       report.removed.push(k);
     } catch {
       // Quota / privacy mode — best-effort; don't throw mid-erasure.
+    }
+  }
+
+  // v1.5.5 — silent sweep of `evenkeel.bus.log` as the last step, in
+  // case `publish()` above created the key after our snapshot.
+  // Performed AFTER the main loop so it can't interleave with the
+  // documented `report.removed` list. Not added to the report — it is
+  // an implementation artefact, not a user-visible piece of learner data.
+  //
+  // This closes the audit C-3 defect: previously, immediately after a
+  // "wipe my child's data" action, localStorage still contained one
+  // bus.log entry saying that erasure happened.
+  if (toRemove.length > 0) {
+    try {
+      window.localStorage.removeItem("evenkeel.bus.log");
+    } catch {
+      /* best-effort */
     }
   }
 

@@ -27,40 +27,34 @@
 import type { EscalationEntry } from "../escalation-queue";
 import type { ProviderAdapter, ProviderOutcome } from "./types";
 
+// v1.5.5 — HONEST STUB.
+//
+// An earlier iteration of this adapter POSTed to /api/safeguarding/dispatch
+// (which itself was a no-op that console.log'd and returned ok:true) and
+// reported `delivered`. The file header has always claimed "STUB. Returns
+// provider_key_required whenever called." — the body did not match the
+// claim. A Designated Safeguarding Lead would have seen a green "delivered"
+// badge for a crisis escalation that no human ever received, which is the
+// single worst kind of safeguarding lie.
+//
+// This file is now what its header says it is: a structurally honest stub
+// that refuses to claim delivery. `isImplemented: false` so the Compliance
+// surface lists it under "Phase 2 — configuration required" instead of
+// alongside the working webhook adapter.
 export const smsTwilioProvider: ProviderAdapter = {
   id: "sms-twilio",
   displayName: "SMS (Twilio relay)",
-  isImplemented: true,
-  async deliver(entry: EscalationEntry): Promise<ProviderOutcome> {
-    try {
-      const res = await fetch("/api/safeguarding/dispatch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: "sms-twilio", entry }),
-      });
-      if (!res.ok) {
-        return {
-          kind: "transient_failure",
-          reason: `HTTP ${res.status}: Server dispatch failed`,
-        };
-      }
-      const data = await res.json();
-      if (!data.ok) {
-        return {
-          kind: "permanent_failure",
-          reason: data.error || "Unknown dispatch error",
-        };
-      }
-      return {
-        kind: "delivered",
-        statusCode: data.statusCode || 200,
-        deliveredAt: data.deliveredAt || Date.now(),
-      };
-    } catch (e) {
-      return {
-        kind: "transient_failure",
-        reason: String(e),
-      };
-    }
+  isImplemented: false,
+  async deliver(_entry: EscalationEntry): Promise<ProviderOutcome> {
+    return {
+      kind: "provider_key_required",
+      providerName: "Twilio SMS",
+      configHelp:
+        "Configure a Twilio account SID, auth token, and verified sender " +
+        "number on a server-side relay. The browser must NOT see the auth " +
+        "token. SMS bodies should carry category-only metadata plus a " +
+        "deep-link to the verifier page — never learner text. Not built " +
+        "in v1.5.4; tracked under SAFEGUARDING.md §1.",
+    };
   },
 };

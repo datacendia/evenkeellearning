@@ -157,4 +157,26 @@ describe("safety/erasure — eraseLearnerData", () => {
     expect(report.kept).toHaveLength(0);
     expect(window.localStorage.getItem("foreign")).toBe("value");
   });
+
+  // v1.5.5 — regression for the C-3 defect.
+  //
+  // Before v1.5.5, `eraseLearnerData` snapshotted the localStorage keyset
+  // and then called `publish(...)`, which appends to `evenkeel.bus.log`.
+  // If bus.log did NOT exist when the snapshot was taken, the freshly-
+  // written entry survived the erase loop, so right after an Art. 17
+  // wipe localStorage still contained one event saying that erasure
+  // happened. This test pins the fix: bus.log is always gone post-erase,
+  // regardless of whether it existed before.
+  it("leaves no evenkeel.bus.log entry behind, even when bus.log did not exist before erasure", () => {
+    // Seed exactly one learner-data key so the function has something to
+    // remove, but DO NOT pre-create bus.log. The publish() inside
+    // eraseLearnerData will create it.
+    window.localStorage.setItem("evenkeel.student.prefs", "anything");
+    expect(window.localStorage.getItem("evenkeel.bus.log")).toBeNull();
+
+    const report = eraseLearnerData();
+
+    expect(window.localStorage.getItem("evenkeel.bus.log")).toBeNull();
+    expect(report.removed).toContain("evenkeel.student.prefs");
+  });
 });

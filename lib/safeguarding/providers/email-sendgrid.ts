@@ -33,40 +33,22 @@
 import type { EscalationEntry } from "../escalation-queue";
 import type { ProviderAdapter, ProviderOutcome } from "./types";
 
+// v1.5.5 — HONEST STUB. See sms-twilio.ts for the rationale; this file had
+// the same defect (POSTed to a fake server route and reported `delivered`).
 export const emailSendgridProvider: ProviderAdapter = {
   id: "email-sendgrid",
   displayName: "Email (SendGrid relay)",
-  isImplemented: true,
-  async deliver(entry: EscalationEntry): Promise<ProviderOutcome> {
-    try {
-      const res = await fetch("/api/safeguarding/dispatch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: "email-sendgrid", entry }),
-      });
-      if (!res.ok) {
-        return {
-          kind: "transient_failure",
-          reason: `HTTP ${res.status}: Server dispatch failed`,
-        };
-      }
-      const data = await res.json();
-      if (!data.ok) {
-        return {
-          kind: "permanent_failure",
-          reason: data.error || "Unknown dispatch error",
-        };
-      }
-      return {
-        kind: "delivered",
-        statusCode: data.statusCode || 200,
-        deliveredAt: data.deliveredAt || Date.now(),
-      };
-    } catch (e) {
-      return {
-        kind: "transient_failure",
-        reason: String(e),
-      };
-    }
+  isImplemented: false,
+  async deliver(_entry: EscalationEntry): Promise<ProviderOutcome> {
+    return {
+      kind: "provider_key_required",
+      providerName: "SendGrid email",
+      configHelp:
+        "Configure a SendGrid API key on a server-side relay (e.g. " +
+        "Cloudflare Worker / Vercel function). The browser must NOT see " +
+        "the key. The relay forwards the v1.4.8 signed envelope as the " +
+        "email body so the receiver still verifies offline. Not built in " +
+        "v1.5.4; tracked under SAFEGUARDING.md §1.",
+    };
   },
 };
