@@ -11,6 +11,11 @@
 // There is no server. Replace `flushQueueToCloud` with a real fetch call
 // when a back-end exists. See HONESTY.md §2.3.
 //
+// The `encryptData()` method below serialises data to JSON — it does NOT
+// encrypt. The `SyncQueueItem.serialized` flag records that the data is
+// in serialised string form; real encryption (e.g. AES-GCM via WebCrypto)
+// must be added before sending data off-device.
+//
 // The IndexedDB schema name is intentionally left as `LuminaryOfflineDB`
 // (a previous product name) so that any developer who already has local
 // data on disk does not lose it on rename. New deployments should rename.
@@ -30,16 +35,18 @@ interface LuminaryOfflineDB extends DBSchema {
   };
   localPatterns: {
     key: string;
-    value: any;
+    value: Record<string, unknown>;
   };
 }
 
 interface SyncQueueItem {
   id: string;
   type: "crt" | "ipa" | "career_dna";
-  data: any;
+  /** JSON-serialised (not encrypted) data payload awaiting sync. */
+  data: string;
   timestamp: number;
-  encrypted: boolean;
+  /** True when `data` has been serialised to a JSON string. NOT an encryption guarantee. */
+  serialized: boolean;
   syncAttempts: number;
 }
 
@@ -69,13 +76,13 @@ export class HardwareGhostProtocol {
 
   private handleOnline = (): void => {
     this.isOnline = true;
-    console.log("Hardware Ghost: Back online - initiating sync burst");
+    console.info("Hardware Ghost: Back online - initiating sync burst");
     this.syncToCloud();
   };
 
   private handleOffline = (): void => {
     this.isOnline = false;
-    console.log("Hardware Ghost: Offline - activating local SLM");
+    console.info("Hardware Ghost: Offline - activating local SLM");
     this.activateLocalSLM();
   };
 
@@ -89,15 +96,15 @@ export class HardwareGhostProtocol {
     }, this.syncInterval);
   }
 
-  async queueForSync(type: SyncQueueItem["type"], data: any): Promise<void> {
+  async queueForSync(type: SyncQueueItem["type"], data: unknown): Promise<void> {
     if (!this.db) return;
     
     const item: SyncQueueItem = {
       id: generateId(),
       type,
-      data: await this.encryptData(data),
+      data: this.serializeData(data),
       timestamp: Date.now(),
-      encrypted: true,
+      serialized: true,
       syncAttempts: 0,
     };
 
@@ -140,15 +147,17 @@ export class HardwareGhostProtocol {
     return new Promise((resolve) => setTimeout(resolve, 100));
   }
 
-  private async encryptData(data: any): Promise<string> {
-    // Simulate encryption
-    // In production, use proper encryption like Web Crypto API
+  /**
+   * Serialises data to a JSON string for storage. This is NOT encryption.
+   * Real encryption (e.g. AES-GCM via the Web Crypto API) must be added
+   * before this data is transmitted off-device.
+   */
+  private serializeData(data: unknown): string {
     return JSON.stringify(data);
   }
 
-  private async decryptData(encrypted: string): Promise<any> {
-    // Simulate decryption
-    return JSON.parse(encrypted);
+  private deserializeData(serialized: string): unknown {
+    return JSON.parse(serialized);
   }
 
   async storeLocalTrace(trace: CognitiveReasoningTrace): Promise<void> {
@@ -168,12 +177,12 @@ export class HardwareGhostProtocol {
 
   private activateLocalSLM(): void {
     this.localSLMActive = true;
-    console.log("Hardware Ghost: Local SLM activated for offline operation");
+    console.info("Hardware Ghost: Local SLM activated for offline operation");
   }
 
   private deactivateLocalSLM(): void {
     this.localSLMActive = false;
-    console.log("Hardware Ghost: Local SLM deactivated");
+    console.info("Hardware Ghost: Local SLM deactivated");
   }
 
   isUsingLocalSLM(): boolean {
@@ -208,7 +217,7 @@ export class HardwareGhostProtocol {
 }
 
 function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 2 + 9)}`;
 }
 
 export function createHardwareGhostProtocol(): HardwareGhostProtocol {

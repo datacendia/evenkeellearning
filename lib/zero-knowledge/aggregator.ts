@@ -13,11 +13,25 @@
 // rotating, server-held salt. See HONESTY.md §4.4.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { CognitiveReasoningTrace } from "../types";
+
 interface AggregatedMetric {
   metric: string;
   count: number;
   average: number;
   distribution: { [key: string]: number };
+}
+
+interface StruggleRecord {
+  studentId: string;
+  status: string;
+  frictionLevel: number;
+}
+
+interface AggregatedStrugglePatterns {
+  totalStudents: number;
+  statusDistribution: { [key: string]: number };
+  averageFriction: number;
 }
 
 // v1.5.5 — audit M-4: fail loudly if a production build inherits the
@@ -61,7 +75,7 @@ export class ZeroKnowledgeAggregator {
   }
 
   // Aggregate cognitive metrics without exposing individual data
-  aggregateCognitiveMetrics(traces: any[]): AggregatedMetric[] {
+  aggregateCognitiveMetrics(traces: CognitiveReasoningTrace[]): AggregatedMetric[] {
     const anonymizedData = traces.map(trace => ({
       id: this.anonymizeId(trace.studentId),
       thinkTime: trace.totalThinkTime,
@@ -86,7 +100,7 @@ export class ZeroKnowledgeAggregator {
   }
 
   // Aggregate struggle patterns
-  aggregateStrugglePatterns(struggleData: any[]): any {
+  aggregateStrugglePatterns(struggleData: StruggleRecord[]): AggregatedStrugglePatterns {
     const anonymized = struggleData.map(d => ({
       id: this.anonymizeId(d.studentId),
       status: d.status,
