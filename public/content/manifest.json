@@ -1,19 +1,19 @@
 {
   "schemaVersion": "1.0.0",
   "version": "1.0.0",
-  "builtAtIso": "2026-05-11T12:34:56.019Z",
+  "builtAtIso": "2026-05-11T12:40:14.876Z",
   "trustedReviewers": [
     {
-      "fingerprint": "cyd7JG_hrG4XkpUC",
+      "fingerprint": "qtxeYL8UFUFVu6Vv",
       "name": "Build-Time Seed Reviewer (v1.5.0)",
-      "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3HtClTDBVJmJZ6XrGP_wppUp5HVxcXxGiG8BT-fOQSgpE5YN42R_nnIujNqdPlO4Eu66cwihEeXo-LNRZWmhNQ"
+      "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEI1rIM65YOGgjozlpsVyPLhEmvKQg0bVSUh5xZvlvugY7mv5BeLjwas-ObgdLwR0l7X51t0dD41aXwgksRztjpw"
     }
   ],
   "entries": [
     {
       "packId": "english.aqa-paper1-q3-structure",
       "path": "packs/english.aqa-paper1-q3-structure.json",
-      "contentHashB64url": "jP-M4e44Q5ALsxa9fTEX--e9vz_Q8j5JLQwws3qc_Gg",
+      "contentHashB64url": "VRWpqeHxEL5gXXorbhogsu2SFZCEpzxCOPxm_0Xw2VM",
       "version": "1.0.0",
       "subject": "english",
       "skillFamily": "eng-paper1-q3-structure",
@@ -22,7 +22,7 @@
     {
       "packId": "maths.fractions-arith",
       "path": "packs/maths.fractions-arith.json",
-      "contentHashB64url": "VVIw5Wuj4vFaS5vRVlaik_1CBGKN_juMTtHQWTlg234",
+      "contentHashB64url": "hPD-KJPRQ8kAHgBDK61hVuiyH_7HqHSVU-gQdtW2cvs",
       "version": "1.0.0",
       "subject": "maths",
       "skillFamily": "fractions-arith",
@@ -31,16 +31,25 @@
     {
       "packId": "maths.linear-eq-1var",
       "path": "packs/maths.linear-eq-1var.json",
-      "contentHashB64url": "0sU0tdD6FbJmiS4BQp3WelpEnz-Qldhf2eDMQ2mFm-E",
+      "contentHashB64url": "4FBsjsyS2x_pJSzVnleZNEf9Gmf40cHknGf72ZpbcwI",
       "version": "1.0.0",
       "subject": "maths",
       "skillFamily": "linear-eq-1var",
       "itemCount": 2
     },
     {
+      "packId": "maths.percentages",
+      "path": "packs/maths.percentages.json",
+      "contentHashB64url": "xBNI3w57vOIhGzPBObfs_zAFKmJEVgg2PtsOkkS84nQ",
+      "version": "1.0.0",
+      "subject": "maths",
+      "skillFamily": "percentages",
+      "itemCount": 4
+    },
+    {
       "packId": "maths.quadratic-eq-1var",
       "path": "packs/maths.quadratic-eq-1var.json",
-      "contentHashB64url": "pgePYagFu0UbERA8aYLdecuaKfpejtG9thrwz2aViI4",
+      "contentHashB64url": "CDCiFgCovDs33u9vDWrRsCbPbAyDw7mN1C_pbHfzjn8",
       "version": "1.0.0",
       "subject": "maths",
       "skillFamily": "quadratic-eq-1var",
