@@ -91,6 +91,7 @@ export type BusEventType =
   | "parent.erasure.completed"      // GDPR Art. 17 erasure ran; payload reports counts (v1.5.4)
   | "student.crt.session.finalized" // a per-problem CRT session was finalized + signed (v1.5.4 follow-up)
   | "roster.import.committed"       // teacher committed a CSV roster import; payload is counts + digest only, never PII (v1.6.6)
+  | "teacher.attestation.signed"    // teacher counter-signed a CRT with their passkey; payload is verdict + envelope-summary, never PII (v1.6.7)
   | "system.ping";                  // heartbeat, mostly for tests
 
 /** Shape of a single bus event. `ts` and `id` are set by `publish()`. */
