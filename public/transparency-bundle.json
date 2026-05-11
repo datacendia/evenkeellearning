@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "hashAlgorithm": "SHA-256",
   "signingAlgorithm": "ECDSA-P256-SHA256",
-  "generatedAtIso": "2026-05-11T15:47:40.757Z",
+  "generatedAtIso": "2026-05-11T16:41:16.874Z",
   "engineVersion": "evenkeel@1.5.4",
   "packageName": "even-keel-learning",
   "packageVersion": "1.5.4",
@@ -101,9 +101,9 @@
   },
   "componentDigestB64url": "W5vHdH9iWnonwEI4y04BXnQnX_OT0PDkcohuooOUR0U",
   "signature": {
-    "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEm9HuG9VXiEDQgwv3u2PvOZuOsxV6T1pSEX6vS2Pip_BeSWET16h0MZuZOGOuQavy79_XGop27rx2VN3xdPLz7Q",
-    "signatureB64url": "Mx8YYYJMVDerCVT_1mYY5N9zS2Qy8bTXMfA_z7T3f4qH_OyJURL05x3ZrgGtVW0zZZB8d0FdFiy8yAkIqUX_Gg",
-    "signedAtIso": "2026-05-11T15:47:40.790Z",
+    "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE2rgQKd214NHvEfkj82GPpFky0p8X_4yAIzmYgX-nV0zeT9f5MhwmvXJNjio4WCkAT7s1_DkQ3UddtyjQDzk6AQ",
+    "signatureB64url": "FyqRFByxP39ewW_Svla4Fxzp6fIbmGTnYG19Ofg0sPlX2vo8afTN_6W_Ab1WpPdg7P7GZ8iEkGbu1-KMBFolNQ",
+    "signedAtIso": "2026-05-11T16:41:16.885Z",
     "keyType": "ephemeral-build-time",
     "note": "Key generated at build time and embedded in the bundle. Phase 2 binds this to a longer-lived KMS / passkey-derived key."
   }
