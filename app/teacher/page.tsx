@@ -308,6 +308,10 @@ function Ledger() {
         return `PUSH — Logic Bridge to ${(e.payload as any).studentInitials ?? "class"}`;
       case "teacher.honors.pushed":
         return `PUSH — Honors prompt to ${(e.payload as any).studentInitials ?? "class"}`;
+      case "roster.import.committed": {
+        const p = e.payload as { imported?: number; skipped?: number; under13Count?: number };
+        return `ROSTER — imported ${p.imported ?? "?"}, skipped ${p.skipped ?? 0}, under-13 ${p.under13Count ?? 0}`;
+      }
       default:
         return e.type;
     }
