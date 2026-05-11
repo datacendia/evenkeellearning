@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "hashAlgorithm": "SHA-256",
   "signingAlgorithm": "ECDSA-P256-SHA256",
-  "generatedAtIso": "2026-04-29T12:39:55.990Z",
+  "generatedAtIso": "2026-05-11T15:27:28.987Z",
   "engineVersion": "evenkeel@1.5.4",
   "packageName": "even-keel-learning",
   "packageVersion": "1.5.4",
@@ -18,8 +18,8 @@
       {
         "path": "HONESTY.md",
         "present": true,
-        "sha256": "IMxXjlFEVSOgkx0jqK5yMyfE1i1cknVZ6dzKcDCD1XM",
-        "sizeBytes": 62971
+        "sha256": "FaHzLQ4UbVy18-gCN-D329yBlbEqW8Y3BfpabzcleEU",
+        "sizeBytes": 62906
       },
       {
         "path": "CHANGELOG.md",
@@ -85,25 +85,25 @@
       "generatedAtIso": "2026-04-28T03:14:37.675Z"
     },
     "audit": {
-      "path": "evidence/test-manifest-enterprise-complete-20260429073836.json",
+      "path": "evidence/test-manifest-enterprise-complete-20260511102543.json",
       "present": true,
-      "sha256": "sGABGUPH8dZysQhMRn-cUuIUk4eu9m2k0H73Qo3gDQ0",
-      "generatedAt": "2026-04-29T07:38:36.653-0500",
+      "sha256": "9x3jWfwrPMv2A16gndx8wxiV3tUsVfTIJKCSBwqnb8o",
+      "generatedAt": "2026-05-11T10:25:43.613-0500",
       "counters": {
-        "totalPassed": 18,
-        "totalFailed": 0,
-        "totalSkipped": 0,
+        "totalPassed": 14,
+        "totalFailed": 2,
+        "totalSkipped": 2,
         "buildChecks": 9,
         "httpTests": 0,
         "inlineAssertions": 8
       }
     }
   },
-  "componentDigestB64url": "ePSbxlf58Z91NU9rwJVARsmmPNH83yXmd46YgrbWSXM",
+  "componentDigestB64url": "x8w051IV7NCuGoXVohdN_d5TkLWw-mnuGOm5BFcznlY",
   "signature": {
-    "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEP06q1H_ZHq93OSOKm_isIxalXygu8BWb0FsCOWDkroXyCanr_POo5KNqziOqcTpAYU-zFPOv8QULTD9yUOqm8w",
-    "signatureB64url": "Rnkrm3lMR9NtnKByaWN-SCVqK-HJ_7zMPrbWixL9wSdyXfmlh6V5lUhVfybr1YfRSGUphwk40ipJcCzcETecrQ",
-    "signedAtIso": "2026-04-29T12:39:55.999Z",
+    "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESO4CwYCyMPEz8HIykkhedYEGv_A04ysRRpyJTF4X1y5UVz4EcxRmGwetnZfdChBadb7Lpg7JHGMQTeh-uM8OCQ",
+    "signatureB64url": "g0MdA-TB_wrTifH8lrR3F_qZYZw9jOTvRgxP-MHHh08GoVa2HAKKBpjQLe8PMQue4ob7kQ-Fsu8kW5-Wfeqvwg",
+    "signedAtIso": "2026-05-11T15:27:28.995Z",
     "keyType": "ephemeral-build-time",
     "note": "Key generated at build time and embedded in the bundle. Phase 2 binds this to a longer-lived KMS / passkey-derived key."
   }
