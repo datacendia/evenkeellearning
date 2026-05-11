@@ -49,3 +49,6 @@ Thumbs.db
 # folder structure is present; add a `.gitkeep` if needed.
 evidence/test-manifest-*.json
 evidence/reproducibility-manifest.json
+
+# Claude Code worktree cache
+.claude/
