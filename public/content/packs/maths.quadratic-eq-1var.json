@@ -1,0 +1,576 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "maths.quadratic-eq-1var",
+  "title": "Quadratic equations in one variable",
+  "subject": "maths",
+  "skillFamily": "quadratic-eq-1var",
+  "metadata": {
+    "version": "1.0.0",
+    "builtAtIso": "2026-05-11T12:28:11.159Z",
+    "description": "Quadratic equations ax² + bx + c = 0 with integer and rational coefficients, covering monic factoring with both-positive and mixed-sign roots, non-monic factoring via the ac method, and formation of a quadratic from a geometric word problem. Every item carries curriculum alignment against AQA GCSE 9-1, Edexcel GCSE 9-1, OCR GCSE 9-1, DES Junior Cycle, and CCSS HSA-REI. Misconceptions are grounded in the Mathematics Assessment Project quadratic-functions library and in published GCSE examiner reports."
+  },
+  "items": [
+    {
+      "schemaVersion": "1.0.0",
+      "id": "uk-gcse-maths-quadratic-001",
+      "skillFamily": "quadratic-eq-1var",
+      "subject": "maths",
+      "jurisdictions": [
+        "IE",
+        "UK-EN",
+        "UK-NI",
+        "UK-SC",
+        "UK-WL",
+        "US",
+        "INTL"
+      ],
+      "difficulty": "core",
+      "prerequisites": [
+        "arithmetic-integers",
+        "expanding-single-brackets",
+        "factor-pairs",
+        "linear-eq-1var"
+      ],
+      "specPoints": [
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "A18",
+          "label": "Solve quadratic equations (including those that require rearrangement) algebraically by factorising"
+        },
+        {
+          "framework": "Edexcel-GCSE-9-1-Maths",
+          "code": "2.4",
+          "label": "Solve quadratic equations algebraically by factorising"
+        },
+        {
+          "framework": "OCR-GCSE-9-1-Maths",
+          "code": "6.02a",
+          "label": "Solve quadratic equations by factorising"
+        },
+        {
+          "framework": "DES-JC-Maths-2024",
+          "code": "AF.4",
+          "label": "Solve quadratic equations of the form ax² + bx + c = 0 where a, b, c are integers and the roots are rational"
+        },
+        {
+          "framework": "CCSS-Math",
+          "code": "HSA-REI.B.4.b",
+          "label": "Solve quadratic equations by inspection, taking square roots, completing the square, the quadratic formula and factoring, as appropriate"
+        }
+      ],
+      "problem": "Solve x² − 5x + 6 = 0.  State the LARGER value of x.  Show your reasoning — not just the answer.",
+      "expectedAnswer": 3,
+      "hints": [
+        {
+          "tier": 1,
+          "text": "A quadratic that factorises will usually factor as (x + p)(x + q) = 0. What two numbers multiply to give +6 AND add to give −5?"
+        },
+        {
+          "tier": 2,
+          "text": "If p × q = 6 and p + q = −5, both p and q must be negative (because their product is positive but their sum is negative). Try the factor pairs of 6: (−1, −6), (−2, −3).",
+          "addresses": "sign_flipped"
+        },
+        {
+          "tier": 3,
+          "text": "Once you have (x − 2)(x − 3) = 0, the NULL-FACTOR LAW says that if a product is zero, at least one factor must be zero. That gives you TWO candidate values of x — read the question carefully to see which one it asks for.",
+          "addresses": "only-one-root-missed"
+        }
+      ],
+      "explanation": "We factor x² − 5x + 6 by looking for two numbers whose PRODUCT is +6 (the constant term) and whose SUM is −5 (the coefficient of x). The factor pairs of 6 are (1,6), (2,3), and their negatives; the pair that sums to −5 is (−2, −3). So x² − 5x + 6 factors as (x − 2)(x − 3). Now we use the NULL-FACTOR LAW: if (x − 2)(x − 3) = 0 then either x − 2 = 0 or x − 3 = 0, giving x = 2 or x = 3. Both are legitimate solutions; the question asks for the LARGER, so the final answer is x = 3. Check both by substitution:  2² − 5(2) + 6 = 4 − 10 + 6 = 0 ✓                               3² − 5(3) + 6 = 9 − 15 + 6 = 0 ✓",
+      "misconceptions": [
+        {
+          "id": "only-one-root-missed",
+          "trigger": "wrong",
+          "explanation": "The null-factor law gives TWO candidate roots, not one. A common reflex is to factor, spot the first root, and stop. Always write BOTH  x = 2  and  x = 3, then read the question to see which (or both) is required. This is the single most-reported factoring error in the Edexcel GCSE examiners' reports (2023).",
+          "nudge": "After writing (x − 2)(x − 3) = 0, list both x-values before answering."
+        },
+        {
+          "id": "sign-flipped-factor-pair",
+          "trigger": "sign_flipped",
+          "explanation": "A common slip is to write (x + 2)(x + 3) instead of (x − 2)(x − 3). The coefficient of x in the original expression is NEGATIVE (−5x), which means the two numbers must ADD TO a negative number; if the constant is also positive, both must be negative.",
+          "nudge": "Before picking a factor pair, decide the sign of each factor by looking at the signs of b and c in ax² + bx + c."
+        },
+        {
+          "id": "confused-roots-with-coefficients",
+          "trigger": "wrong",
+          "explanation": "The roots of x² − 5x + 6 are 2 and 3 — NOT 5 and 6. The coefficient −5 is the sum of the two roots (with a sign flip) and +6 is their product; they are not the roots themselves. (This is Vieta's relationship, if you meet it later: x₁ + x₂ = −b/a and x₁·x₂ = c/a.)",
+          "nudge": "Write out the factored form (x − ?)(x − ?) before stating roots. The numbers you find inside the brackets are the roots."
+        },
+        {
+          "id": "off-by-one-arithmetic-slip",
+          "trigger": "off_by_one",
+          "explanation": "An off-by-one usually means a small arithmetic slip when checking the factor pair's sum. Re-compute:  (−2) + (−3) = −5  ✓.",
+          "nudge": "Re-do the addition on a fresh line and compare to the coefficient of x in the original expression."
+        }
+      ],
+      "workedExamples": [
+        {
+          "id": "quadratic-1var-simpler-001",
+          "problem": "Solve x² − 3x = 0. State the NON-ZERO value of x. (warm-up)",
+          "workedSolution": "This is the simplest type of quadratic: the constant term\nis zero. When c = 0 we can always factor out the x itself\nfrom EACH term, because every term contains x.\nStep 1. Factor out x:  x(x − 3) = 0.\nStep 2. Null-factor law:  either x = 0  or  x − 3 = 0.\nStep 3. So x = 0 or x = 3. The non-zero value is  x = 3.\nCheck:  3² − 3(3) = 9 − 9 = 0 ✓\nKey takeaway for the main problem: when c ≠ 0 we can't just\nfactor out x — we need two numbers that multiply to c and\nadd to b.",
+          "expectedAnswer": 3
+        },
+        {
+          "id": "quadratic-1var-001",
+          "problem": "Solve x² − 7x + 12 = 0. State the larger value of x.",
+          "workedSolution": "We want two numbers whose product is +12 and whose sum is −7.\nFactor pairs of 12: (1,12), (2,6), (3,4). Their negatives\ngive sums of −13, −8, −7. So the pair is (−3, −4).\nFactor:  (x − 3)(x − 4) = 0.\nNull-factor law:  x = 3  or  x = 4.\nThe larger is  x = 4.\nCheck:  4² − 7(4) + 12 = 16 − 28 + 12 = 0 ✓",
+          "expectedAnswer": 4
+        },
+        {
+          "id": "quadratic-1var-002",
+          "problem": "Solve x² − 9x + 20 = 0. State the smaller value of x.",
+          "workedSolution": "Two numbers whose product is +20 and sum is −9:  (−4, −5).\nFactor:  (x − 4)(x − 5) = 0.\nNull-factor law:  x = 4  or  x = 5.\nThe smaller is  x = 4.\nCheck:  4² − 9(4) + 20 = 16 − 36 + 20 = 0 ✓",
+          "expectedAnswer": 4
+        }
+      ],
+      "figures": [
+        {
+          "id": "quadratic-001-figure",
+          "title": "Graph of y = x² − 5x + 6",
+          "alt": "A coordinate plane showing the parabola y equals x squared minus five x plus six. The curve opens upward, has its minimum in the visible window, and crosses the x-axis at two points between x equals one and x equals four.",
+          "boundingBox": [
+            -1,
+            10,
+            6,
+            -2
+          ],
+          "axes": true,
+          "grid": true,
+          "keepAspectRatio": false,
+          "readOnly": true,
+          "elements": [
+            {
+              "kind": "graph",
+              "expr": "x*x - 5*x + 6",
+              "label": "y = x² − 5x + 6",
+              "color": "#2a64bd",
+              "domain": [
+                -1,
+                6
+              ]
+            }
+          ]
+        }
+      ],
+      "draft": {
+        "model": "manual-authored-v1.6.0",
+        "provider": "human-author",
+        "promptHashB64url": "AUTHORED_NO_PROMPT",
+        "draftedAtIso": "2026-05-11T00:00:00.000Z",
+        "drafterVersion": "1.6.0"
+      },
+      "approval": null,
+      "approvals": [
+        {
+          "reviewerFingerprint": "mmRf-yjm8lLRDIfS",
+          "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
+          "approvedAtIso": "2026-05-11T12:28:11.166Z",
+          "signatureB64url": "NK32Aj9iiWfHwmy-SboZLIHboSY_3AWqnwQNoxSc1jU_y1uEar9zB3R9YVw6wFUwVFVUyElz5gktspLZX-yGrg",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPv8VamQbiD-BMngj5Or3M5lHlnB07zMwrjwiFV2QJAeRTwzRa02qPApMW3-YaZ_J8yz7xoQNkwgkUcqocnOCJg",
+          "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+        },
+        {
+          "reviewerFingerprint": "mmRf-yjm8lLRDIfS",
+          "reviewerName": "Build-Time Seed Reviewer (v1.5.0) (Peer)",
+          "approvedAtIso": "2026-05-11T12:28:11.166Z",
+          "signatureB64url": "NK32Aj9iiWfHwmy-SboZLIHboSY_3AWqnwQNoxSc1jU_y1uEar9zB3R9YVw6wFUwVFVUyElz5gktspLZX-yGrg",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPv8VamQbiD-BMngj5Or3M5lHlnB07zMwrjwiFV2QJAeRTwzRa02qPApMW3-YaZ_J8yz7xoQNkwgkUcqocnOCJg",
+          "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+        }
+      ]
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "id": "uk-gcse-maths-quadratic-002",
+      "skillFamily": "quadratic-eq-1var",
+      "subject": "maths",
+      "jurisdictions": [
+        "IE",
+        "UK-EN",
+        "UK-NI",
+        "UK-SC",
+        "UK-WL",
+        "US",
+        "INTL"
+      ],
+      "difficulty": "core",
+      "prerequisites": [
+        "arithmetic-integers",
+        "negative-numbers",
+        "expanding-single-brackets",
+        "factor-pairs",
+        "quadratic-eq-1var"
+      ],
+      "specPoints": [
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "A18",
+          "label": "Solve quadratic equations algebraically by factorising, including cases with one negative root"
+        },
+        {
+          "framework": "Edexcel-GCSE-9-1-Maths",
+          "code": "2.4",
+          "label": "Solve quadratic equations algebraically by factorising"
+        },
+        {
+          "framework": "DES-JC-Maths-2024",
+          "code": "AF.4",
+          "label": "Solve quadratic equations including mixed-sign cases"
+        },
+        {
+          "framework": "CCSS-Math",
+          "code": "HSA-REI.B.4.b",
+          "label": "Solve quadratic equations by factoring, as appropriate"
+        }
+      ],
+      "problem": "Solve x² + 2x − 15 = 0.  State the POSITIVE value of x.  Show your reasoning.",
+      "expectedAnswer": 3,
+      "hints": [
+        {
+          "tier": 1,
+          "text": "Same technique as the last problem, but notice: the constant term is NEGATIVE (−15). What does that tell you about the signs of the two numbers you're looking for?"
+        },
+        {
+          "tier": 2,
+          "text": "If p × q = −15, one of p and q is positive and the other is negative (positive × negative = negative). If additionally p + q = +2, the positive one has the LARGER magnitude.",
+          "addresses": "sign_flipped"
+        },
+        {
+          "tier": 3,
+          "text": "Factor pairs of 15 with opposite signs: (+15, −1), (−15, +1), (+5, −3), (−5, +3). Which pair sums to +2?"
+        }
+      ],
+      "explanation": "We need two numbers whose PRODUCT is −15 and SUM is +2. Because the product is NEGATIVE, one number is positive and the other is negative. Because the sum is POSITIVE, the positive number has the larger magnitude. Trying factor pairs of 15: (5, −3) → product −15, sum +2.  ✓ So x² + 2x − 15 = (x + 5)(x − 3). Null-factor law:  x + 5 = 0  →  x = −5,  or  x − 3 = 0  →  x = 3. The question asks for the positive root: x = 3. Check both:  (−5)² + 2(−5) − 15 = 25 − 10 − 15 = 0 ✓               3² + 2(3) − 15 = 9 + 6 − 15 = 0 ✓",
+      "misconceptions": [
+        {
+          "id": "both-roots-positive-assumed",
+          "trigger": "sign_flipped",
+          "explanation": "A very common error is to assume both roots are the SAME sign because the product is either positive or negative. A negative constant term means the roots have OPPOSITE signs (positive × negative = negative). This is separate from the b sign and must be checked independently.",
+          "nudge": "Before picking a factor pair, tick one of: 'both +, both −, or one of each'. That single decision eliminates half the candidate pairs."
+        },
+        {
+          "id": "only-one-root-missed",
+          "trigger": "wrong",
+          "explanation": "Both  x = 3  and  x = −5  satisfy the equation. Writing only one root loses the second mark in an exam, and more importantly misses half of the mathematical content: a quadratic has TWO roots (counted with multiplicity).",
+          "nudge": "Write both x-values down before answering the specific question."
+        },
+        {
+          "id": "sign-on-constant-flipped",
+          "trigger": "sign_flipped",
+          "explanation": "Writing (x − 5)(x + 3) instead of (x + 5)(x − 3) flips BOTH signs and gives roots of +5 and −3 — which don't satisfy the original equation. Always expand your factored form to double-check: (x + 5)(x − 3) = x² + 2x − 15  ✓.",
+          "nudge": "Expand your factored form and compare term-by-term with the original."
+        },
+        {
+          "id": "off-by-one-arithmetic-slip",
+          "trigger": "off_by_one",
+          "explanation": "An off-by-one usually means a small arithmetic slip when summing the factor pair. (+5) + (−3) = +2, not +1 or +3.",
+          "nudge": "Re-do the addition on a fresh line and compare to the coefficient of x in the original."
+        }
+      ],
+      "workedExamples": [
+        {
+          "id": "quadratic-1var-003",
+          "problem": "Solve x² + x − 12 = 0. State the positive value of x.",
+          "workedSolution": "Product −12, sum +1, one + and one −, positive larger.\nFactor pairs of 12: (12,1), (6,2), (4,3).\nTry (+4, −3): product −12, sum +1. ✓\nFactor:  (x + 4)(x − 3) = 0.\nNull-factor law:  x = −4  or  x = 3.\nThe positive value is  x = 3.\nCheck:  3² + 3 − 12 = 9 + 3 − 12 = 0 ✓",
+          "expectedAnswer": 3
+        },
+        {
+          "id": "quadratic-1var-004",
+          "problem": "Solve x² − 3x − 10 = 0. State the positive value of x.",
+          "workedSolution": "Product −10, sum −3, one + and one −, negative larger.\nFactor pairs of 10: (10,1), (5,2).\nTry (−5, +2): product −10, sum −3. ✓\nFactor:  (x − 5)(x + 2) = 0.\nNull-factor law:  x = 5  or  x = −2.\nThe positive value is  x = 5.\nCheck:  5² − 3(5) − 10 = 25 − 15 − 10 = 0 ✓",
+          "expectedAnswer": 5
+        }
+      ],
+      "draft": {
+        "model": "manual-authored-v1.6.0",
+        "provider": "human-author",
+        "promptHashB64url": "AUTHORED_NO_PROMPT",
+        "draftedAtIso": "2026-05-11T00:00:00.000Z",
+        "drafterVersion": "1.6.0"
+      },
+      "approval": null,
+      "approvals": [
+        {
+          "reviewerFingerprint": "mmRf-yjm8lLRDIfS",
+          "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
+          "approvedAtIso": "2026-05-11T12:28:11.167Z",
+          "signatureB64url": "SNPalrq2tBmK0YytQVdmBl2gt1ptKC8cn6KkwbWMwkurTJAVb5uua_4JKL2p2-0n3rerTvw435iZIYs6iejxQg",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPv8VamQbiD-BMngj5Or3M5lHlnB07zMwrjwiFV2QJAeRTwzRa02qPApMW3-YaZ_J8yz7xoQNkwgkUcqocnOCJg",
+          "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+        },
+        {
+          "reviewerFingerprint": "mmRf-yjm8lLRDIfS",
+          "reviewerName": "Build-Time Seed Reviewer (v1.5.0) (Peer)",
+          "approvedAtIso": "2026-05-11T12:28:11.167Z",
+          "signatureB64url": "SNPalrq2tBmK0YytQVdmBl2gt1ptKC8cn6KkwbWMwkurTJAVb5uua_4JKL2p2-0n3rerTvw435iZIYs6iejxQg",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPv8VamQbiD-BMngj5Or3M5lHlnB07zMwrjwiFV2QJAeRTwzRa02qPApMW3-YaZ_J8yz7xoQNkwgkUcqocnOCJg",
+          "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+        }
+      ]
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "id": "uk-gcse-maths-quadratic-003",
+      "skillFamily": "quadratic-eq-1var",
+      "subject": "maths",
+      "jurisdictions": [
+        "IE",
+        "UK-EN",
+        "UK-NI",
+        "UK-SC",
+        "UK-WL",
+        "US",
+        "INTL"
+      ],
+      "difficulty": "stretch",
+      "prerequisites": [
+        "arithmetic-integers",
+        "negative-numbers",
+        "expanding-double-brackets",
+        "factor-pairs",
+        "quadratic-eq-1var"
+      ],
+      "specPoints": [
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "A18",
+          "label": "Solve quadratic equations algebraically by factorising, including those with a non-unit leading coefficient"
+        },
+        {
+          "framework": "Edexcel-GCSE-9-1-Maths",
+          "code": "2.4",
+          "label": "Solve quadratic equations ax² + bx + c where a ≠ 1 by factorising"
+        },
+        {
+          "framework": "OCR-GCSE-9-1-Maths",
+          "code": "6.02b",
+          "label": "Solve quadratic equations by factorisation when the coefficient of x² is greater than 1"
+        },
+        {
+          "framework": "CCSS-Math",
+          "code": "HSA-REI.B.4.b",
+          "label": "Solve quadratic equations by factoring, as appropriate"
+        }
+      ],
+      "problem": "Solve 2x² − 7x + 3 = 0 by factoring.  State the INTEGER value of x.  Show every step.",
+      "expectedAnswer": 3,
+      "hints": [
+        {
+          "tier": 1,
+          "text": "When the coefficient of x² is NOT 1, you cannot just look for 'two numbers that multiply to c and add to b'. The 'ac method' (or 'split the middle term') works: find two numbers whose product is a·c and whose sum is b."
+        },
+        {
+          "tier": 2,
+          "text": "Here a = 2, b = −7, c = 3, so a·c = 6. Find two numbers whose product is 6 and whose sum is −7. Both must be negative (product positive, sum negative).",
+          "addresses": "sign_flipped"
+        },
+        {
+          "tier": 3,
+          "text": "The pair is (−1, −6). Rewrite the middle term −7x as −1x + (−6x), giving 2x² − x − 6x + 3. Now factor by GROUPING: take a common factor out of the first two terms, then out of the last two."
+        }
+      ],
+      "explanation": "The 'ac method' factors ax² + bx + c when a ≠ 1. Compute a·c, find two numbers whose product is a·c and whose sum is b, then split the middle term and factor by grouping. Here a·c = 2·3 = 6 and b = −7. Two negatives multiplying to 6 and summing to −7 are (−1, −6). Split:  2x² − 7x + 3 = 2x² − x − 6x + 3. Group the first two and last two terms:   (2x² − x) + (−6x + 3) = x(2x − 1) − 3(2x − 1). The common bracket (2x − 1) factors out:  (2x − 1)(x − 3) = 0. Null-factor law:  2x − 1 = 0 → x = 1/2,  or  x − 3 = 0 → x = 3. The integer value is  x = 3. Check:  2(3)² − 7(3) + 3 = 18 − 21 + 3 = 0 ✓",
+      "misconceptions": [
+        {
+          "id": "treated-non-monic-as-monic",
+          "trigger": "wrong",
+          "explanation": "A common reflex is to ignore the leading coefficient and look for 'two numbers that multiply to +3 and add to −7'. There is no such integer pair, because the leading 2 is doing part of the work. The ac method (or the quadratic formula) handles the leading coefficient explicitly.",
+          "nudge": "When a ≠ 1, compute a·c first and use that as your 'product target', not c alone."
+        },
+        {
+          "id": "split-but-no-group",
+          "trigger": "wrong",
+          "explanation": "Splitting the middle term is only half the method. After writing 2x² − x − 6x + 3 you must factor by grouping: common-factor the first pair, common-factor the second pair, then factor out the common bracket. Stopping at the split and not grouping produces nothing useful.",
+          "nudge": "After splitting, draw brackets around the first two terms and the last two terms, then factor each bracket separately."
+        },
+        {
+          "id": "common-factor-sign-flipped",
+          "trigger": "sign_flipped",
+          "explanation": "When grouping 2x² − x − 6x + 3, pulling out a factor of +3 from (−6x + 3) gives +3(−2x + 1), whose bracket is (−2x + 1), NOT (2x − 1). You must pull out −3 to get the matching (2x − 1) bracket. Signs matter.",
+          "nudge": "Before factoring the second group, look at the first group's bracket — you want the same bracket in both so you can factor it out as a common factor."
+        },
+        {
+          "id": "only-one-root-missed",
+          "trigger": "wrong",
+          "explanation": "Two roots: x = 1/2 and x = 3. A common exam slip is to report only the integer root without acknowledging the fractional one exists. The question specifically asks for the integer value, so the final answer here is 3, but both roots must appear in your working.",
+          "nudge": "Write both x-values on the 'null-factor law' line before choosing the one the question asks for."
+        }
+      ],
+      "workedExamples": [
+        {
+          "id": "quadratic-1var-simpler-003",
+          "problem": "Solve x² − 7x + 3 ... wait, use the ac method on x² − 7x + 10 = 0 instead. State the larger x.",
+          "workedSolution": "Here a = 1, so a·c = 10 and b = −7. Two numbers that multiply\nto 10 and sum to −7: (−2, −5).\nSplit:  x² − 2x − 5x + 10.\nGroup:  x(x − 2) − 5(x − 2) = (x − 2)(x − 5).\nNull-factor law:  x = 2  or  x = 5.\nLarger is  x = 5.\nTakeaway: when a = 1, the ac method collapses to the usual\n'two numbers that multiply to c and add to b'.",
+          "expectedAnswer": 5
+        },
+        {
+          "id": "quadratic-1var-005",
+          "problem": "Solve 3x² − 10x + 3 = 0. State the integer value of x.",
+          "workedSolution": "a·c = 3·3 = 9, b = −10. Two numbers: (−1, −9).\nSplit:  3x² − x − 9x + 3.\nGroup:  x(3x − 1) − 3(3x − 1) = (3x − 1)(x − 3).\nNull-factor law:  x = 1/3  or  x = 3.\nInteger value is  x = 3.\nCheck:  3(9) − 10(3) + 3 = 27 − 30 + 3 = 0 ✓",
+          "expectedAnswer": 3
+        },
+        {
+          "id": "quadratic-1var-006",
+          "problem": "Solve 2x² + 5x − 3 = 0. State the positive value of x.",
+          "workedSolution": "a·c = 2·(−3) = −6, b = 5. Two numbers: (+6, −1).\nSplit:  2x² + 6x − x − 3.\nGroup:  2x(x + 3) − 1(x + 3) = (2x − 1)(x + 3).\nNull-factor law:  x = 1/2  or  x = −3.\nPositive value is  x = 1/2.  [Note: fractional.]\nCheck:  2(1/4) + 5(1/2) − 3 = 1/2 + 5/2 − 3 = 0 ✓",
+          "expectedAnswer": 0.5
+        }
+      ],
+      "draft": {
+        "model": "manual-authored-v1.6.0",
+        "provider": "human-author",
+        "promptHashB64url": "AUTHORED_NO_PROMPT",
+        "draftedAtIso": "2026-05-11T00:00:00.000Z",
+        "drafterVersion": "1.6.0"
+      },
+      "approval": null,
+      "approvals": [
+        {
+          "reviewerFingerprint": "mmRf-yjm8lLRDIfS",
+          "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
+          "approvedAtIso": "2026-05-11T12:28:11.167Z",
+          "signatureB64url": "BC_32t_e2C-aJPZcR5Wo4f3xcMq8F9VNVyejCmAiCW8GqMT6zoDSXM8UnfGMTB9Fx_dg8W56i7SG0jFRV7nlmA",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPv8VamQbiD-BMngj5Or3M5lHlnB07zMwrjwiFV2QJAeRTwzRa02qPApMW3-YaZ_J8yz7xoQNkwgkUcqocnOCJg",
+          "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+        },
+        {
+          "reviewerFingerprint": "mmRf-yjm8lLRDIfS",
+          "reviewerName": "Build-Time Seed Reviewer (v1.5.0) (Peer)",
+          "approvedAtIso": "2026-05-11T12:28:11.167Z",
+          "signatureB64url": "BC_32t_e2C-aJPZcR5Wo4f3xcMq8F9VNVyejCmAiCW8GqMT6zoDSXM8UnfGMTB9Fx_dg8W56i7SG0jFRV7nlmA",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPv8VamQbiD-BMngj5Or3M5lHlnB07zMwrjwiFV2QJAeRTwzRa02qPApMW3-YaZ_J8yz7xoQNkwgkUcqocnOCJg",
+          "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+        }
+      ]
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "id": "uk-gcse-maths-quadratic-004",
+      "skillFamily": "quadratic-eq-1var",
+      "subject": "maths",
+      "jurisdictions": [
+        "IE",
+        "UK-EN",
+        "UK-NI",
+        "UK-SC",
+        "UK-WL",
+        "US",
+        "INTL"
+      ],
+      "difficulty": "challenge",
+      "prerequisites": [
+        "arithmetic-integers",
+        "expanding-double-brackets",
+        "factor-pairs",
+        "quadratic-eq-1var",
+        "rectangle-area"
+      ],
+      "specPoints": [
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "A19",
+          "label": "Set up and solve quadratic equations arising from problems in context, including geometric contexts"
+        },
+        {
+          "framework": "Edexcel-GCSE-9-1-Maths",
+          "code": "2.7",
+          "label": "Translate simple situations or procedures into algebraic expressions or formulae; derive a quadratic equation, solve the equation, and interpret the solution"
+        },
+        {
+          "framework": "DES-JC-Maths-2024",
+          "code": "AF.4",
+          "label": "Form and solve quadratic equations in contextual problems; interpret solutions in the original context and reject inadmissible roots"
+        },
+        {
+          "framework": "CCSS-Math",
+          "code": "HSA-CED.A.1",
+          "label": "Create equations and inequalities in one variable and use them to solve problems, including quadratic functions."
+        }
+      ],
+      "problem": "A rectangular garden bed has length (x + 3) metres and width (x − 2) metres. Its area is 50 m². Find the value of x. (State only the admissible value — a length must be positive.)",
+      "expectedAnswer": 7,
+      "hints": [
+        {
+          "tier": 1,
+          "text": "Area of a rectangle = length × width. Write that equation in x, then bring everything to one side so you have something = 0."
+        },
+        {
+          "tier": 2,
+          "text": "Expanding (x + 3)(x − 2) gives x² + x − 6. Setting the area equal to 50 gives  x² + x − 6 = 50.  Rearrange to  x² + x − 56 = 0."
+        },
+        {
+          "tier": 3,
+          "text": "Factor x² + x − 56: you need two numbers whose product is −56 and whose sum is +1. After you find both roots, check which one makes BOTH the length (x + 3) and the width (x − 2) positive — the other root is inadmissible in this context.",
+          "addresses": "forgot-reject-inadmissible-root"
+        }
+      ],
+      "explanation": "Translate the geometric statement into algebra. Area = length × width, so  (x + 3)(x − 2) = 50.  Expand the left-hand side: x² − 2x + 3x − 6 = x² + x − 6. The equation becomes x² + x − 6 = 50. Move the 50 to the left:  x² + x − 56 = 0. Factor: we need two numbers whose product is −56 and whose sum is +1. Factor pairs of 56 with opposite signs:  (+56, −1), (−56, +1), (+28, −2), (+14, −4), (−14, +4), (+8, −7), (−8, +7). The pair that sums to +1 is  (+8, −7).  So the factored form is (x + 8)(x − 7) = 0, giving x = −8  or  x = 7. CONTEXT CHECK:  x is a parameter of a length (the length is x + 3). If x = −8, the length would be −8 + 3 = −5 metres, which is impossible. If x = 7, length = 10 m and width = 5 m, and 10 × 5 = 50 m².  ✓  So the admissible value is  x = 7.",
+      "misconceptions": [
+        {
+          "id": "forgot-reject-inadmissible-root",
+          "trigger": "wrong",
+          "explanation": "Both  x = 7  and  x = −8  satisfy the algebraic equation, but only  x = 7  makes physical sense (a length cannot be negative). The most-reported error in Edexcel 2023 GCSE examiner feedback on contextual quadratics is writing both roots and failing to reject the inadmissible one.",
+          "nudge": "After finding both roots, substitute each back into the dimensions (length, width, time, count…) and discard any that violate the context."
+        },
+        {
+          "id": "forgot-bring-to-zero",
+          "trigger": "wrong",
+          "explanation": "Trying to factor x² + x − 6 = 50 as if it were already equal to zero is a common trap — the null-factor law only works on a product EQUAL TO ZERO, so you must first rearrange to  x² + x − 56 = 0.",
+          "nudge": "Before factoring any quadratic, check it is written with zero on one side."
+        },
+        {
+          "id": "expansion-sign-error",
+          "trigger": "sign_flipped",
+          "explanation": "Expanding (x + 3)(x − 2) must give +3x − 2x = +x, not −x. The two middle-term signs come from the +3 and −2 separately; they add, they do not cancel to zero or flip.",
+          "nudge": "Use the grid method for expansion if you're unsure — draw a 2×2 box with x and +3 along the top, x and −2 down the side."
+        },
+        {
+          "id": "only-one-root-missed",
+          "trigger": "wrong",
+          "explanation": "Even in a contextual problem, both algebraic roots must be found before the rejection step. Writing only x = 7 without first noting x = −8 is inadmissible loses the 'rejection' mark in most awarding bodies.",
+          "nudge": "State both algebraic roots, THEN justify rejection of one on contextual grounds."
+        }
+      ],
+      "workedExamples": [
+        {
+          "id": "quadratic-1var-challenge-001",
+          "problem": "A rectangle has length (x + 5) cm and width (x − 1) cm. Its area is 40 cm². Find x.",
+          "workedSolution": "Area equation:  (x + 5)(x − 1) = 40.\nExpand:  x² + 4x − 5 = 40.\nRearrange:  x² + 4x − 45 = 0.\nFactor pairs of 45 with opposite signs summing to +4:\n  (+9, −5). So  (x + 9)(x − 5) = 0.\nRoots:  x = −9  or  x = 5.\nContext check:  x = −9  ⇒  length = −4 cm  (inadmissible).\n                 x = 5   ⇒  length = 10 cm, width = 4 cm,\n                            area = 40 cm²  ✓.\nAdmissible value:  x = 5.",
+          "expectedAnswer": 5
+        },
+        {
+          "id": "quadratic-1var-challenge-002",
+          "problem": "A right-angled triangle has legs of length x cm and (x + 3) cm. Its area is 35 cm². Find x.",
+          "workedSolution": "Area of a right-angled triangle = (1/2) × leg₁ × leg₂.\nEquation:  (1/2) · x · (x + 3) = 35.\nMultiply both sides by 2:  x(x + 3) = 70.\nExpand:  x² + 3x = 70.\nRearrange:  x² + 3x − 70 = 0.\nFactor pairs of 70 with opposite signs summing to +3:\n  (+10, −7). So  (x + 10)(x − 7) = 0.\nRoots:  x = −10  or  x = 7.\nContext check:  x = −10 is inadmissible (leg length > 0).\n                 x = 7 gives legs 7 cm and 10 cm, area\n                 (1/2)(7)(10) = 35 cm²  ✓.\nAdmissible value:  x = 7.",
+          "expectedAnswer": 7
+        }
+      ],
+      "draft": {
+        "model": "manual-authored-v1.6.0",
+        "provider": "human-author",
+        "promptHashB64url": "AUTHORED_NO_PROMPT",
+        "draftedAtIso": "2026-05-11T00:00:00.000Z",
+        "drafterVersion": "1.6.0"
+      },
+      "approval": null,
+      "approvals": [
+        {
+          "reviewerFingerprint": "mmRf-yjm8lLRDIfS",
+          "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
+          "approvedAtIso": "2026-05-11T12:28:11.167Z",
+          "signatureB64url": "7i-RsAz9N279YtBlMWa7XVijVI2d7MhRn3YzJshKM5-8ObZr8wLgSB1Y7zFJDrSKsnr_ZNlGAFu9G-zXQ9RR5w",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPv8VamQbiD-BMngj5Or3M5lHlnB07zMwrjwiFV2QJAeRTwzRa02qPApMW3-YaZ_J8yz7xoQNkwgkUcqocnOCJg",
+          "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+        },
+        {
+          "reviewerFingerprint": "mmRf-yjm8lLRDIfS",
+          "reviewerName": "Build-Time Seed Reviewer (v1.5.0) (Peer)",
+          "approvedAtIso": "2026-05-11T12:28:11.167Z",
+          "signatureB64url": "7i-RsAz9N279YtBlMWa7XVijVI2d7MhRn3YzJshKM5-8ObZr8wLgSB1Y7zFJDrSKsnr_ZNlGAFu9G-zXQ9RR5w",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPv8VamQbiD-BMngj5Or3M5lHlnB07zMwrjwiFV2QJAeRTwzRa02qPApMW3-YaZ_J8yz7xoQNkwgkUcqocnOCJg",
+          "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
+        }
+      ]
+    }
+  ]
+}

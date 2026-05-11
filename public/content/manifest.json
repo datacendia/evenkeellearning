@@ -1,19 +1,19 @@
 {
   "schemaVersion": "1.0.0",
   "version": "1.0.0",
-  "builtAtIso": "2026-04-29T16:28:54.415Z",
+  "builtAtIso": "2026-05-11T12:28:11.159Z",
   "trustedReviewers": [
     {
-      "fingerprint": "wRvHYlIq-i0jnjgW",
+      "fingerprint": "mmRf-yjm8lLRDIfS",
       "name": "Build-Time Seed Reviewer (v1.5.0)",
-      "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEgH5CGOXG92pP7fda7PEMI4PMznAKVRRvnkRvj1IcJaGyFIdVMz4CaNiqZqeSJRfltAy2Hfk184VJdb1-R_aj_w"
+      "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPv8VamQbiD-BMngj5Or3M5lHlnB07zMwrjwiFV2QJAeRTwzRa02qPApMW3-YaZ_J8yz7xoQNkwgkUcqocnOCJg"
     }
   ],
   "entries": [
     {
       "packId": "english.aqa-paper1-q3-structure",
       "path": "packs/english.aqa-paper1-q3-structure.json",
-      "contentHashB64url": "UhOiY8CM5T4R586L4jZKBhnDchWkYqn3B3snt1HrqK0",
+      "contentHashB64url": "oe6BZojmvA2nW8AllUSbMnrr9x4ieRL3teNQFjczQIQ",
       "version": "1.0.0",
       "subject": "english",
       "skillFamily": "eng-paper1-q3-structure",
@@ -22,11 +22,20 @@
     {
       "packId": "maths.linear-eq-1var",
       "path": "packs/maths.linear-eq-1var.json",
-      "contentHashB64url": "SvK3Q49EhmIYzo0OV5B1GNuu_ubxqAQe0V9pbn0BGc0",
+      "contentHashB64url": "FA68SYJfbphk87whivQhMituqGlQh3AJG9OENaOnfQ4",
       "version": "1.0.0",
       "subject": "maths",
       "skillFamily": "linear-eq-1var",
       "itemCount": 2
+    },
+    {
+      "packId": "maths.quadratic-eq-1var",
+      "path": "packs/maths.quadratic-eq-1var.json",
+      "contentHashB64url": "oMpU1u5jN7sjOMGy0gDKn-8U8_XlFQf0eJCMjRMsU9o",
+      "version": "1.0.0",
+      "subject": "maths",
+      "skillFamily": "quadratic-eq-1var",
+      "itemCount": 4
     }
   ]
 }
