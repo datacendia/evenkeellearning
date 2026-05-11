@@ -30,6 +30,13 @@ import {
   CLAIM_VOCABULARY_VERSION,
   validateSpecPointClaim,
 } from "./claim-vocabulary";
+import {
+  decodeBitstring,
+  isRevokedByIndex,
+  STATUS_LIST_ENTRY_TYPE,
+  STATUS_PURPOSE_REVOCATION,
+  type StatusListCredential,
+} from "./status-list";
 
 // ─── Result types ──────────────────────────────────────────────────────────
 
@@ -51,7 +58,9 @@ export type VcVerificationReason =
   | "invalid_spec_point"
   | "bad_public_key"
   | "bad_signature"
-  | "verify_threw";
+  | "verify_threw"
+  | "revoked"
+  | "status_list_mismatch";
 
 export type VcVerificationResult =
   | { ok: true; credential: VerifiableCredential }
@@ -230,21 +239,78 @@ async function verifyProofSignature(
   return { ok: true };
 }
 
+export interface VerifyCredentialOptions {
+  /** Clamp the accepted claim-vocabulary version (verifier-older-than-
+   *  issuer simulation). Defaults to the build's compiled version. */
+  supportedVocabularyVersion?: number;
+  /**
+   * Optional revocation resolver. When provided AND the VC carries a
+   * `credentialStatus` block, the verifier calls this with the status-
+   * list URL and expects either the decoded status-list credential
+   * back, or `null` if the list could not be resolved.
+   *
+   * Returning `null` is NOT a verification failure — an offline
+   * verifier is expected to pass the signature check and surface the
+   * fact that revocation could not be checked. We DO fail verification
+   * when the returned list's id does not match the URL requested, or
+   * when the bit at the entry's index is 1.
+   */
+  resolveStatusList?: (
+    statusListUrl: string,
+  ) => Promise<StatusListCredential | null>;
+}
+
 /**
  * Verify a VC end-to-end. Returns a discriminated result whose
  * `reason` is a stable machine code on rejection.
- *
- * `supportedVocabularyVersion` is optional and defaults to the version
- * this build was compiled against — pass a lower value to simulate an
- * older verifier.
  */
 export async function verifyCredential(
   raw: unknown,
-  supportedVocabularyVersion: number = CLAIM_VOCABULARY_VERSION,
+  optionsOrSupportedVersion:
+    | VerifyCredentialOptions
+    | number = CLAIM_VOCABULARY_VERSION,
 ): Promise<VcVerificationResult> {
+  const opts: VerifyCredentialOptions =
+    typeof optionsOrSupportedVersion === "number"
+      ? { supportedVocabularyVersion: optionsOrSupportedVersion }
+      : optionsOrSupportedVersion;
+  const supportedVocabularyVersion =
+    opts.supportedVocabularyVersion ?? CLAIM_VOCABULARY_VERSION;
+
   const shape = checkCredentialShape(raw, supportedVocabularyVersion);
   if (!shape.ok) return shape;
   const sig = await verifyProofSignature(shape.credential);
   if (!sig.ok) return { ok: false, reason: sig.reason };
+
+  // Revocation — only checked when the VC declares a status and the
+  // caller supplied a resolver.
+  const statusEntry = shape.credential.credentialStatus;
+  if (statusEntry && opts.resolveStatusList) {
+    if (
+      statusEntry.type !== STATUS_LIST_ENTRY_TYPE ||
+      statusEntry.statusPurpose !== STATUS_PURPOSE_REVOCATION
+    ) {
+      return { ok: false, reason: "status_list_mismatch" };
+    }
+    const list = await opts.resolveStatusList(statusEntry.statusListCredential);
+    if (list) {
+      if (list.id !== statusEntry.statusListCredential) {
+        return { ok: false, reason: "status_list_mismatch" };
+      }
+      const index = Number(statusEntry.statusListIndex);
+      if (!Number.isInteger(index) || index < 0) {
+        return { ok: false, reason: "status_list_mismatch" };
+      }
+      const bits = decodeBitstring(list.credentialSubject.encodedList);
+      if (index >= bits.length * 8) {
+        return { ok: false, reason: "status_list_mismatch" };
+      }
+      if (isRevokedByIndex(bits, index)) {
+        return { ok: false, reason: "revoked" };
+      }
+    }
+    // list === null → offline/unreachable; pass through (documented).
+  }
+
   return { ok: true, credential: shape.credential };
 }

@@ -50,6 +50,7 @@ import {
   validateSpecPointClaim,
   type SpecPointClaim,
 } from "./claim-vocabulary";
+import type { CredentialStatusEntry } from "./status-list";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -96,6 +97,12 @@ export interface UnsignedVerifiableCredential {
   issuer: string;
   validFrom: string;
   credentialSubject: EvenKeelCredentialSubject;
+  /**
+   * Optional StatusList2021-subset entry. Present when the issuer wants
+   * the credential to be revocable; absent for one-shot credentials
+   * (which cannot be revoked — a fact verifiers should surface).
+   */
+  credentialStatus?: CredentialStatusEntry;
 }
 
 /** Proof block embedded into the signed VC. */
@@ -165,6 +172,14 @@ export interface IssueVcInput {
   signer?: (canonicalPayload: { canonical: string }) => Promise<
     SignedEnvelope<{ canonical: string }>
   >;
+  /**
+   * Optional `credentialStatus` block. When present, the issuer embeds
+   * it into the VC so verifiers can check the status-list bitstring
+   * for revocation. Build via `buildCredentialStatusEntry()` from
+   * `lib/vc/status-list.ts` — that helper also registers the
+   * allocation in the registry.
+   */
+  credentialStatus?: CredentialStatusEntry;
 }
 
 /**
@@ -203,7 +218,7 @@ export function buildUnsignedCredential(
     input.id ??
     `urn:evenkeel:vc:${input.attestation.contentDigestB64url}`;
 
-  return {
+  const unsigned: UnsignedVerifiableCredential = {
     "@context": [VC_V2_CONTEXT],
     id,
     type: ["VerifiableCredential", EVEN_KEEL_CREDENTIAL_TYPE],
@@ -211,6 +226,10 @@ export function buildUnsignedCredential(
     validFrom: input.validFromIso ?? a.attestedAtIso,
     credentialSubject: subject,
   };
+  if (input.credentialStatus) {
+    unsigned.credentialStatus = input.credentialStatus;
+  }
+  return unsigned;
 }
 
 /**
