@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "hashAlgorithm": "SHA-256",
   "signingAlgorithm": "ECDSA-P256-SHA256",
-  "generatedAtIso": "2026-05-11T15:27:28.987Z",
+  "generatedAtIso": "2026-05-11T15:47:40.757Z",
   "engineVersion": "evenkeel@1.5.4",
   "packageName": "even-keel-learning",
   "packageVersion": "1.5.4",
@@ -12,50 +12,50 @@
       {
         "path": "README.md",
         "present": true,
-        "sha256": "4OKd4qkTNOBXxHAGJWv2i_bGhnO0ImH1HUlWtwKtKZ0",
-        "sizeBytes": 8947
+        "sha256": "krnANSPkBNgD0iTk5w2V1XmQR14Vbx38mUXoCI0HIvo",
+        "sizeBytes": 8772
       },
       {
         "path": "HONESTY.md",
         "present": true,
-        "sha256": "FaHzLQ4UbVy18-gCN-D329yBlbEqW8Y3BfpabzcleEU",
-        "sizeBytes": 62906
+        "sha256": "uazNPTAVKElE9u4tCmjYL1Qh_R2ETvRF52wawdEjmpg",
+        "sizeBytes": 62338
       },
       {
         "path": "CHANGELOG.md",
         "present": true,
-        "sha256": "XEWEzN2eXrK6863MIRCbb_QmiLKcPKbqFj4vSQ9h5zA",
-        "sizeBytes": 97375
+        "sha256": "RP4QvZiglwjx-xrcSqSVlxpZlGF6lCkAQudc-4s2rYA",
+        "sizeBytes": 95563
       },
       {
         "path": "EVEN_KEEL_BIBLE.md",
         "present": true,
-        "sha256": "gXqlx-aihpAB5azqoxEG5AtmmEUP3WiJtxSp6Tccmbo",
-        "sizeBytes": 56449
+        "sha256": "SxbLELATW0YX2ScUg5VnZaTCZnkMPGF4gHOV3eJku-Q",
+        "sizeBytes": 55405
       },
       {
         "path": "SAFEGUARDING.md",
         "present": true,
-        "sha256": "jP5JiLIYd9E20N68RYdAWNwH-vlyutEwaHous-M4_-k",
-        "sizeBytes": 43300
+        "sha256": "aGTvdSIsaZc8hj6KC2rvme2hzrezfPfNEi-Bxgz-Ycw",
+        "sizeBytes": 42483
       },
       {
         "path": "docs/PROPOSAL_TRUTH_PACK.md",
         "present": true,
-        "sha256": "Xi_QxYRJYTIUk08U8lV7r_MenkfAXrXfQG3Ij1TROAU",
-        "sizeBytes": 36462
+        "sha256": "JsreO6OsKTQBfd4BYl5HB92P2hiHl4KUKcl1zOxM16c",
+        "sizeBytes": 35825
       },
       {
         "path": "docs/PROPOSAL_REWRITER_NOTES.md",
         "present": true,
-        "sha256": "4I3XRDQavih6hOcQiasUAQkv_j7nnWnNp9GMkmUgKos",
-        "sizeBytes": 3717
+        "sha256": "hO9izAKYMahDcgJSR00Gg5R8uiNJ0zupHF9qvxaUjyg",
+        "sizeBytes": 3635
       }
     ],
     "controlMap": {
       "path": "compliance/kcsie-2025-prevent-duty-map.json",
       "present": true,
-      "sha256": "AHI5iDoyO6D05QXdTbyqfovd-olK8ZLUGIisNFN1Kq4",
+      "sha256": "PmTylRmH07UTO7dDuyFsXw2wgmPVVv6rxVY297Er7i8",
       "sizeBytes": 13119,
       "title": "KCSIE 2025 / Prevent Duty / DfE Filtering & Monitoring control map",
       "version": "1.0.1",
@@ -77,7 +77,7 @@
     "reproducibility": {
       "path": "evidence/reproducibility-manifest.json",
       "present": true,
-      "sha256": "KQTxAaU2fFiMmuzkr6oZxK1bnam2LnuGBr-SNdRXO0g",
+      "sha256": "liP4BeAiX44X1l7f4Sgb2yNkxJdEGv1E5aLbGlVLpvU",
       "aggregateSha256": "YZtr4D4iEXuNNh2AVtzFixrdyA4B92vzcnjecK8hvU0",
       "schemaVersion": 1,
       "fileCount": 118,
@@ -85,25 +85,25 @@
       "generatedAtIso": "2026-04-28T03:14:37.675Z"
     },
     "audit": {
-      "path": "evidence/test-manifest-enterprise-complete-20260511102543.json",
+      "path": "evidence/test-manifest-enterprise-complete-20260429074009.json",
       "present": true,
-      "sha256": "9x3jWfwrPMv2A16gndx8wxiV3tUsVfTIJKCSBwqnb8o",
-      "generatedAt": "2026-05-11T10:25:43.613-0500",
+      "sha256": "9B8vPPuf5-YZQl2KFLNnSHtnMQaYIsmH5Q73-W1nrnE",
+      "generatedAt": "2026-04-29T07:40:09.173-0500",
       "counters": {
-        "totalPassed": 14,
-        "totalFailed": 2,
-        "totalSkipped": 2,
+        "totalPassed": 18,
+        "totalFailed": 0,
+        "totalSkipped": 0,
         "buildChecks": 9,
         "httpTests": 0,
         "inlineAssertions": 8
       }
     }
   },
-  "componentDigestB64url": "x8w051IV7NCuGoXVohdN_d5TkLWw-mnuGOm5BFcznlY",
+  "componentDigestB64url": "W5vHdH9iWnonwEI4y04BXnQnX_OT0PDkcohuooOUR0U",
   "signature": {
-    "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESO4CwYCyMPEz8HIykkhedYEGv_A04ysRRpyJTF4X1y5UVz4EcxRmGwetnZfdChBadb7Lpg7JHGMQTeh-uM8OCQ",
-    "signatureB64url": "g0MdA-TB_wrTifH8lrR3F_qZYZw9jOTvRgxP-MHHh08GoVa2HAKKBpjQLe8PMQue4ob7kQ-Fsu8kW5-Wfeqvwg",
-    "signedAtIso": "2026-05-11T15:27:28.995Z",
+    "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEm9HuG9VXiEDQgwv3u2PvOZuOsxV6T1pSEX6vS2Pip_BeSWET16h0MZuZOGOuQavy79_XGop27rx2VN3xdPLz7Q",
+    "signatureB64url": "Mx8YYYJMVDerCVT_1mYY5N9zS2Qy8bTXMfA_z7T3f4qH_OyJURL05x3ZrgGtVW0zZZB8d0FdFiy8yAkIqUX_Gg",
+    "signedAtIso": "2026-05-11T15:47:40.790Z",
     "keyType": "ephemeral-build-time",
     "note": "Key generated at build time and embedded in the bundle. Phase 2 binds this to a longer-lived KMS / passkey-derived key."
   }
