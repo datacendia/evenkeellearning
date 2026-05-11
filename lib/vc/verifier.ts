@@ -30,6 +30,11 @@ import {
   CLAIM_VOCABULARY_VERSION,
   validateSpecPointClaim,
 } from "./claim-vocabulary";
+import {
+  STATUS_LIST_ENTRY_TYPE,
+  decodeBitstring,
+  getBit,
+} from "./status-list";
 
 // ─── Result types ──────────────────────────────────────────────────────────
 
@@ -51,7 +56,12 @@ export type VcVerificationReason =
   | "invalid_spec_point"
   | "bad_public_key"
   | "bad_signature"
-  | "verify_threw";
+  | "verify_threw"
+  | "credential_revoked"
+  | "credential_suspended"
+  | "status_resolver_failed"
+  | "status_index_out_of_range"
+  | "wrong_status_list_url";
 
 export type VcVerificationResult =
   | { ok: true; credential: VerifiableCredential }
@@ -231,20 +241,131 @@ async function verifyProofSignature(
 }
 
 /**
+ * Resolver that fetches the encoded bitstring for a StatusList2021
+ * credential URL. Returns the `encodedList` string verbatim. The
+ * verifier handles gunzip + base64url + bit-read.
+ *
+ * In production this is `fetch(url).then(r => r.json()).then(...)`
+ * (resolving a signed StatusList2021Credential and reading
+ * `credentialSubject.encodedList`). In tests it's a stub.
+ */
+export type StatusListResolver = (
+  statusListCredentialUrl: string,
+) => Promise<string>;
+
+export interface VerifyCredentialOptions {
+  /** Bump down to simulate an older verifier. Default: this build's
+   *  `CLAIM_VOCABULARY_VERSION`. */
+  supportedVocabularyVersion?: number;
+  /**
+   * Optional. If supplied AND the credential carries a
+   * `credentialStatus` block, the verifier will:
+   *   1. Call `resolver(statusListCredential)` to fetch the list.
+   *   2. Decode + read the bit at `statusListIndex`.
+   *   3. Reject with `credential_revoked` (or `credential_suspended`)
+   *      when the bit is set.
+   * If not supplied, revocation is not checked. (A verifier that wants
+   * to ENFORCE revocation should always supply a resolver.)
+   */
+  statusListResolver?: StatusListResolver;
+  /**
+   * Optional allowlist. When set, the credential's
+   * `credentialStatus.statusListCredential` URL must appear in this
+   * list — protects against an attacker substituting a status list of
+   * their own that has the bit clear. Has no effect if the credential
+   * carries no `credentialStatus` block.
+   */
+  allowedStatusListUrls?: string[];
+}
+
+/**
  * Verify a VC end-to-end. Returns a discriminated result whose
  * `reason` is a stable machine code on rejection.
- *
- * `supportedVocabularyVersion` is optional and defaults to the version
- * this build was compiled against — pass a lower value to simulate an
- * older verifier.
  */
 export async function verifyCredential(
   raw: unknown,
-  supportedVocabularyVersion: number = CLAIM_VOCABULARY_VERSION,
+  optsOrLegacy?: VerifyCredentialOptions | number,
 ): Promise<VcVerificationResult> {
-  const shape = checkCredentialShape(raw, supportedVocabularyVersion);
+  // Back-compat: previous signature was `(raw, supportedVocabularyVersion?)`.
+  const opts: VerifyCredentialOptions =
+    typeof optsOrLegacy === "number"
+      ? { supportedVocabularyVersion: optsOrLegacy }
+      : (optsOrLegacy ?? {});
+  const supportedVocab =
+    opts.supportedVocabularyVersion ?? CLAIM_VOCABULARY_VERSION;
+
+  const shape = checkCredentialShape(raw, supportedVocab);
   if (!shape.ok) return shape;
   const sig = await verifyProofSignature(shape.credential);
   if (!sig.ok) return { ok: false, reason: sig.reason };
+
+  // Revocation check — only runs if both a status block and a resolver
+  // are present. A status block without a resolver passes (caller opted
+  // out). A resolver without a status block also passes (no claim of
+  // revocability was made by the issuer).
+  const status = (shape.credential as { credentialStatus?: unknown })
+    .credentialStatus;
+  if (status && opts.statusListResolver) {
+    const r = await checkRevocation(status, opts);
+    if (!r.ok) return { ok: false, reason: r.reason };
+  }
+
   return { ok: true, credential: shape.credential };
+}
+
+type RevocationCheckResult =
+  | { ok: true }
+  | { ok: false; reason: VcVerificationReason };
+
+async function checkRevocation(
+  rawStatus: unknown,
+  opts: VerifyCredentialOptions,
+): Promise<RevocationCheckResult> {
+  if (!rawStatus || typeof rawStatus !== "object") {
+    return { ok: false, reason: "status_resolver_failed" };
+  }
+  const s = rawStatus as Record<string, unknown>;
+  if (s.type !== STATUS_LIST_ENTRY_TYPE) {
+    return { ok: false, reason: "status_resolver_failed" };
+  }
+  if (typeof s.statusListCredential !== "string") {
+    return { ok: false, reason: "status_resolver_failed" };
+  }
+  if (typeof s.statusListIndex !== "string") {
+    return { ok: false, reason: "status_resolver_failed" };
+  }
+  const idx = Number(s.statusListIndex);
+  if (!Number.isInteger(idx) || idx < 0) {
+    return { ok: false, reason: "status_index_out_of_range" };
+  }
+  if (
+    opts.allowedStatusListUrls &&
+    !opts.allowedStatusListUrls.includes(s.statusListCredential)
+  ) {
+    return { ok: false, reason: "wrong_status_list_url" };
+  }
+  let encoded: string;
+  try {
+    encoded = await opts.statusListResolver!(s.statusListCredential);
+  } catch {
+    return { ok: false, reason: "status_resolver_failed" };
+  }
+  let bits: Uint8Array;
+  try {
+    bits = await decodeBitstring(encoded);
+  } catch {
+    return { ok: false, reason: "status_resolver_failed" };
+  }
+  if (idx >= bits.length * 8) {
+    return { ok: false, reason: "status_index_out_of_range" };
+  }
+  const bit = getBit(bits, idx);
+  if (bit === 1) {
+    const purpose: VcVerificationReason =
+      s.statusPurpose === "suspension"
+        ? "credential_suspended"
+        : "credential_revoked";
+    return { ok: false, reason: purpose };
+  }
+  return { ok: true };
 }

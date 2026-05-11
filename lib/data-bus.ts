@@ -93,6 +93,9 @@ export type BusEventType =
   | "roster.import.committed"       // teacher committed a CSV roster import; payload is counts + digest only, never PII (v1.6.6)
   | "teacher.attestation.signed"    // teacher counter-signed a CRT with their passkey; payload is verdict + envelope-summary, never PII (v1.6.7)
   | "parent.report.signed"          // teacher signed a printable parent report bundle; payload is counts + digest, never PII (v1.6.10)
+  | "vc.credential.revoked"         // issuer flipped a StatusList2021 bit to 1; payload is list-id + index + reason-code (v1.7.1)
+  | "vc.credential.unrevoked"       // issuer flipped a StatusList2021 bit back to 0 (corrects a mistaken revoke) (v1.7.1)
+  | "vc.statuslist.republished"     // issuer re-signed the StatusList2021Credential after a batch of changes (v1.7.1)
   | "system.ping";                  // heartbeat, mostly for tests
 
 /** Shape of a single bus event. `ts` and `id` are set by `publish()`. */

@@ -50,6 +50,7 @@ import {
   validateSpecPointClaim,
   type SpecPointClaim,
 } from "./claim-vocabulary";
+import type { StatusList2021Entry } from "./status-list";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -96,6 +97,10 @@ export interface UnsignedVerifiableCredential {
   issuer: string;
   validFrom: string;
   credentialSubject: EvenKeelCredentialSubject;
+  /** Optional StatusList2021 entry pointing at a bit in the issuer's
+   *  status-list credential. Present iff the issuer was given a status
+   *  registry at issuance time. (v1.7.1) */
+  credentialStatus?: StatusList2021Entry;
 }
 
 /** Proof block embedded into the signed VC. */
@@ -165,6 +170,13 @@ export interface IssueVcInput {
   signer?: (canonicalPayload: { canonical: string }) => Promise<
     SignedEnvelope<{ canonical: string }>
   >;
+  /**
+   * Optional inline `credentialStatus` block. If present it is included
+   * in the canonical bytes BEFORE signing, so any tamper to the status
+   * pointer post-issuance breaks signature verification. Build it via
+   * `lib/vc/status-registry.ts#allocate()` for normal flows. (v1.7.1)
+   */
+  credentialStatus?: StatusList2021Entry;
 }
 
 /**
@@ -203,7 +215,7 @@ export function buildUnsignedCredential(
     input.id ??
     `urn:evenkeel:vc:${input.attestation.contentDigestB64url}`;
 
-  return {
+  const unsigned: UnsignedVerifiableCredential = {
     "@context": [VC_V2_CONTEXT],
     id,
     type: ["VerifiableCredential", EVEN_KEEL_CREDENTIAL_TYPE],
@@ -211,6 +223,10 @@ export function buildUnsignedCredential(
     validFrom: input.validFromIso ?? a.attestedAtIso,
     credentialSubject: subject,
   };
+  if (input.credentialStatus) {
+    unsigned.credentialStatus = input.credentialStatus;
+  }
+  return unsigned;
 }
 
 /**
