@@ -120,6 +120,100 @@ async function signItem(item, reviewer, reviewerName) {
 }
 
 // ── Validation (lightweight mirror; full TS validator lives in schema.ts) ───
+//
+// v1.5.5 — audit M-1: authored items are rendered through KaTeX into
+// `dangerouslySetInnerHTML` by `lib/render/math.tsx`. That's safe ONLY
+// while KaTeX's own allow-list stays in force. A malicious or careless
+// author could still get XSS/exfiltration vectors into a pack by
+// exploiting commands KaTeX deliberately does NOT neutralise by default:
+//
+//   • `\href{url}{text}` — KaTeX renders to a real <a href="..."> and
+//     respects `javascript:` by default when `trust: true` is set.
+//   • `\includegraphics{...}` — same story: renders to <img src="..."/>
+//     under `trust: true`.
+//   • `\url{...}` — emits a hyperlink; similarly footgunned.
+//   • `\htmlClass`, `\htmlId`, `\htmlStyle`, `\htmlData` — `trust: true`
+//     commands that inject arbitrary HTML attributes into rendered
+//     output.
+//   • Raw `<script>` / `<iframe>` / `javascript:` strings — never
+//     legitimate in a maths authored string; a tripwire for paste
+//     mistakes from external sources.
+//
+// `lib/render/math.tsx` is pinned to `trust: false, strict: true` so
+// KaTeX will reject these today. This lint is a DEFENCE-IN-DEPTH trip-
+// wire: a future change that re-enables `trust`, or a new rendering
+// path that bypasses math.tsx, still can't ship an authored pack with
+// these payloads because the build blocks them.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Commands KaTeX only renders as real HTML under `trust: true`. Banning
+// them in authored source means an accidental flip of that flag can
+// never turn authored math into an HTML-injection vector.
+const BANNED_KATEX_COMMANDS = [
+  /\\href\b/,
+  /\\url\b/,
+  /\\includegraphics\b/,
+  /\\htmlClass\b/,
+  /\\htmlId\b/,
+  /\\htmlStyle\b/,
+  /\\htmlData\b/,
+];
+
+// Raw strings that have no business in a maths corpus.
+const BANNED_RAW_STRINGS = [
+  /<script\b/i,
+  /<iframe\b/i,
+  /javascript:/i,
+  /on(?:click|error|load|mouseover)\s*=/i,
+];
+
+function scanAuthoredText(text, where) {
+  const errs = [];
+  if (typeof text !== "string" || text.length === 0) return errs;
+  for (const rx of BANNED_KATEX_COMMANDS) {
+    if (rx.test(text)) {
+      errs.push(`${where}: banned KaTeX command ${rx} — see scripts/build-content-manifest.mjs`);
+    }
+  }
+  for (const rx of BANNED_RAW_STRINGS) {
+    if (rx.test(text)) {
+      errs.push(`${where}: banned raw HTML/JS pattern ${rx}`);
+    }
+  }
+  return errs;
+}
+
+// Walks every authored string field on an item (problem, hints,
+// workedExamples, explanation, misconceptions) and applies the tripwire.
+function scanAllAuthoredFields(item) {
+  const errs = [];
+  errs.push(...scanAuthoredText(item.problem, `items[${item.id}].problem`));
+  errs.push(...scanAuthoredText(item.explanation, `items[${item.id}].explanation`));
+  if (Array.isArray(item.hints)) {
+    for (const [i, h] of item.hints.entries()) {
+      errs.push(...scanAuthoredText(h.text, `items[${item.id}].hints[${i}].text`));
+    }
+  }
+  if (Array.isArray(item.workedExamples)) {
+    for (const [i, w] of item.workedExamples.entries()) {
+      errs.push(...scanAuthoredText(w.setup, `items[${item.id}].workedExamples[${i}].setup`));
+      if (Array.isArray(w.steps)) {
+        for (const [j, s] of w.steps.entries()) {
+          errs.push(...scanAuthoredText(s, `items[${item.id}].workedExamples[${i}].steps[${j}]`));
+        }
+      }
+      errs.push(...scanAuthoredText(w.answer, `items[${item.id}].workedExamples[${i}].answer`));
+    }
+  }
+  if (Array.isArray(item.misconceptions)) {
+    for (const [i, m] of item.misconceptions.entries()) {
+      errs.push(...scanAuthoredText(m.explanation, `items[${item.id}].misconceptions[${i}].explanation`));
+      errs.push(...scanAuthoredText(m.nudge, `items[${item.id}].misconceptions[${i}].nudge`));
+    }
+  }
+  return errs;
+}
+
 function validateItem(item) {
   const errs = [];
   if (item.schemaVersion !== SCHEMA_VERSION) errs.push("schemaVersion mismatch");
@@ -137,6 +231,8 @@ function validateItem(item) {
   if (!item.explanation || item.explanation.length < 20) errs.push("explanation must be ≥20 chars");
   if (!Array.isArray(item.workedExamples) || !item.workedExamples.length) errs.push("workedExamples required");
   if (!item.draft) errs.push("draft provenance required");
+  // v1.5.5 — audit M-1: KaTeX safety tripwire.
+  errs.push(...scanAllAuthoredFields(item));
   return errs;
 }
 

@@ -2,9 +2,40 @@
 // and proof-of-work integrity check.
 
 import { describe, it, expect } from "vitest";
-import { generateHash, generateProofOfWork, verifyProofOfWork } from "@/lib/crypto/hash";
+import {
+  generateHash,
+  generateProofOfWork,
+  verifyProofOfWork,
+  sha256Hex,
+} from "@/lib/crypto/hash";
 
 describe("crypto/hash", () => {
+  // v1.5.5 — audit M-2: lock down the pure-JS SHA-256 against NIST
+  // FIPS 180-4 test vectors. Any future optimisation or rewrite of
+  // `lib/crypto/hash.ts` that drifts from standard SHA-256 will fail
+  // here before it ships.
+  //
+  // These are the canonical FIPS 180-4 test vectors — any SHA-256
+  // implementation that doesn't match both is not SHA-256.
+  it("matches FIPS 180-4 SHA-256 test vectors", () => {
+    // SHA-256("") — the empty string vector.
+    expect(sha256Hex("")).toBe(
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    );
+    // SHA-256("abc") — the classic FIPS 180-4 test vector.
+    expect(sha256Hex("abc")).toBe(
+      "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+    );
+    // Multi-block message that exercises the chunking loop.
+    expect(
+      sha256Hex(
+        "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
+      ),
+    ).toBe(
+      "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1",
+    );
+  });
+
   it("produces a stable hex digest for identical input", () => {
     const a = generateHash({ x: 1, y: "two" });
     const b = generateHash({ x: 1, y: "two" });

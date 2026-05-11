@@ -177,7 +177,12 @@ function prettyEventLabel(e: BusEvent): string {
     case "student.problem.started":
       return "Started a new problem";
     case "student.crt.signed":
-      return "CRT cryptographically signed";
+      return "Submission signed (per-attempt CRT)";
+    case "student.crt.session.finalized":
+      // v1.5.5 — audit M-5: distinct from per-submission signing. This is
+      // emitted when EkeChat unmounts and the WHOLE-SESSION CRT envelope
+      // is persisted to the local CRT bank.
+      return "Problem session finalized (signed CRT bank entry)";
     case "teacher.logic_bridge.pushed":
       return "Teacher pushed a Logic Bridge";
     case "teacher.honors.pushed":

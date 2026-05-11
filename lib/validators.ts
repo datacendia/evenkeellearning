@@ -160,6 +160,16 @@ const BUS_EVENT_TYPES: BusEventType[] = [
   "student.paste.blocked",
   "student.submit",
   "student.crt.signed",
+  // v1.5.5 — audit M-5: include the session-finalized event so
+  // `validateBusEvent` doesn't silently reject valid traffic.
+  "student.crt.session.finalized",
+  "student.session.paused",
+  "student.session.resumed",
+  "student.error.observed",
+  "student.practice.session",
+  "student.answer.validated",
+  "safeguarding.escalation.requested",
+  "parent.erasure.completed",
   "teacher.logic_bridge.pushed",
   "teacher.honors.pushed",
   "compliance.conflict.resolved",

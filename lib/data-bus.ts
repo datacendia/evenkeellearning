@@ -40,6 +40,27 @@
 /**
  * All event types that flow on the bus. Add new members here rather than
  * using free-form strings, so consumers get exhaustive switch coverage.
+ *
+ * v1.5.5 — audit M-5: clarification of the two CRT-signing events.
+ *
+ * `student.crt.signed` — fires from `EkeChat.tsx` once per learner
+ * submission. Carries an envelope summary (digest + signature prefix +
+ * keyType + per-attempt fields like `inputDigestB64url`, `inputChars`,
+ * trust). Read by the Compliance Integrity Ledger and Parent feed.
+ *
+ * `student.crt.session.finalized` — fires from `lib/crt/bank.ts` once
+ * per CRT session, when the EkeChat component unmounts (or the
+ * `problemId` prop changes). Carries aggregated session metadata
+ * (eventCount, deletionCount, pivotCount, durationMs, contentDigest).
+ * Marks the moment the WHOLE-SESSION envelope landed in the local CRT
+ * bank.
+ *
+ * The two are NOT duplicates — they live at different granularities and
+ * a session may emit many `student.crt.signed` events but exactly one
+ * `student.crt.session.finalized`. Consumers that care about "did
+ * anything happen on this problem" should listen for the session-
+ * finalized event; consumers that want every attempt should listen for
+ * the per-submission event.
  */
 export type BusEventType =
   | "student.problem.started"       // a student began a problem
@@ -50,7 +71,7 @@ export type BusEventType =
   | "student.practice.session"      // private-practice-mode session bracket — only metadata, never contents (v1.4.3)
   | "student.paste.blocked"         // IPA blocked a paste attempt
   | "student.submit"                // a student submitted reasoning
-  | "student.crt.signed"            // a CRT was cryptographically signed
+  | "student.crt.signed"            // a per-submission CRT was signed (one event per learner submit)
   | "teacher.logic_bridge.pushed"   // teacher pushed a Logic Bridge to class
   | "teacher.honors.pushed"         // teacher pushed an honors prompt
   | "compliance.conflict.resolved"  // a regulatory conflict was signed off
