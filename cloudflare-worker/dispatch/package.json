@@ -1,0 +1,18 @@
+{
+  "name": "evenkeel-dispatch-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Even Keel crisis-dispatch Cloudflare Worker. Verifies signed safeguarding envelopes and forwards to allowlisted DSL endpoints.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250101.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0",
+    "wrangler": "^3.78.0"
+  }
+}

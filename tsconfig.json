@@ -28,6 +28,7 @@
     "tests/**/*",
     "playwright.config.ts",
     "vitest.config.ts",
-    "scripts/**/*"
+    "scripts/**/*",
+    "cloudflare-worker/**/*"
   ]
 }

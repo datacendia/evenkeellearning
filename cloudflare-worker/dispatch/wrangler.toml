@@ -1,0 +1,43 @@
+name = "evenkeel-dispatch"
+main = "src/index.ts"
+compatibility_date = "2025-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Environment configuration
+# ─────────────────────────────────────────────────────────────────────────────
+# All five vars below are READ from the request-handling path via
+# `policyFromEnv`. Pass them in via `wrangler secret put` (for the
+# allowlists) or `vars` (for the numeric tuning knobs).
+#
+# Required:
+#   ISSUER_ALLOWLIST       - comma-separated base64url prefixes (>= 16 chars)
+#                            of school-issued signing public keys.
+#                            Example: "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQc,MFkw…"
+#   DESTINATION_ALLOWLIST  - comma-separated FULL https://… URLs that
+#                            this Worker is permitted to forward to.
+#                            Example: "https://safeguarding.school1.ie/ingest"
+#
+# Optional (defaults shown):
+#   RATE_LIMIT_WINDOW_MS   default 60000
+#   RATE_LIMIT_MAX         default 60
+#   MAX_BODY_BYTES         default 32768
+# ─────────────────────────────────────────────────────────────────────────────
+
+[vars]
+RATE_LIMIT_WINDOW_MS = "60000"
+RATE_LIMIT_MAX = "60"
+MAX_BODY_BYTES = "32768"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Deployment workflow (operator notes)
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. npm install
+# 2. npx wrangler secret put ISSUER_ALLOWLIST       (paste the comma list)
+# 3. npx wrangler secret put DESTINATION_ALLOWLIST  (paste the comma list)
+# 4. npx wrangler deploy
+# 5. In the school's Compliance Officer surface, set the webhook URL to
+#    the Worker's public route (e.g. https://evenkeel-dispatch.<sub>.workers.dev/dispatch).
+#    The browser sends the original target URL in the X-EvenKeel-Target
+#    header; the Worker validates it against DESTINATION_ALLOWLIST.
+# ─────────────────────────────────────────────────────────────────────────────
