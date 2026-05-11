@@ -30,20 +30,50 @@ jobs:
       - name: Typecheck (tsc --noEmit)
         run: npx tsc --noEmit
 
-      - name: Lint
-        run: npm run lint -- --max-warnings 0
+      - name: Lint (strict — zero warnings)
+        run: npm run lint:strict
 
       - name: Unit tests
         run: npm test -- --run
 
+      # v1.5.5 — CI gates expanded per audit M-8.
+      #
+      # The privacy / XSS / ads greps stay, but `dangerouslySetInnerHTML`
+      # is now scoped: the only legitimate use is KaTeX-rendered authored
+      # math (lib/render/math.tsx), which the grep script already
+      # excludes. Adding a defence-in-depth check that NEW occurrences
+      # outside that file fail CI.
       - name: Anti-pattern grep (privacy / XSS / ads)
         run: |
           node scripts/grep-anti-pattern.mjs "mediaDevices|userVerification\\s*:\\s*['\"]required['\"]"
           node scripts/grep-anti-pattern.mjs "googletagmanager|google-analytics|doubleclick|facebook\\.net"
           node scripts/grep-anti-pattern.mjs "dangerouslySetInnerHTML"
 
+      # v1.5.5 — audit M-8: catch the v1.5.4 "fake-delivery providers"
+      # regression class. Every safeguarding stub provider MUST advertise
+      # itself with `isImplemented: false` until a real server-side relay
+      # ships. A diff that flips one of them to `true` will fail CI.
+      - name: Stub-provider honesty check
+        run: |
+          if grep -E "isImplemented:\s*true" lib/safeguarding/providers/sms-twilio.ts lib/safeguarding/providers/email-sendgrid.ts lib/safeguarding/providers/push-fcm.ts; then
+            echo "::error::A safeguarding stub provider is marked isImplemented:true. See HONESTY.md §4.2 / audit C-1."
+            exit 1
+          fi
+
       - name: Audit manifest (offline checks)
         run: node scripts/audit.mjs --strict
+
+      # v1.5.5 — audit M-8: the transparency bundle is the single
+      # signed artefact a procurement officer ships to a regulator. If
+      # any component drifts (governance doc, KCSIE map, repro manifest,
+      # audit manifest) without rebuilding the bundle, CI fails.
+      - name: Verify transparency bundle
+        run: |
+          if [ -f public/transparency-bundle.json ]; then
+            npm run transparency:verify
+          else
+            echo "::warning::No transparency-bundle.json — skipping verify (run 'npm run transparency:build' to seed)"
+          fi
 
       - name: Upload audit manifest
         if: always()

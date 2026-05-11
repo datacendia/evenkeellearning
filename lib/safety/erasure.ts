@@ -267,3 +267,68 @@ export function eraseLearnerData(now: Date = new Date()): ErasureReport {
 
   return report;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// v1.5.5 — audit M-9: learner-id rotation.
+//
+// The EkeChat component generates a stable per-device `evenkeel.student.id`
+// in localStorage on first visit and reuses it across all subsequent
+// session traces, CRT bank entries, and signed receipts. That's a feature
+// (intra-device continuity is what makes the spacing scheduler and the
+// "coming back today" card work) but it's also a stable identifier the
+// learner can never see or rotate without nuking everything.
+//
+// This helper lets a parent / learner mint a fresh id without touching
+// safety policy. After rotation:
+//   • Any CRT logger / IPA analyser instance still running with the old
+//     id will keep using it for the lifetime of the current mount —
+//     React state is not in our control here.
+//   • Future mounts pick up the new id (EkeChat reads localStorage at
+//     mount time).
+//   • Existing signed envelopes in the CRT bank are NOT rewritten. They
+//     remain valid evidence of past sessions under the old id; the new
+//     id only affects events from this point forward.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const LEARNER_ID_KEY = "evenkeel.student.id";
+
+export interface LearnerIdRotation {
+  /** Truthy if a previous id existed and was replaced. */
+  previousExisted: boolean;
+  /** Short, base36-encoded prefix of the newly-minted id (audit display only). */
+  newIdPrefix: string;
+}
+
+export function rotateLearnerId(): LearnerIdRotation {
+  if (typeof window === "undefined") {
+    return { previousExisted: false, newIdPrefix: "" };
+  }
+  let prevExisted = false;
+  try {
+    prevExisted = window.localStorage.getItem(LEARNER_ID_KEY) !== null;
+  } catch {
+    /* private mode — treat as non-existent */
+  }
+  const rng = typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  const fresh = `s_${rng}`;
+  try {
+    window.localStorage.setItem(LEARNER_ID_KEY, fresh);
+  } catch {
+    /* quota / private mode — best-effort */
+  }
+  try {
+    publish(
+      "parent.erasure.completed",
+      { removedCount: prevExisted ? 1 : 0, keptCount: 0, learnerIdRotated: true },
+      "parent",
+    );
+  } catch {
+    /* bus may be unavailable in tests */
+  }
+  return {
+    previousExisted: prevExisted,
+    newIdPrefix: fresh.slice(0, 10),
+  };
+}

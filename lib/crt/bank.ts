@@ -82,7 +82,14 @@ export async function appendCRT(
     p: CognitiveReasoningTrace,
   ) => Promise<CRTEnvelope>,
 ): Promise<CRTEnvelope> {
-  const env = await (signer ?? signPayloadWithAutoPasskey)(trace);
+  // v1.5.5 — explicitly bind the generic when calling the default
+  // signer; passing `signPayloadWithAutoPasskey` as a bare function
+  // reference widens the inferred type to `SignedEnvelope<unknown>`
+  // because of the v1.5.5 `options` parameter on that helper. The
+  // arrow wrapper keeps the inferred return as `CRTEnvelope`.
+  const env = signer
+    ? await signer(trace)
+    : await signPayloadWithAutoPasskey<CognitiveReasoningTrace>(trace);
   if (typeof window !== "undefined") {
     try {
       const current = listCRTs();

@@ -9,6 +9,7 @@
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
 import type { CognitiveReasoningTrace } from "@/lib/types";
 import { appendCRT, listCRTs, clearCRTs, listVerifiedCRTs } from "@/lib/crt/bank";
+import { signPayload, verifyEnvelope, resetSessionKeyPair } from "@/lib/crypto/signing";
 
 describe("crt/bank — persistence", () => {
   beforeEach(() => {
@@ -155,5 +156,49 @@ describe("crt/bank — verification", () => {
     const verified = await listVerifiedCRTs();
     // Since the mock signature is bogus, verification should fail
     expect(verified).toHaveLength(0);
+  });
+
+  // v1.5.5 — audit M-6: end-to-end real-crypto roundtrip. Every other
+  // test in this file uses a mock signer that returns a static fake
+  // envelope, so a bug in the real `signPayload` → bank persistence →
+  // `listVerifiedCRTs` path would never surface here. This test signs
+  // with the actual session ECDSA-P256 key, persists, and verifies the
+  // round-trip end-to-end. Also pins that tampering with the persisted
+  // bytes makes verification fail (integrity property of the bank).
+  it("real-crypto roundtrip: signs with the session key, persists, and verifies", async () => {
+    resetSessionKeyPair();
+    const trace: CognitiveReasoningTrace = {
+      studentId: "real-student",
+      sessionId: "real-session",
+      problemId: "real-prob",
+      events: [],
+      startTime: 4242,
+      endTime: 5252,
+      totalThinkTime: 1010,
+      deletionCount: 0,
+      pivotCount: 0,
+      proofOfWorkHash: "real-hash",
+    };
+
+    const env = await appendCRT(trace, signPayload);
+    expect(env.signatureB64url.length).toBeGreaterThan(40);
+    expect(env.publicKeyB64url.length).toBeGreaterThan(40);
+
+    // Sanity: round-trip directly through verifyEnvelope.
+    expect(await verifyEnvelope(env)).toBe(true);
+
+    // The bank's verifier returns the envelope as verified.
+    const verified = await listVerifiedCRTs();
+    expect(verified).toHaveLength(1);
+    expect(verified[0]!.payload.studentId).toBe("real-student");
+
+    // Tamper with the persisted payload and confirm verification fails.
+    const stored = JSON.parse(
+      window.localStorage.getItem("evenkeel.crt.bank") ?? "[]",
+    ) as Array<{ payload: CognitiveReasoningTrace }>;
+    stored[0]!.payload.studentId = "tampered-student";
+    window.localStorage.setItem("evenkeel.crt.bank", JSON.stringify(stored));
+    const afterTamper = await listVerifiedCRTs();
+    expect(afterTamper).toHaveLength(0);
   });
 });

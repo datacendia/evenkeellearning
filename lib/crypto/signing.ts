@@ -233,9 +233,52 @@ export type SignKeySource =
  * for CRT envelopes where the goal is "use passkey if available, otherwise
  * use session key" without blocking the learner.
  */
+/**
+ * Options for {@link signPayloadWithAutoPasskey}.
+ *
+ * `requirePasskey: true` (v1.5.5 — audit H-2) flips this from "prefer
+ * passkey with silent session-key fallback" to "use passkey or fail."
+ * Used by surfaces / signing flows where a session-key envelope is not
+ * acceptable as evidence (e.g. high-stakes coursework submission, where
+ * an unauthenticated session-key receipt would be misleading).
+ *
+ * The default (no options, or `requirePasskey: false`) preserves the
+ * existing learner-flow-never-blocks contract.
+ */
+export interface AutoPasskeyOptions {
+  /**
+   * If true, signing fails when no passkey is enrolled or when the
+   * passkey ceremony fails. Throws `PasskeyRequiredError` rather than
+   * falling back to the session key.
+   */
+  requirePasskey?: boolean;
+}
+
+/**
+ * Thrown by {@link signPayloadWithAutoPasskey} when called with
+ * `requirePasskey: true` and the passkey path is unavailable.
+ *
+ * Carries a `reason` so a caller can distinguish "no passkey enrolled
+ * on this device" (recoverable — prompt for enrolment) from "passkey
+ * ceremony failed" (transient — let the user retry).
+ */
+export class PasskeyRequiredError extends Error {
+  readonly reason: "not_enrolled" | "ceremony_failed" | "module_unavailable";
+  constructor(reason: PasskeyRequiredError["reason"], detail?: string) {
+    super(
+      `Passkey signing was required but the path is unavailable: ${reason}` +
+        (detail ? ` — ${detail}` : ""),
+    );
+    this.name = "PasskeyRequiredError";
+    this.reason = reason;
+  }
+}
+
 export async function signPayloadWithAutoPasskey<T>(
   payload: T,
+  options: AutoPasskeyOptions = {},
 ): Promise<SignedEnvelope<T>> {
+  const requirePasskey = options.requirePasskey === true;
   // Lazy-import passkey module to avoid pulling it into code paths that
   // never need it (e.g. SSR build).
   try {
@@ -244,13 +287,29 @@ export async function signPayloadWithAutoPasskey<T>(
     if (enrolment) {
       try {
         return await signPayload(payload, { keySource: "passkey" });
-      } catch {
-        // Passkey signing failed (user cancel, unsupported, ceremony error).
-        // Fall back to session key silently.
+      } catch (e) {
+        // Passkey ceremony failed (user cancel, unsupported, etc.).
+        if (requirePasskey) {
+          throw new PasskeyRequiredError(
+            "ceremony_failed",
+            e instanceof Error ? e.message : undefined,
+          );
+        }
+        // Else fall back to session key silently.
       }
+    } else if (requirePasskey) {
+      throw new PasskeyRequiredError("not_enrolled");
     }
-  } catch {
-    // Passkey module unavailable or getEnrolment threw. Fall back to session key.
+  } catch (e) {
+    if (e instanceof PasskeyRequiredError) throw e;
+    if (requirePasskey) {
+      throw new PasskeyRequiredError(
+        "module_unavailable",
+        e instanceof Error ? e.message : undefined,
+      );
+    }
+    // Else: passkey module unavailable or getEnrolment threw. Fall
+    // back to session key.
   }
   // Default to session key.
   return signPayload(payload, { keySource: "session" });

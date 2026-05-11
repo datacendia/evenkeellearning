@@ -467,7 +467,15 @@ function SafetyCentre() {
  */
 function ErasurePanel() {
   const [stage, setStage] = useState<"idle" | "confirming" | "done">("idle");
-  const [report, setReport] = useState<{ removed: number; kept: number } | null>(null);
+  const [report, setReport] = useState<{
+    removed: number;
+    kept: number;
+    tombstoned: number;
+  } | null>(null);
+  // v1.5.5 — audit M-9: learner-id rotation. Discrete from full erasure
+  // (this keeps signed envelopes intact but mints a fresh on-device
+  // identifier going forward).
+  const [rotation, setRotation] = useState<{ rotated: boolean; prefix: string } | null>(null);
 
   function runErasure() {
     // Lazy import keeps the module out of the SSR bundle for any consumer
@@ -475,8 +483,19 @@ function ErasurePanel() {
     // `eraseLearnerData` itself, but this is one less reason to ship it.
     import("@/lib/safety/erasure").then(({ eraseLearnerData }) => {
       const r = eraseLearnerData();
-      setReport({ removed: r.removed.length, kept: r.kept.length });
+      setReport({
+        removed: r.removed.length,
+        kept: r.kept.length,
+        tombstoned: r.tombstoned.length,
+      });
       setStage("done");
+    });
+  }
+
+  function rotate() {
+    import("@/lib/safety/erasure").then(({ rotateLearnerId }) => {
+      const r = rotateLearnerId();
+      setRotation({ rotated: r.previousExisted, prefix: r.newIdPrefix });
     });
   }
 
@@ -562,10 +581,63 @@ function ErasurePanel() {
             Erasure complete. Removed <strong>{report.removed}</strong> learner
             data {report.removed === 1 ? "key" : "keys"} from this device;
             kept <strong>{report.kept}</strong> parent-policy{" "}
-            {report.kept === 1 ? "key" : "keys"}.
+            {report.kept === 1 ? "key" : "keys"}
+            {report.tombstoned > 0 && (
+              <>
+                {" "}
+                · tombstoned <strong>{report.tombstoned}</strong> WORM-protected
+                {report.tombstoned === 1 ? " record" : " records"} to hash-only
+                audit rows
+              </>
+            )}
+            .
           </p>
         </div>
       )}
+
+      {/* v1.5.5 — audit M-9: learner-id rotation as a sibling action.
+          Discrete from full erasure: doesn't touch any signed envelope,
+          just mints a fresh on-device identifier so future sessions are
+          unlinkable from prior ones without losing prior evidence. */}
+      <div
+        className="mt-3 pt-3 flex items-center justify-between gap-3"
+        style={{ borderTop: "1px solid var(--border)" }}
+      >
+        <div>
+          <p className="text-xs" style={{ fontWeight: 600, color: "var(--fg)" }}>
+            Rotate on-device learner identifier
+          </p>
+          <p className="text-xs" style={{ color: "var(--fg-dim)" }}>
+            Mints a fresh per-device id for future sessions. Existing signed
+            CRTs and receipts are kept and remain valid evidence of past work.
+          </p>
+          {rotation && (
+            <p
+              className="text-xs mt-2"
+              style={{ color: "var(--fg)" }}
+              role="status"
+            >
+              {rotation.rotated ? "Rotated" : "Initialised"} — new id starts{" "}
+              <code style={{ background: "var(--bg-deep)", padding: "0 4px" }}>
+                {rotation.prefix}…
+              </code>
+            </p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={rotate}
+          className="px-3 py-1.5 rounded text-xs"
+          style={{
+            background: "var(--bg-deep)",
+            color: "var(--fg)",
+            border: "1px solid var(--border)",
+            flexShrink: 0,
+          }}
+        >
+          Rotate id
+        </button>
+      </div>
     </div>
   );
 }
