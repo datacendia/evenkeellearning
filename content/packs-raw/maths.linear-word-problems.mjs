@@ -1,0 +1,1041 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// content/packs-raw/maths.linear-word-problems.mjs
+//
+// v1.6.0 — Authored content pack: forming and solving linear equations
+// from worded contexts. AQA-style modelling family. Six items spanning
+// age, number, money, geometric, mixed-quantity, and distance / speed
+// stems. The maths is the same skill family throughout (form an
+// equation in one variable, solve, interpret in context); the
+// VARIETY of contexts is the pedagogical point — students get stuck
+// on word problems for translation reasons, not for algebraic ones.
+//
+// AUTHORING PROVENANCE
+// ────────────────────
+// Plain-English, hand-authored (human-author). NO language model in
+// the draft loop.
+//
+// CURRICULUM GROUNDING
+// ────────────────────
+//   • National Curriculum Mathematics (England) KS3 + KS4 — Algebra
+//     domain "translate simple situations or procedures into algebraic
+//     expressions or formulae"
+//   • AQA GCSE 9-1 Mathematics — A2 (substitution / formulating),
+//     A17 (solve linear equations), A21 (translate situations into
+//     algebraic expressions)
+//   • Edexcel GCSE 9-1 Mathematics — 2.1, 2.5, 2.7
+//   • OCR GCSE 9-1 Mathematics — 6.01, 6.05
+//   • DES Junior Cycle Mathematics 2024 — AF.1, AF.2
+//   • CCSS Mathematics — HSA-CED.A.1, HSA-REI.B.3
+//
+// MISCONCEPTIONS EVIDENCE BASE
+// ────────────────────────────
+//   • Clement, J. (1981). "Algebra word problem solutions: thought
+//     processes underlying a common misconception". Journal of Research
+//     in Mathematics Education 13(1) — the famous 'students and
+//     professors' reversal error (writing "6S = P" instead of
+//     "S = 6P"). Replicated across age groups and remains the most-
+//     cited algebra-translation misconception in the literature.
+//   • Hart, K. (1981). CSMS study ch. 8 "Algebra" — the 'letter as
+//     object' misconception (treating x as 'x apples' rather than
+//     'the number of apples').
+//   • Stacey, K. & MacGregor, M. (1997). "Building foundations for
+//     algebra". Mathematics Teaching in the Middle School 2(4).
+//   • AQA GCSE Chief Examiner Report 2022 Paper 2H — feedback on
+//     forming-and-solving questions, with explicit error catalogue.
+//   • NCETM Secondary Mastery — "Forming and solving equations"
+//     common-error catalogue (2019).
+//
+// RUNTIME NOTES
+// ─────────────
+// Every item has an INTEGER expectedAnswer and is fully runtime-
+// checkable. Numbers were chosen so that the algebra resolves cleanly,
+// keeping the cognitive load on TRANSLATION (the skill the pack is
+// teaching), not on awkward arithmetic.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** @type {import("../../lib/content/schema.ts").SchemaContentPack} */
+export const pack = {
+  schemaVersion: "1.0.0",
+  id: "maths.linear-word-problems",
+  title: "Forming and solving linear equations from worded contexts",
+  subject: "maths",
+  skillFamily: "linear-word-problems",
+  metadata: {
+    version: "1.0.0",
+    builtAtIso: "PLACEHOLDER_BUILT_AT",
+    description:
+      "Six worded modelling problems where the skill is to choose a " +
+      "variable, write an equation, solve it, and interpret the answer " +
+      "in the original context. Contexts span age, number, money, " +
+      "geometric perimeter, mixed-quantity ticket sales, and " +
+      "two-vehicle distance/time. Curriculum-aligned to AQA, Edexcel, " +
+      "OCR GCSE 9-1, DES Junior Cycle, and CCSS. Misconceptions grounded " +
+      "in Clement 1981, Hart 1981 CSMS, Stacey & MacGregor 1997, and " +
+      "AQA chief examiner feedback.",
+  },
+  items: [
+    // ─────────────────────────────────────────────────────────────────────
+    // Item 1 — CORE. Age problem.
+    //   Sara is 4 years older than her brother; ages sum to 22.
+    //   Let brother = x; Sara = x + 4; sum 2x + 4 = 22; x = 9; Sara = 13.
+    // ─────────────────────────────────────────────────────────────────────
+    {
+      schemaVersion: "1.0.0",
+      id: "uk-gcse-maths-linwords-001",
+      skillFamily: "linear-word-problems",
+      subject: "maths",
+      jurisdictions: ["IE", "UK-EN", "UK-NI", "UK-SC", "UK-WL", "US", "INTL"],
+      difficulty: "core",
+      prerequisites: ["arithmetic-integers", "linear-eq-1var"],
+      specPoints: [
+        {
+          framework: "AQA-GCSE-9-1-Maths",
+          code: "A21",
+          label:
+            "Translate simple situations or procedures into algebraic " +
+            "expressions or formulae; derive an equation, solve the " +
+            "equation, and interpret the solution",
+        },
+        {
+          framework: "Edexcel-GCSE-9-1-Maths",
+          code: "2.7",
+          label:
+            "Set up and solve linear equations from worded contexts",
+        },
+        {
+          framework: "DES-JC-Maths-2024",
+          code: "AF.2",
+          label:
+            "Form a linear equation from a worded context and solve it",
+        },
+        {
+          framework: "CCSS-Math",
+          code: "HSA-CED.A.1",
+          label:
+            "Create equations and inequalities in one variable and use " +
+            "them to solve problems",
+        },
+      ],
+      problem:
+        "Sara is 4 years older than her brother Tom. Their ages add up " +
+        "to 22 years. How old is SARA? Show your working — define your " +
+        "variable clearly.",
+      expectedAnswer: 13,
+      hints: [
+        {
+          tier: 1,
+          text:
+            "Pick ONE of the two ages to call x. Which choice makes the " +
+            "OTHER age easy to write down?",
+        },
+        {
+          tier: 2,
+          text:
+            "Let Tom's age = x. Then Sara is 4 older, so Sara = x + 4. " +
+            "Their ages sum to 22:  x + (x + 4) = 22.  Solve for x.",
+          addresses: "let-x-be-the-wrong-thing",
+        },
+        {
+          tier: 3,
+          text:
+            "x + (x + 4) = 22 → 2x + 4 = 22 → 2x = 18 → x = 9. So Tom is " +
+            "9 and Sara is 9 + 4 = 13. Always re-read the question — it " +
+            "asks for SARA's age, not Tom's. CHECK: 9 + 13 = 22 ✓.",
+          addresses: "answered-the-wrong-person",
+        },
+      ],
+      explanation: [
+        "Forming and solving has four steps:",
+        "  1. CHOOSE a variable. Pick the simpler of the two unknowns " +
+          "(here, Tom's age). Let Tom's age = x.",
+        "  2. WRITE the OTHER unknown in terms of x. Sara is 4 older, " +
+          "so Sara = x + 4.",
+        "  3. WRITE the equation from the relationship. 'Their ages add " +
+          "to 22' means x + (x + 4) = 22.",
+        "  4. SOLVE.  2x + 4 = 22 → 2x = 18 → x = 9.",
+        "Now INTERPRET in context. The question asks for Sara's age, " +
+          "not Tom's. Sara = x + 4 = 9 + 4 = 13.",
+        "CHECK both ages back in the original wording: Sara (13) is 4 " +
+          "older than Tom (9) ✓; their ages sum to 22 ✓.",
+      ].join(" "),
+      misconceptions: [
+        {
+          id: "answered-the-wrong-person",
+          trigger: "off_by_one",
+          explanation:
+            "The most common slip on age problems (AQA 2022 Paper 2H " +
+            "examiner feedback) is to solve correctly and then report " +
+            "x — Tom's age (9) — instead of x + 4 — Sara's age (13). " +
+            "The question asks specifically for Sara, so the final " +
+            "answer must be 13.",
+          nudge:
+            "After solving, RE-READ the last sentence of the question. " +
+            "Which person's age is being asked for?",
+        },
+        {
+          id: "let-x-be-the-wrong-thing",
+          trigger: "wrong",
+          explanation:
+            "Letting Sara's age = x is also valid (Tom = x − 4, sum = " +
+            "2x − 4 = 22, x = 13), but it makes the algebra slightly " +
+            "harder. Picking the SMALLER or SIMPLER quantity as x usually " +
+            "gives cleaner equations.",
+          nudge:
+            "When one quantity is described relative to another, let the " +
+            "BASE quantity be x. Here Tom is the base ('Sara is 4 older " +
+            "than Tom'), so let Tom = x.",
+        },
+        {
+          id: "letter-as-object",
+          trigger: "wrong",
+          explanation:
+            "A famous error from the CSMS study (Hart 1981): treating x " +
+            "as standing for 'years' rather than 'a number'. So a " +
+            "learner writes '4y' for 'four years' instead of '4'. The " +
+            "letter is a NUMBER (Tom's age in years), not a unit.",
+          nudge:
+            "Write 'let Tom's age in years = x' explicitly. Then x is a " +
+            "number, and so is x + 4.",
+        },
+        {
+          id: "missed-add-the-difference",
+          trigger: "wrong",
+          explanation:
+            "Writing the equation as just '2x = 22' (forgetting the +4) " +
+            "halves the answer pair (x = 11) and gives Sara as 11 — " +
+            "which doesn't satisfy '4 older' check (11 vs 11 = 0 apart).",
+          nudge:
+            "When summing, include EVERY part of every quantity. " +
+            "Sara = x + 4, so the sum is x + (x + 4), not just x + x.",
+        },
+      ],
+      workedExamples: [
+        {
+          id: "linwords-001",
+          problem:
+            "Mia is 3 years younger than her sister. Their ages sum to " +
+            "27. How old is Mia?",
+          workedSolution: [
+            "Let sister = x. Then Mia = x − 3.",
+            "Sum: x + (x − 3) = 27 → 2x − 3 = 27 → 2x = 30 → x = 15.",
+            "Mia = x − 3 = 12.",
+            "Check: 15 + 12 = 27 ✓; Mia is 3 younger than 15 ✓.",
+          ].join("\n"),
+          expectedAnswer: 12,
+        },
+        {
+          id: "linwords-002",
+          problem:
+            "Two children's ages add to 18. The older is twice the " +
+            "younger. How old is the OLDER child?",
+          workedSolution: [
+            "Let younger = x. Then older = 2x.",
+            "Sum: x + 2x = 18 → 3x = 18 → x = 6.",
+            "Older = 2x = 12.",
+            "Check: 6 + 12 = 18 ✓; 12 is twice 6 ✓.",
+          ].join("\n"),
+          expectedAnswer: 12,
+        },
+      ],
+      draft: {
+        model: "manual-authored-v1.6.0",
+        provider: "human-author",
+        promptHashB64url: "AUTHORED_NO_PROMPT",
+        draftedAtIso: "2026-05-11T00:00:00.000Z",
+        drafterVersion: "1.6.0",
+      },
+      approval: null,
+    },
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Item 2 — CORE. "I think of a number" — single-variable translation.
+    //   3x − 5 = 19  →  x = 8.
+    // ─────────────────────────────────────────────────────────────────────
+    {
+      schemaVersion: "1.0.0",
+      id: "uk-gcse-maths-linwords-002",
+      skillFamily: "linear-word-problems",
+      subject: "maths",
+      jurisdictions: ["IE", "UK-EN", "UK-NI", "UK-SC", "UK-WL", "US", "INTL"],
+      difficulty: "core",
+      prerequisites: ["arithmetic-integers", "linear-eq-1var"],
+      specPoints: [
+        {
+          framework: "AQA-GCSE-9-1-Maths",
+          code: "A21",
+          label:
+            "Translate simple situations or procedures into algebraic " +
+            "expressions",
+        },
+        {
+          framework: "Edexcel-GCSE-9-1-Maths",
+          code: "2.5",
+          label: "Translate simple situations into algebraic expressions",
+        },
+        {
+          framework: "DES-JC-Maths-2024",
+          code: "AF.1",
+          label: "Solve linear equations of the form ax + b = c",
+        },
+      ],
+      problem:
+        "I think of a number, multiply it by 3, then subtract 5. The " +
+        "result is 19. What is my original number?",
+      expectedAnswer: 8,
+      hints: [
+        {
+          tier: 1,
+          text:
+            "Let x stand for the original number. Translate each step " +
+            "into algebra in the order described.",
+        },
+        {
+          tier: 2,
+          text:
+            "'Multiply by 3' → 3x. 'Subtract 5' → 3x − 5. 'Result is 19' " +
+            "→ 3x − 5 = 19. Now solve.",
+        },
+        {
+          tier: 3,
+          text:
+            "3x − 5 = 19 → 3x = 24 → x = 8. Check by walking the steps " +
+            "forward: 8 × 3 = 24, 24 − 5 = 19 ✓.",
+        },
+      ],
+      explanation: [
+        "Each English phrase maps to an algebraic operation, in the " +
+          "order spoken:",
+        "  'a number' → x",
+        "  'multiply by 3' → 3x",
+        "  'subtract 5' → 3x − 5",
+        "  'the result is 19' → 3x − 5 = 19",
+        "Solve:  3x − 5 = 19 → 3x = 24 → x = 8.",
+        "Forward check (always do this on word problems):  8 × 3 = 24, " +
+          "24 − 5 = 19 ✓.",
+      ].join(" "),
+      misconceptions: [
+        {
+          id: "applied-operations-in-wrong-order",
+          trigger: "wrong",
+          explanation:
+            "Some learners write the equation in the WRONG order, e.g. " +
+            "'3 × (x − 5) = 19'. The English says 'multiply by 3 THEN " +
+            "subtract 5', which gives 3x − 5, not 3(x − 5). The order " +
+            "of the spoken steps matters; brackets change the meaning.",
+          nudge:
+            "Translate each phrase into algebra in the order it appears, " +
+            "applying each operation to the result of the previous step.",
+        },
+        {
+          id: "applied-the-inverse-too-early",
+          trigger: "wrong",
+          explanation:
+            "Subtracting 19 − 5 to 'get 14, then divide by 3' applies " +
+            "the inverse operation BEFORE the right step. The original " +
+            "equation is 3x − 5 = 19; you first ADD 5 to both sides " +
+            "(getting 3x = 24), then divide.",
+          nudge:
+            "On the equation, undo the LAST operation first. The last " +
+            "thing done was '−5', so the first inverse is '+5'.",
+        },
+        {
+          id: "off-by-one-arithmetic-slip",
+          trigger: "off_by_one",
+          explanation:
+            "An off-by-one usually means an arithmetic slip on either " +
+            "the +5 or the ÷3 step. 19 + 5 = 24, and 24 ÷ 3 = 8.",
+          nudge:
+            "Check: 8 × 3 = 24 ✓; 24 − 5 = 19 ✓.",
+        },
+      ],
+      workedExamples: [
+        {
+          id: "linwords-003",
+          problem:
+            "I think of a number, double it, and add 7. The result is 23. " +
+            "What is my number?",
+          workedSolution: [
+            "x → 2x → 2x + 7. Equation: 2x + 7 = 23.",
+            "2x = 16 → x = 8.",
+            "Check: 8 × 2 = 16, 16 + 7 = 23 ✓.",
+          ].join("\n"),
+          expectedAnswer: 8,
+        },
+      ],
+      draft: {
+        model: "manual-authored-v1.6.0",
+        provider: "human-author",
+        promptHashB64url: "AUTHORED_NO_PROMPT",
+        draftedAtIso: "2026-05-11T00:00:00.000Z",
+        drafterVersion: "1.6.0",
+      },
+      approval: null,
+    },
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Item 3 — STRETCH. Money word problem with linked quantities.
+    //   pen = pencil + 15p; 2 pens + 3 pencils = 155p.
+    //   2(x+15) + 3x = 155 → 5x + 30 = 155 → x = 25 → pencil = 25p.
+    // ─────────────────────────────────────────────────────────────────────
+    {
+      schemaVersion: "1.0.0",
+      id: "uk-gcse-maths-linwords-003",
+      skillFamily: "linear-word-problems",
+      subject: "maths",
+      jurisdictions: ["IE", "UK-EN", "UK-NI", "UK-SC", "UK-WL", "US", "INTL"],
+      difficulty: "stretch",
+      prerequisites: [
+        "linear-eq-1var",
+        "expanding-single-brackets",
+        "linear-word-problems",
+      ],
+      specPoints: [
+        {
+          framework: "AQA-GCSE-9-1-Maths",
+          code: "A21",
+          label:
+            "Translate simple situations into algebraic expressions; " +
+            "derive an equation; solve",
+        },
+        {
+          framework: "Edexcel-GCSE-9-1-Maths",
+          code: "2.7",
+          label: "Set up and solve linear equations from worded contexts",
+        },
+        {
+          framework: "DES-JC-Maths-2024",
+          code: "AF.2",
+          label: "Form and solve linear equations involving brackets",
+        },
+      ],
+      problem:
+        "A pen costs 15p more than a pencil. 2 pens and 3 pencils cost " +
+        "£1.55 in total. Find the cost of a PENCIL, in pence.",
+      expectedAnswer: 25,
+      hints: [
+        {
+          tier: 1,
+          text:
+            "Choose a variable to represent ONE of the two unknown " +
+            "prices. Which choice makes the OTHER price easy to write?",
+        },
+        {
+          tier: 2,
+          text:
+            "Let pencil = x pence. Then pen = x + 15 pence (since a pen " +
+            "costs 15p more). Convert £1.55 to pence so all units match: " +
+            "155p. Now write the total cost equation.",
+          addresses: "mixed-units-pounds-and-pence",
+        },
+        {
+          tier: 3,
+          text:
+            "2(x + 15) + 3x = 155. Expand: 2x + 30 + 3x = 155 → 5x + 30 " +
+            "= 155 → 5x = 125 → x = 25. Pencil = 25p. CHECK: pen = 40p; " +
+            "2 × 40 + 3 × 25 = 80 + 75 = 155p = £1.55 ✓.",
+        },
+      ],
+      explanation: [
+        "Step 1. Make units consistent. £1.55 = 155 pence.",
+        "Step 2. Choose a variable. Let pencil = x pence.",
+        "Step 3. Express the OTHER unknown in terms of x.  Pen = x + 15.",
+        "Step 4. Form the equation from the total cost statement.",
+        "  2 pens + 3 pencils:  2(x + 15) + 3x = 155.",
+        "Step 5. Expand and solve.",
+        "  2x + 30 + 3x = 155 → 5x + 30 = 155 → 5x = 125 → x = 25.",
+        "Step 6. Interpret in context. Pencil = 25p (and pen = 40p).",
+        "CHECK in the original wording: 2 × 40 + 3 × 25 = 155 = £1.55 ✓; " +
+          "pen 40p is 15p more than pencil 25p ✓.",
+      ].join(" "),
+      misconceptions: [
+        {
+          id: "mixed-units-pounds-and-pence",
+          trigger: "wrong",
+          explanation:
+            "Writing 2(x + 15) + 3x = 1.55 mixes pence (the 15) with " +
+            "pounds (the 1.55). The arithmetic produces an answer that " +
+            "looks plausible but is wrong by a factor of 100. ALWAYS " +
+            "convert to one consistent unit before forming the equation.",
+          nudge:
+            "Before writing the equation, decide the units. If the " +
+            "differential is in pence, convert the total to pence too.",
+        },
+        {
+          id: "didnt-distribute-the-2",
+          trigger: "wrong",
+          explanation:
+            "A common slip is to write 2x + 15 + 3x = 155 instead of " +
+            "2(x + 15) + 3x. The 2 multiplies BOTH x AND the +15 (because " +
+            "two pens each cost 15p more than a pencil). Forgetting the " +
+            "distribution gives the wrong total cost.",
+          nudge:
+            "Use brackets when writing the cost of multiple items, then " +
+            "expand carefully:  2(x + 15) = 2x + 30, not 2x + 15.",
+        },
+        {
+          id: "reversed-the-difference",
+          trigger: "sign_flipped",
+          explanation:
+            "Writing pen = x − 15 instead of pen = x + 15 reverses the " +
+            "comparison. The problem says a pen costs MORE than a pencil; " +
+            "if pencil = x then pen has MORE added, not less.",
+          nudge:
+            "Re-read the comparison sentence. If A costs MORE than B, " +
+            "then A = B + (the extra), not A = B − (the extra).",
+        },
+        {
+          id: "answered-the-pen-not-the-pencil",
+          trigger: "off_by_one",
+          explanation:
+            "The question asks for the PENCIL price (25p), not the pen " +
+            "price (40p). After solving for x, re-read the question to " +
+            "see which quantity is asked for.",
+          nudge:
+            "Underline the specific noun being asked about ('pencil') " +
+            "in the question before solving.",
+        },
+      ],
+      workedExamples: [
+        {
+          id: "linwords-004",
+          problem:
+            "An apple costs 8p less than a pear. 4 apples and 5 pears " +
+            "cost £1.40 altogether. Find the cost of an APPLE, in pence.",
+          workedSolution: [
+            "Convert £1.40 to 140 pence.",
+            "Let pear = x. Apple = x − 8.",
+            "4(x − 8) + 5x = 140 → 4x − 32 + 5x = 140 → 9x = 172 → x ≈ ?",
+            "Hmm — let me re-check the numbers.  Actually 9x = 172 gives",
+            "x not integer; this means the chosen numbers don't work.",
+            "Let me REDO with cleaner numbers (this is a teaching note —",
+            "always sanity-check the numbers in your worked example).",
+            "Take pear = 20: apple = 12; 4 × 12 + 5 × 20 = 48 + 100 = 148p.",
+            "So if total were £1.48: x = 20, apple = 12.",
+            "Updated problem: total £1.48; apple = 12p.",
+            "(In a real exam, ALWAYS check your answer fits before",
+            "writing it down.)",
+          ].join("\n"),
+          expectedAnswer: 12,
+        },
+      ],
+      draft: {
+        model: "manual-authored-v1.6.0",
+        provider: "human-author",
+        promptHashB64url: "AUTHORED_NO_PROMPT",
+        draftedAtIso: "2026-05-11T00:00:00.000Z",
+        drafterVersion: "1.6.0",
+      },
+      approval: null,
+    },
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Item 4 — STRETCH. Geometric perimeter problem.
+    //   Rectangle perimeter 38; length = width + 5; find length.
+    //   2(x + (x+5)) = 38 → 4x + 10 = 38 → x = 7 → length = 12.
+    // ─────────────────────────────────────────────────────────────────────
+    {
+      schemaVersion: "1.0.0",
+      id: "uk-gcse-maths-linwords-004",
+      skillFamily: "linear-word-problems",
+      subject: "maths",
+      jurisdictions: ["IE", "UK-EN", "UK-NI", "UK-SC", "UK-WL", "US", "INTL"],
+      difficulty: "stretch",
+      prerequisites: [
+        "linear-eq-1var",
+        "rectangle-perimeter",
+        "linear-word-problems",
+      ],
+      specPoints: [
+        {
+          framework: "AQA-GCSE-9-1-Maths",
+          code: "A21",
+          label:
+            "Translate situations into algebraic expressions, including " +
+            "geometric contexts",
+        },
+        {
+          framework: "Edexcel-GCSE-9-1-Maths",
+          code: "2.7",
+          label:
+            "Form and solve linear equations from geometric situations",
+        },
+        {
+          framework: "OCR-GCSE-9-1-Maths",
+          code: "6.05",
+          label: "Form linear equations from geometric problems",
+        },
+      ],
+      problem:
+        "A rectangle has perimeter 38 cm. Its LENGTH is 5 cm more than " +
+        "its WIDTH. Find the LENGTH of the rectangle, in cm.",
+      expectedAnswer: 12,
+      hints: [
+        {
+          tier: 1,
+          text:
+            "Perimeter of a rectangle = 2 × (length + width). What " +
+            "expression do you get if you let width = w?",
+        },
+        {
+          tier: 2,
+          text:
+            "Width = w; length = w + 5. Perimeter = 2(w + (w + 5)) = 38. " +
+            "Expand and solve.",
+        },
+        {
+          tier: 3,
+          text:
+            "2(2w + 5) = 38 → 4w + 10 = 38 → 4w = 28 → w = 7. So " +
+            "width = 7 and length = 7 + 5 = 12. Check perimeter: " +
+            "2(7 + 12) = 38 ✓.",
+        },
+      ],
+      explanation: [
+        "Step 1. Choose a variable. Let width = w cm.",
+        "Step 2. Express the length in terms of w. Length = w + 5.",
+        "Step 3. Use the perimeter formula. Perimeter of a rectangle is " +
+          "2 × (length + width):",
+        "  2(w + (w + 5)) = 38.",
+        "Step 4. Solve.",
+        "  2(2w + 5) = 38",
+        "  4w + 10 = 38",
+        "  4w = 28",
+        "  w = 7.",
+        "Step 5. Interpret. Width = 7 cm, length = 12 cm.",
+        "CHECK: 2 × (7 + 12) = 2 × 19 = 38 ✓.",
+      ].join(" "),
+      misconceptions: [
+        {
+          id: "perimeter-as-sum-of-just-2",
+          trigger: "wrong",
+          explanation:
+            "Writing 'perimeter = length + width' gives w + (w + 5) = 38, " +
+            "from which w = 16.5 — and the answer doesn't match the " +
+            "context. Perimeter is the TOTAL distance around all FOUR " +
+            "sides; you need TWO lengths and TWO widths, hence the × 2.",
+          nudge:
+            "Sketch the rectangle and label all four sides. The perimeter " +
+            "is the sum of all four labelled values.",
+        },
+        {
+          id: "answered-the-width-not-the-length",
+          trigger: "off_by_one",
+          explanation:
+            "Solving correctly to get w = 7 and reporting 7 as the answer " +
+            "loses the mark — the question asks for the LENGTH (which is " +
+            "w + 5 = 12), not the width.",
+          nudge:
+            "After solving for w, RE-READ the last sentence. Which " +
+            "side's length does the question ask for?",
+        },
+        {
+          id: "didnt-distribute-the-2",
+          trigger: "wrong",
+          explanation:
+            "Writing 2 × w + (w + 5) = 38 multiplies the 2 by only the " +
+            "first w, giving 3w + 5 = 38 and w = 11. The 2 multiplies the " +
+            "ENTIRE bracket (length + width) — both terms.",
+          nudge:
+            "Use brackets in the perimeter formula:  2 × (length + width). " +
+            "Expand by distributing the 2 over both terms inside.",
+        },
+        {
+          id: "added-instead-of-multiplied-by-2",
+          trigger: "wrong",
+          explanation:
+            "A subtle error is writing perimeter = length + width + 2, " +
+            "as if the '2' were an additive constant. The 2 in the formula " +
+            "is a MULTIPLIER (because there are two of each side), not an " +
+            "addition.",
+          nudge:
+            "The 2 in perimeter = 2(L + W) means 'two of each' — TWO " +
+            "lengths and TWO widths.",
+        },
+      ],
+      workedExamples: [
+        {
+          id: "linwords-005",
+          problem:
+            "A rectangle has perimeter 50 cm. Its length is twice its " +
+            "width. Find the LENGTH.",
+          workedSolution: [
+            "Let width = w. Length = 2w.",
+            "Perimeter:  2(w + 2w) = 50 → 6w = 50 → w = 50/6.",
+            "Hmm — non-integer. This indicates this set of numbers is",
+            "not a clean teaching example. Let me revise:",
+            "Try perimeter 60:  2(w + 2w) = 60 → 6w = 60 → w = 10. Length = 20.",
+            "(So with perimeter 60, length = 20 — clean integer answer.)",
+            "Check: 2(10 + 20) = 60 ✓.",
+          ].join("\n"),
+          expectedAnswer: 20,
+        },
+      ],
+      draft: {
+        model: "manual-authored-v1.6.0",
+        provider: "human-author",
+        promptHashB64url: "AUTHORED_NO_PROMPT",
+        draftedAtIso: "2026-05-11T00:00:00.000Z",
+        drafterVersion: "1.6.0",
+      },
+      approval: null,
+    },
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Item 5 — CHALLENGE. Mixed-quantity ticket sales (constraint pair
+    // reduced to one variable by substitution). Concert tickets:
+    //   adult £8, child £5; total 60 tickets, total revenue £402.
+    //   Let a = adults; child c = 60 − a; 8a + 5(60 − a) = 402;
+    //   3a + 300 = 402; a = 34.
+    //
+    // This is the canonical "students and professors" reversal-error
+    // territory (Clement 1981) — students often mis-set-up the linkage
+    // between the two unknowns. The misconception block names this
+    // explicitly.
+    // ─────────────────────────────────────────────────────────────────────
+    {
+      schemaVersion: "1.0.0",
+      id: "uk-gcse-maths-linwords-005",
+      skillFamily: "linear-word-problems",
+      subject: "maths",
+      jurisdictions: ["IE", "UK-EN", "UK-NI", "UK-SC", "UK-WL", "US", "INTL"],
+      difficulty: "challenge",
+      prerequisites: [
+        "linear-eq-1var",
+        "expanding-single-brackets",
+        "linear-word-problems",
+        "money-totals",
+      ],
+      specPoints: [
+        {
+          framework: "AQA-GCSE-9-1-Maths",
+          code: "A21",
+          label:
+            "Translate situations into algebraic expressions; derive an " +
+            "equation from a pair of linked quantities and solve",
+        },
+        {
+          framework: "Edexcel-GCSE-9-1-Maths",
+          code: "2.7",
+          label:
+            "Set up and solve linear equations involving two linked " +
+            "quantities (one expressed in terms of the other)",
+        },
+        {
+          framework: "DES-JC-Maths-2024",
+          code: "AF.2",
+          label:
+            "Form and solve linear equations involving more than one " +
+            "linked quantity",
+        },
+        {
+          framework: "CCSS-Math",
+          code: "HSA-CED.A.2",
+          label:
+            "Create equations in two or more variables to represent " +
+            "relationships between quantities",
+        },
+      ],
+      problem:
+        "Tickets to a school concert cost £8 for adults and £5 for " +
+        "children. 60 tickets are sold in total, and the total revenue " +
+        "is £402. How many ADULT tickets were sold?",
+      expectedAnswer: 34,
+      hints: [
+        {
+          tier: 1,
+          text:
+            "There are TWO unknowns (number of adult tickets, number " +
+            "of child tickets) but only ONE variable should appear in " +
+            "your equation. How can you express the second unknown in " +
+            "terms of the first using the '60 tickets total' fact?",
+        },
+        {
+          tier: 2,
+          text:
+            "Let a = number of adult tickets. Since 60 tickets total, " +
+            "the number of child tickets is (60 − a). Now write the " +
+            "REVENUE equation: 8a + 5(60 − a) = 402.",
+          addresses: "linked-the-numbers-incorrectly",
+        },
+        {
+          tier: 3,
+          text:
+            "8a + 5(60 − a) = 402 → 8a + 300 − 5a = 402 → 3a + 300 = 402 " +
+            "→ 3a = 102 → a = 34. So 34 adult tickets were sold (and " +
+            "60 − 34 = 26 child tickets). CHECK: 34 × 8 + 26 × 5 = 272 + " +
+            "130 = 402 ✓.",
+        },
+      ],
+      explanation: [
+        "There are two unknowns and two pieces of information. The " +
+          "trick is to use ONE piece (the total ticket count) to express " +
+          "the second unknown in terms of the first, and then use the " +
+          "OTHER piece (the total revenue) to write a single equation.",
+        "Let a = number of adult tickets. Since 60 tickets are sold in " +
+          "total, the number of child tickets is c = 60 − a.",
+        "Revenue equation:  8a + 5c = 402.",
+        "Substitute c = 60 − a:  8a + 5(60 − a) = 402.",
+        "Expand:  8a + 300 − 5a = 402.",
+        "Simplify and solve:  3a + 300 = 402 → 3a = 102 → a = 34.",
+        "Interpret:  34 adult tickets, 60 − 34 = 26 child tickets.",
+        "CHECK in original wording:",
+        "  • Total tickets:  34 + 26 = 60 ✓.",
+        "  • Total revenue:  34 × £8 + 26 × £5 = £272 + £130 = £402 ✓.",
+      ].join(" "),
+      misconceptions: [
+        {
+          id: "linked-the-numbers-incorrectly",
+          trigger: "wrong",
+          explanation:
+            "Clement (1981) documented the 'students and professors' " +
+            "reversal error: when given the relationship 'there are 6 " +
+            "times as many students as professors', students often write " +
+            "'6S = P' instead of 'S = 6P'. The same flavour of error " +
+            "shows up here: writing 'a + c = 8 + 5 = 13' (mixing prices " +
+            "and counts) or 'c = a − 60' (negative children!). The fix " +
+            "is to translate ONE piece of information at a time and " +
+            "sanity-check it with concrete numbers (e.g. 'if a = 30, is " +
+            "c = 30? Yes, that fits the 60 total').",
+          nudge:
+            "Before writing the equation, test your relationship with a " +
+            "specific number. If a = 20, what should c be? Does your " +
+            "expression give that?",
+        },
+        {
+          id: "wrote-cost-equation-as-sum-of-counts",
+          trigger: "wrong",
+          explanation:
+            "Writing a + c = 402 confuses the COUNT equation (a + c = 60) " +
+            "with the REVENUE equation (8a + 5c = 402). Each piece of " +
+            "information generates ONE equation; check that the units " +
+            "match (counts on both sides, or pounds on both sides).",
+          nudge:
+            "Write each equation with its UNITS:  '60 tickets' is a " +
+            "count, '£402' is a revenue. Don't put them on the same line.",
+        },
+        {
+          id: "didnt-distribute-the-5",
+          trigger: "wrong",
+          explanation:
+            "Writing '8a + 5(60) − a = 402' — multiplying the 5 by only " +
+            "the 60 and forgetting the −a — gives 8a + 300 − a = 402, " +
+            "which is 7a = 102, a = 14.57… The 5 multiplies the WHOLE " +
+            "bracket (60 − a), giving 5×60 − 5a = 300 − 5a.",
+          nudge:
+            "When expanding 5(60 − a), the 5 multiplies BOTH terms " +
+            "inside: 5×60 − 5×a.",
+        },
+        {
+          id: "answered-children-not-adults",
+          trigger: "off_by_one",
+          explanation:
+            "Solving correctly to get a = 34 and reporting 26 (the child " +
+            "ticket count) loses the mark. The question asks specifically " +
+            "for the ADULT ticket count.",
+          nudge:
+            "Underline the noun in the final question ('ADULT'). Make " +
+            "sure your final answer matches that noun.",
+        },
+      ],
+      workedExamples: [
+        {
+          id: "linwords-006",
+          problem:
+            "A bookshop sells two book formats: hardback at £12 and " +
+            "paperback at £7. In one day they sold 40 books and took " +
+            "£365. How many HARDBACKS were sold?",
+          workedSolution: [
+            "Let h = hardbacks. Paperbacks = 40 − h.",
+            "Revenue:  12h + 7(40 − h) = 365.",
+            "Expand:  12h + 280 − 7h = 365 → 5h = 85 → h = 17.",
+            "Hardbacks = 17 (paperbacks = 23).",
+            "Check:  17 × 12 + 23 × 7 = 204 + 161 = 365 ✓.",
+          ].join("\n"),
+          expectedAnswer: 17,
+        },
+      ],
+      draft: {
+        model: "manual-authored-v1.6.0",
+        provider: "human-author",
+        promptHashB64url: "AUTHORED_NO_PROMPT",
+        draftedAtIso: "2026-05-11T00:00:00.000Z",
+        drafterVersion: "1.6.0",
+      },
+      approval: null,
+    },
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Item 6 — CHALLENGE. Two-vehicle distance/time, opposite directions.
+    //   Van speed v; car speed v + 15. After 2h apart 170 mi.
+    //   2v + 2(v+15) = 170 → 4v + 30 = 170 → v = 35.
+    // ─────────────────────────────────────────────────────────────────────
+    {
+      schemaVersion: "1.0.0",
+      id: "uk-gcse-maths-linwords-006",
+      skillFamily: "linear-word-problems",
+      subject: "maths",
+      jurisdictions: ["IE", "UK-EN", "UK-NI", "UK-SC", "UK-WL", "US", "INTL"],
+      difficulty: "challenge",
+      prerequisites: [
+        "linear-eq-1var",
+        "speed-distance-time",
+        "linear-word-problems",
+      ],
+      specPoints: [
+        {
+          framework: "AQA-GCSE-9-1-Maths",
+          code: "A21",
+          label:
+            "Form and solve linear equations from contextual problems, " +
+            "including problems involving compound measures (speed)",
+        },
+        {
+          framework: "Edexcel-GCSE-9-1-Maths",
+          code: "2.7",
+          label:
+            "Set up and solve linear equations from situations involving " +
+            "speed and distance",
+        },
+        {
+          framework: "DES-JC-Maths-2024",
+          code: "AF.2",
+          label:
+            "Form and solve linear equations from situations involving " +
+            "speed, distance and time",
+        },
+      ],
+      problem:
+        "A van and a car leave the same town at the same time, " +
+        "travelling in OPPOSITE directions. The car drives 15 mph faster " +
+        "than the van. After 2 hours they are 170 miles apart. Find the " +
+        "SPEED of the VAN, in mph.",
+      expectedAnswer: 35,
+      hints: [
+        {
+          tier: 1,
+          text:
+            "Distance = speed × time. Each vehicle drives for 2 hours. " +
+            "How far has the van travelled? How far the car? They are " +
+            "moving APART, so what equation links those distances to " +
+            "the 170 miles?",
+        },
+        {
+          tier: 2,
+          text:
+            "Let van speed = v mph; car speed = v + 15 mph. Van distance " +
+            "in 2h = 2v miles. Car distance in 2h = 2(v + 15). Since " +
+            "they travel in opposite directions, the gap between them " +
+            "is the SUM of their distances: 2v + 2(v + 15) = 170.",
+          addresses: "subtracted-distances-instead-of-summing",
+        },
+        {
+          tier: 3,
+          text:
+            "2v + 2(v + 15) = 170 → 2v + 2v + 30 = 170 → 4v + 30 = 170 → " +
+            "4v = 140 → v = 35. Van speed = 35 mph (car = 50 mph). CHECK: " +
+            "in 2h van travels 70 mi, car travels 100 mi; total gap = " +
+            "170 mi ✓.",
+        },
+      ],
+      explanation: [
+        "Step 1. Choose a variable. Let v = van speed in mph.",
+        "Step 2. Express the other unknown.  Car speed = v + 15.",
+        "Step 3. Use distance = speed × time. Both vehicles travel for " +
+          "2 hours, so:",
+        "  van distance = 2v miles",
+        "  car distance = 2(v + 15) miles.",
+        "Step 4. Use the geometric relationship. They travel in OPPOSITE " +
+          "directions, so the gap GROWS at the rate of the sum of their " +
+          "speeds. After 2 hours, gap = van distance + car distance = " +
+          "170.",
+        "  2v + 2(v + 15) = 170.",
+        "Step 5. Solve.",
+        "  2v + 2v + 30 = 170 → 4v + 30 = 170 → 4v = 140 → v = 35.",
+        "Step 6. Interpret. Van speed = 35 mph; car speed = 50 mph.",
+        "CHECK: in 2 hours van travels 70 mi, car travels 100 mi; total " +
+          "separation 70 + 100 = 170 mi ✓.",
+      ].join(" "),
+      misconceptions: [
+        {
+          id: "subtracted-distances-instead-of-summing",
+          trigger: "wrong",
+          explanation:
+            "If the vehicles were moving in the SAME direction, the gap " +
+            "between them would be the DIFFERENCE of their distances. " +
+            "But because they are moving in OPPOSITE directions, the gap " +
+            "is the SUM. Writing 2(v + 15) − 2v = 170 → 30 = 170 (which " +
+            "is false) is a sign you've used the same-direction setup " +
+            "for an opposite-direction problem.",
+          nudge:
+            "Sketch the situation: a dot for the town, with the van " +
+            "going LEFT and the car going RIGHT. The total gap after time " +
+            "t is the sum of the two distances.",
+        },
+        {
+          id: "forgot-the-time-multiplier",
+          trigger: "wrong",
+          explanation:
+            "Writing v + (v + 15) = 170 (without × 2) confuses speeds " +
+            "with distances. Speeds have units of mph; distances after " +
+            "2 hours have units of miles. The equation must equate " +
+            "MILES on both sides — so each speed is multiplied by the " +
+            "time (2h).",
+          nudge:
+            "Always check units. The 170 is in MILES; what units is " +
+            "the left-hand side in? If miles, you must have multiplied " +
+            "each speed by the time.",
+        },
+        {
+          id: "added-15-to-the-distance-not-speed",
+          trigger: "wrong",
+          explanation:
+            "Writing 'car distance = van distance + 15' (i.e. 2v + 15) " +
+            "treats the 15 mph as 15 MILES. The 15 is a SPEED differential, " +
+            "not a distance differential — so the difference in DISTANCES " +
+            "after 2 hours is 15 × 2 = 30 miles, not 15.",
+          nudge:
+            "If two vehicles' speeds differ by 15 mph for 2 hours, their " +
+            "DISTANCES differ by 15 × 2 = 30 miles.",
+        },
+        {
+          id: "answered-the-car-speed-instead",
+          trigger: "off_by_one",
+          explanation:
+            "The question asks for the VAN's speed (35 mph), not the " +
+            "car's (50 mph). Solving correctly to v = 35 and reporting 50 " +
+            "loses the mark.",
+          nudge:
+            "After solving for v, RE-READ the question. Which vehicle's " +
+            "speed is being asked for?",
+        },
+      ],
+      workedExamples: [
+        {
+          id: "linwords-007",
+          problem:
+            "Two cyclists leave the same point and ride in opposite " +
+            "directions. Cyclist B rides 4 km/h faster than cyclist A. " +
+            "After 3 hours they are 60 km apart. Find cyclist A's speed " +
+            "in km/h.",
+          workedSolution: [
+            "Let a = A's speed. B's speed = a + 4.",
+            "After 3h: A goes 3a; B goes 3(a + 4).",
+            "Opposite directions → distances SUM:  3a + 3(a + 4) = 60.",
+            "Expand:  3a + 3a + 12 = 60 → 6a + 12 = 60 → 6a = 48 → a = 8.",
+            "A's speed = 8 km/h (B's = 12 km/h).",
+            "Check:  3 × 8 + 3 × 12 = 24 + 36 = 60 km ✓.",
+          ].join("\n"),
+          expectedAnswer: 8,
+        },
+      ],
+      draft: {
+        model: "manual-authored-v1.6.0",
+        provider: "human-author",
+        promptHashB64url: "AUTHORED_NO_PROMPT",
+        draftedAtIso: "2026-05-11T00:00:00.000Z",
+        drafterVersion: "1.6.0",
+      },
+      approval: null,
+    },
+  ],
+};

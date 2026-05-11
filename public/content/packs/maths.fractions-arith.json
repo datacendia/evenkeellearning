@@ -6,7 +6,7 @@
   "skillFamily": "fractions-arith",
   "metadata": {
     "version": "1.0.0",
-    "builtAtIso": "2026-05-11T12:40:14.876Z",
+    "builtAtIso": "2026-05-11T12:46:42.020Z",
     "description": "The four arithmetic operations with fractions, including mixed numbers and a KS4 word-problem application. Every item carries curriculum alignment to the National Curriculum (England), AQA and Edexcel GCSE 9-1, DES Junior Cycle, and CCSS 6.NS / 7.NS. Misconceptions grounded in the CSMS study (Hart 1981), the MAP fractions library, NCETM mastery materials, and Edexcel 2023 chief examiner feedback."
   },
   "items": [
@@ -131,19 +131,19 @@
       "approval": null,
       "approvals": [
         {
-          "reviewerFingerprint": "qtxeYL8UFUFVu6Vv",
+          "reviewerFingerprint": "zp-kQ_C5tQLd7eTm",
           "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
-          "approvedAtIso": "2026-05-11T12:40:14.883Z",
-          "signatureB64url": "3W-gH021TcGNTUehBczf8zxDhTjrUnbN-A8GpVhT9kr4gKrCE_zmrvConOEJocpNjjAW38QwqhFSqR2gXhwxqQ",
-          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEI1rIM65YOGgjozlpsVyPLhEmvKQg0bVSUh5xZvlvugY7mv5BeLjwas-ObgdLwR0l7X51t0dD41aXwgksRztjpw",
+          "approvedAtIso": "2026-05-11T12:46:42.026Z",
+          "signatureB64url": "2H__QNE4gDLmsDNI2gBGxga2fOJZh_D0ghD06745H71zWygh40-nw3nVfB1TwxnwOQmDpMTGMORvgkmtZUfOJg",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYNjecsl70sLe8r-eWSjGNsFMEvllgueqW8gqaGqEjnOnR30f48jyFhzBJ0Q3eWgrE7ySdpZ560krbe-26ZHIoA",
           "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
         },
         {
-          "reviewerFingerprint": "qtxeYL8UFUFVu6Vv",
+          "reviewerFingerprint": "zp-kQ_C5tQLd7eTm",
           "reviewerName": "Build-Time Seed Reviewer (v1.5.0) (Peer)",
-          "approvedAtIso": "2026-05-11T12:40:14.883Z",
-          "signatureB64url": "3W-gH021TcGNTUehBczf8zxDhTjrUnbN-A8GpVhT9kr4gKrCE_zmrvConOEJocpNjjAW38QwqhFSqR2gXhwxqQ",
-          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEI1rIM65YOGgjozlpsVyPLhEmvKQg0bVSUh5xZvlvugY7mv5BeLjwas-ObgdLwR0l7X51t0dD41aXwgksRztjpw",
+          "approvedAtIso": "2026-05-11T12:46:42.026Z",
+          "signatureB64url": "2H__QNE4gDLmsDNI2gBGxga2fOJZh_D0ghD06745H71zWygh40-nw3nVfB1TwxnwOQmDpMTGMORvgkmtZUfOJg",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYNjecsl70sLe8r-eWSjGNsFMEvllgueqW8gqaGqEjnOnR30f48jyFhzBJ0Q3eWgrE7ySdpZ560krbe-26ZHIoA",
           "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
         }
       ]
@@ -258,19 +258,19 @@
       "approval": null,
       "approvals": [
         {
-          "reviewerFingerprint": "qtxeYL8UFUFVu6Vv",
+          "reviewerFingerprint": "zp-kQ_C5tQLd7eTm",
           "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
-          "approvedAtIso": "2026-05-11T12:40:14.884Z",
-          "signatureB64url": "43WvaY-XYcBrc6zqnyOQfs9oRkNLOKzzdM9uE4vVI9wo2-qhBndLKsAnaPWxfmqf1NKRq4gtylO7l6fGPuKNSQ",
-          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEI1rIM65YOGgjozlpsVyPLhEmvKQg0bVSUh5xZvlvugY7mv5BeLjwas-ObgdLwR0l7X51t0dD41aXwgksRztjpw",
+          "approvedAtIso": "2026-05-11T12:46:42.027Z",
+          "signatureB64url": "iD1ZeMC9uPr3rh6qyyD_aMjzZeqtV3Debd84gxAJOZngoxgEamPGb88EWxGq237BjrgTfVa4WbFKY7ar10RCoA",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYNjecsl70sLe8r-eWSjGNsFMEvllgueqW8gqaGqEjnOnR30f48jyFhzBJ0Q3eWgrE7ySdpZ560krbe-26ZHIoA",
           "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
         },
         {
-          "reviewerFingerprint": "qtxeYL8UFUFVu6Vv",
+          "reviewerFingerprint": "zp-kQ_C5tQLd7eTm",
           "reviewerName": "Build-Time Seed Reviewer (v1.5.0) (Peer)",
-          "approvedAtIso": "2026-05-11T12:40:14.884Z",
-          "signatureB64url": "43WvaY-XYcBrc6zqnyOQfs9oRkNLOKzzdM9uE4vVI9wo2-qhBndLKsAnaPWxfmqf1NKRq4gtylO7l6fGPuKNSQ",
-          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEI1rIM65YOGgjozlpsVyPLhEmvKQg0bVSUh5xZvlvugY7mv5BeLjwas-ObgdLwR0l7X51t0dD41aXwgksRztjpw",
+          "approvedAtIso": "2026-05-11T12:46:42.027Z",
+          "signatureB64url": "iD1ZeMC9uPr3rh6qyyD_aMjzZeqtV3Debd84gxAJOZngoxgEamPGb88EWxGq237BjrgTfVa4WbFKY7ar10RCoA",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYNjecsl70sLe8r-eWSjGNsFMEvllgueqW8gqaGqEjnOnR30f48jyFhzBJ0Q3eWgrE7ySdpZ560krbe-26ZHIoA",
           "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
         }
       ]
@@ -391,19 +391,19 @@
       "approval": null,
       "approvals": [
         {
-          "reviewerFingerprint": "qtxeYL8UFUFVu6Vv",
+          "reviewerFingerprint": "zp-kQ_C5tQLd7eTm",
           "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
-          "approvedAtIso": "2026-05-11T12:40:14.884Z",
-          "signatureB64url": "Jw3vL_BZXkqVj7Lb2O5xesrLXFI024xVpDOe_QFC2U7yEBHZ6rYwBF9Sr4wv9zfrqRhoBZbbkao7A2KuoQ9-1g",
-          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEI1rIM65YOGgjozlpsVyPLhEmvKQg0bVSUh5xZvlvugY7mv5BeLjwas-ObgdLwR0l7X51t0dD41aXwgksRztjpw",
+          "approvedAtIso": "2026-05-11T12:46:42.027Z",
+          "signatureB64url": "3vjv4sLT9fAx2h_1gcSP1jvfUVcabBsyC5feerU9bc3PIKkFrDhHHin51s7SwRliaQ3LdIu2XQFGCHi7L5rsZQ",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYNjecsl70sLe8r-eWSjGNsFMEvllgueqW8gqaGqEjnOnR30f48jyFhzBJ0Q3eWgrE7ySdpZ560krbe-26ZHIoA",
           "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
         },
         {
-          "reviewerFingerprint": "qtxeYL8UFUFVu6Vv",
+          "reviewerFingerprint": "zp-kQ_C5tQLd7eTm",
           "reviewerName": "Build-Time Seed Reviewer (v1.5.0) (Peer)",
-          "approvedAtIso": "2026-05-11T12:40:14.884Z",
-          "signatureB64url": "Jw3vL_BZXkqVj7Lb2O5xesrLXFI024xVpDOe_QFC2U7yEBHZ6rYwBF9Sr4wv9zfrqRhoBZbbkao7A2KuoQ9-1g",
-          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEI1rIM65YOGgjozlpsVyPLhEmvKQg0bVSUh5xZvlvugY7mv5BeLjwas-ObgdLwR0l7X51t0dD41aXwgksRztjpw",
+          "approvedAtIso": "2026-05-11T12:46:42.027Z",
+          "signatureB64url": "3vjv4sLT9fAx2h_1gcSP1jvfUVcabBsyC5feerU9bc3PIKkFrDhHHin51s7SwRliaQ3LdIu2XQFGCHi7L5rsZQ",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYNjecsl70sLe8r-eWSjGNsFMEvllgueqW8gqaGqEjnOnR30f48jyFhzBJ0Q3eWgrE7ySdpZ560krbe-26ZHIoA",
           "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
         }
       ]
@@ -518,19 +518,19 @@
       "approval": null,
       "approvals": [
         {
-          "reviewerFingerprint": "qtxeYL8UFUFVu6Vv",
+          "reviewerFingerprint": "zp-kQ_C5tQLd7eTm",
           "reviewerName": "Build-Time Seed Reviewer (v1.5.0)",
-          "approvedAtIso": "2026-05-11T12:40:14.884Z",
-          "signatureB64url": "JNQj1U-kzultNy2SS2UVFN7qeRkV5urmuMM9hxO2hA3PHCf-gEs0AzF-ApcsE32_JICusYriizC2n5tLbK6mFQ",
-          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEI1rIM65YOGgjozlpsVyPLhEmvKQg0bVSUh5xZvlvugY7mv5BeLjwas-ObgdLwR0l7X51t0dD41aXwgksRztjpw",
+          "approvedAtIso": "2026-05-11T12:46:42.027Z",
+          "signatureB64url": "EIfz85y-prKWBwGU6HI87xy0OVuVkKFKdS1qKfMhMNt9YwQaX8EpVhN2ECxTB1FCD4V096xvFx3xd983x_B7wQ",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYNjecsl70sLe8r-eWSjGNsFMEvllgueqW8gqaGqEjnOnR30f48jyFhzBJ0Q3eWgrE7ySdpZ560krbe-26ZHIoA",
           "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
         },
         {
-          "reviewerFingerprint": "qtxeYL8UFUFVu6Vv",
+          "reviewerFingerprint": "zp-kQ_C5tQLd7eTm",
           "reviewerName": "Build-Time Seed Reviewer (v1.5.0) (Peer)",
-          "approvedAtIso": "2026-05-11T12:40:14.884Z",
-          "signatureB64url": "JNQj1U-kzultNy2SS2UVFN7qeRkV5urmuMM9hxO2hA3PHCf-gEs0AzF-ApcsE32_JICusYriizC2n5tLbK6mFQ",
-          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEI1rIM65YOGgjozlpsVyPLhEmvKQg0bVSUh5xZvlvugY7mv5BeLjwas-ObgdLwR0l7X51t0dD41aXwgksRztjpw",
+          "approvedAtIso": "2026-05-11T12:46:42.027Z",
+          "signatureB64url": "EIfz85y-prKWBwGU6HI87xy0OVuVkKFKdS1qKfMhMNt9YwQaX8EpVhN2ECxTB1FCD4V096xvFx3xd983x_B7wQ",
+          "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYNjecsl70sLe8r-eWSjGNsFMEvllgueqW8gqaGqEjnOnR30f48jyFhzBJ0Q3eWgrE7ySdpZ560krbe-26ZHIoA",
           "note": "Build-time seed approval. Replace with a teacher passkey signature via /author before classroom rollout."
         }
       ]
