@@ -1,0 +1,26 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1"
+  ],
+  "id": "did:web:samples.evenkeel.org",
+  "verificationMethod": [
+    {
+      "id": "did:web:samples.evenkeel.org#key-1",
+      "type": "JsonWebKey2020",
+      "controller": "did:web:samples.evenkeel.org",
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "-36l1xzZSw0KTL1ZBvroO3wtbcmGdspLUaf9SZlha74",
+        "y": "bd4y04JRZNdhGZ_mi_h-YeoZl6jzRJpjDSWDBDQ7HtY"
+      }
+    }
+  ],
+  "assertionMethod": [
+    "did:web:samples.evenkeel.org#key-1"
+  ],
+  "authentication": [
+    "did:web:samples.evenkeel.org#key-1"
+  ]
+}

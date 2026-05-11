@@ -1,0 +1,27 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2"
+  ],
+  "id": "https://samples.evenkeel.org/sl/2026A",
+  "type": [
+    "VerifiableCredential",
+    "StatusList2021Credential"
+  ],
+  "issuer": "did:web:samples.evenkeel.org",
+  "validFrom": "2026-05-11T10:00:00.000Z",
+  "credentialSubject": {
+    "id": "https://samples.evenkeel.org/sl/2026A#list",
+    "type": "StatusList2021",
+    "statusPurpose": "revocation",
+    "encodedList": "H4sIAAAAAAAACu3BMQEAAADCoPVPbQwfoAAAAAAAAAAAAAAAAAAAAIC3AYbSVKsAQAAA"
+  },
+  "proof": {
+    "type": "DataIntegrityProof",
+    "cryptosuite": "ecdsa-jcs-2019",
+    "created": "2026-05-11T10:00:00.000Z",
+    "verificationMethod": "did:web:samples.evenkeel.org#key-1",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "y-t6ndYFoYuZ7rNEfI_j-43JlDILTizOuNz8ARiN5bBLU5MIs2OsFC-ceJf5YHrcwy3ZEHuoZORr8PMiV3ruNw",
+    "publicKeyB64url": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE-36l1xzZSw0KTL1ZBvroO3wtbcmGdspLUaf9SZlha75t3jLTglFk12EZn-aL-H5h6hmXqPNEmmMNJYMENDse1g"
+  }
+}
