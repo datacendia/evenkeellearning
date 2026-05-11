@@ -266,6 +266,14 @@ export function describeReason(reason: VcVerificationReason): string {
       return "The credential's status pointer is outside the issuer's published status list. This is suspicious — treat as untrusted.";
     case "wrong_status_list_url":
       return "The credential points at a status list URL that is not in the verifier's allowlist.";
+    case "did_resolver_failed":
+      return "Could not resolve the issuer's DID document. The signature could not be cross-checked against the issuer's published key.";
+    case "did_verification_method_not_found":
+      return "The proof points at a verification method that is not listed in the issuer's DID document.";
+    case "did_key_mismatch":
+      return "The credential's embedded public key does NOT match the key the issuer publishes in their DID document. Treat as untrusted — the issuer DID does not control the signing key.";
+    case "issuer_did_required":
+      return "Verifier policy requires a did:web issuer; this credential does not have one.";
   }
 }
 

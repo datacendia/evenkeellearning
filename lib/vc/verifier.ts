@@ -35,6 +35,11 @@ import {
   decodeBitstring,
   getBit,
 } from "./status-list";
+import {
+  extractAssertionPublicKey,
+  jwkToSpkiBase64Url,
+  type DidWebResolver,
+} from "./did-web";
 
 // ─── Result types ──────────────────────────────────────────────────────────
 
@@ -61,7 +66,11 @@ export type VcVerificationReason =
   | "credential_suspended"
   | "status_resolver_failed"
   | "status_index_out_of_range"
-  | "wrong_status_list_url";
+  | "wrong_status_list_url"
+  | "did_resolver_failed"
+  | "did_verification_method_not_found"
+  | "did_key_mismatch"
+  | "issuer_did_required";
 
 export type VcVerificationResult =
   | { ok: true; credential: VerifiableCredential }
@@ -198,6 +207,7 @@ async function sha256(bytes: Uint8Array): Promise<Uint8Array> {
  */
 async function verifyProofSignature(
   credential: VerifiableCredential,
+  publicKeyB64urlOverride: string | null = null,
 ): Promise<{ ok: true } | { ok: false; reason: VcVerificationReason }> {
   const proof: DataIntegrityProof = credential.proof;
   const { proof: _omit, ...unsigned } = credential;
@@ -209,12 +219,14 @@ async function verifyProofSignature(
   const digest = await sha256(new TextEncoder().encode(wrapperJson));
   const digestB64url = bytesToBase64Url(digest);
 
-  // Import the SPKI public key.
+  // Import the SPKI public key. When a DID resolver supplied an
+  // override, use that; otherwise trust the embedded one.
+  const spki = publicKeyB64urlOverride ?? proof.publicKeyB64url;
   let pubKey: CryptoKey;
   try {
     pubKey = await crypto.subtle.importKey(
       "spki",
-      toArrayBuffer(base64UrlToBytes(proof.publicKeyB64url)),
+      toArrayBuffer(base64UrlToBytes(spki)),
       SIGNING_ALGORITHM,
       true,
       ["verify"],
@@ -276,6 +288,30 @@ export interface VerifyCredentialOptions {
    * carries no `credentialStatus` block.
    */
   allowedStatusListUrls?: string[];
+  /**
+   * Optional did:web resolver. When supplied:
+   *   1. Resolve the credential's `issuer` (must be a `did:web:…` DID).
+   *   2. Look up the verification method named by `proof.verificationMethod`.
+   *   3. Compare the resolved JWK against the proof's embedded
+   *      `publicKeyB64url`. A mismatch is rejected with
+   *      `did_key_mismatch` — strong signal the issuer DID does not
+   *      actually control the key that signed the credential.
+   *   4. Verify the signature using the RESOLVED key (not the embedded
+   *      one). Even though we just compared them, signing against the
+   *      resolved key is the cryptographically meaningful check.
+   *
+   * If not supplied, the embedded `publicKeyB64url` is trusted as-is —
+   * matches v1.7.0 behaviour. A verifier that wants to ENFORCE issuer
+   * identity should always supply a resolver. (v1.7.3)
+   */
+  didResolver?: DidWebResolver;
+  /**
+   * If true AND the credential's issuer is not a `did:web:…`, reject
+   * with `issuer_did_required`. Use when the verifier has policy that
+   * only DID-anchored credentials count (e.g. an admissions office).
+   * Has no effect when no `didResolver` is supplied. Default: false.
+   */
+  requireDidIssuer?: boolean;
 }
 
 /**
@@ -296,7 +332,22 @@ export async function verifyCredential(
 
   const shape = checkCredentialShape(raw, supportedVocab);
   if (!shape.ok) return shape;
-  const sig = await verifyProofSignature(shape.credential);
+
+  // DID resolution — runs BEFORE signature verification so we can use
+  // the resolved key for the actual verify call. If no resolver is
+  // supplied, we trust the embedded `publicKeyB64url`; this matches
+  // v1.7.0 behaviour. With a resolver, the embedded key must agree
+  // with the one published in the issuer's DID document.
+  let publicKeyB64urlOverride: string | null = null;
+  if (opts.didResolver) {
+    const r = await resolveAndCheckDidIssuer(shape.credential, opts);
+    if (!r.ok) return { ok: false, reason: r.reason };
+    publicKeyB64urlOverride = r.publicKeyB64url;
+  } else if (opts.requireDidIssuer && !shape.credential.issuer.startsWith("did:web:")) {
+    return { ok: false, reason: "issuer_did_required" };
+  }
+
+  const sig = await verifyProofSignature(shape.credential, publicKeyB64urlOverride);
   if (!sig.ok) return { ok: false, reason: sig.reason };
 
   // Revocation check — only runs if both a status block and a resolver
@@ -311,6 +362,46 @@ export async function verifyCredential(
   }
 
   return { ok: true, credential: shape.credential };
+}
+
+type DidResolutionResult =
+  | { ok: true; publicKeyB64url: string }
+  | { ok: false; reason: VcVerificationReason };
+
+async function resolveAndCheckDidIssuer(
+  credential: VerifiableCredential,
+  opts: VerifyCredentialOptions,
+): Promise<DidResolutionResult> {
+  const issuer = credential.issuer;
+  if (!issuer.startsWith("did:web:")) {
+    if (opts.requireDidIssuer) {
+      return { ok: false, reason: "issuer_did_required" };
+    }
+    // Resolver supplied but issuer is not a DID — nothing to resolve;
+    // fall back to embedded key with no override.
+    return { ok: true, publicKeyB64url: credential.proof.publicKeyB64url };
+  }
+  let doc;
+  try {
+    doc = await opts.didResolver!(issuer);
+  } catch {
+    return { ok: false, reason: "did_resolver_failed" };
+  }
+  const vmId = credential.proof.verificationMethod;
+  const jwk = extractAssertionPublicKey(doc, vmId);
+  if (!jwk) {
+    return { ok: false, reason: "did_verification_method_not_found" };
+  }
+  let resolvedSpki: string;
+  try {
+    resolvedSpki = await jwkToSpkiBase64Url(jwk);
+  } catch {
+    return { ok: false, reason: "bad_public_key" };
+  }
+  if (resolvedSpki !== credential.proof.publicKeyB64url) {
+    return { ok: false, reason: "did_key_mismatch" };
+  }
+  return { ok: true, publicKeyB64url: resolvedSpki };
 }
 
 type RevocationCheckResult =
