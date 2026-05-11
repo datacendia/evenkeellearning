@@ -312,6 +312,10 @@ function Ledger() {
         const p = e.payload as { imported?: number; skipped?: number; under13Count?: number };
         return `ROSTER — imported ${p.imported ?? "?"}, skipped ${p.skipped ?? 0}, under-13 ${p.under13Count ?? 0}`;
       }
+      case "teacher.attestation.signed": {
+        const p = e.payload as { verdict?: string; problemId?: string; specPointCount?: number; keyType?: string };
+        return `ATTEST — ${p.verdict ?? "?"} on ${p.problemId ?? "?"} (${p.specPointCount ?? 0} spec-pts, ${p.keyType ?? "?"})`;
+      }
       default:
         return e.type;
     }
