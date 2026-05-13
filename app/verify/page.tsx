@@ -46,6 +46,7 @@ import {
   Info,
 } from "lucide-react";
 import { verifyCredential } from "@/lib/vc/verifier";
+import type { SpecPointRegistryReport } from "@/lib/vc/verifier";
 import type {
   StatusListCredential,
 } from "@/lib/vc/status-list";
@@ -58,6 +59,7 @@ type VerifyStatus =
       kind: "pass";
       credential: VerifiableCredential;
       revocationChecked: boolean;
+      registryReport: SpecPointRegistryReport[];
     }
   | { kind: "fail"; reason: string; detail?: string };
 
@@ -108,6 +110,7 @@ export default function VerifyPage() {
           kind: "pass",
           credential: result.credential,
           revocationChecked: !!statusList,
+          registryReport: result.registryReport,
         });
       } else {
         setStatus({
@@ -270,6 +273,7 @@ export default function VerifyPage() {
           <ResultPass
             credential={status.credential}
             revocationChecked={status.revocationChecked}
+            registryReport={status.registryReport}
           />
         )}
         {status.kind === "fail" && (
@@ -321,11 +325,19 @@ export default function VerifyPage() {
 function ResultPass({
   credential,
   revocationChecked,
+  registryReport,
 }: {
   credential: VerifiableCredential;
   revocationChecked: boolean;
+  registryReport: SpecPointRegistryReport[];
 }) {
   const subj = credential.credentialSubject;
+  // Build (framework, code) -> registry entry lookup so the rendered
+  // spec-point list can pull canonical labels and unknown-marker hints
+  // without re-running the registry from this UI module.
+  const reportByKey = new Map(
+    registryReport.map((r) => [`${r.framework}::${r.code}`, r]),
+  );
   return (
     <div
       className="p-5 rounded space-y-3"
@@ -355,18 +367,40 @@ function ResultPass({
         <p className="text-xs font-mono uppercase tracking-widest mt-2" style={{ opacity: 0.55 }}>
           Spec points demonstrated
         </p>
-        <ul className="mt-1 space-y-1">
-          {subj.demonstratedSpecPoints.map((sp) => (
-            <li
-              key={`${sp.framework}::${sp.code}`}
-              className="text-sm font-mono"
-              style={{ fontSize: 12 }}
-            >
-              {sp.framework} · {sp.code}
-              {sp.label ? ` — ${sp.label}` : ""}
-            </li>
-          ))}
+        <ul className="mt-1 space-y-1.5">
+          {subj.demonstratedSpecPoints.map((sp) => {
+            const r = reportByKey.get(`${sp.framework}::${sp.code}`);
+            // Prefer the registry's canonical label over the embedded
+            // one — issuers sometimes ship abbreviated labels and the
+            // registry holds the official phrasing.
+            const displayLabel = r?.canonicalLabel ?? sp.label;
+            return (
+              <li
+                key={`${sp.framework}::${sp.code}`}
+                className="text-sm font-mono flex items-start gap-2"
+                style={{ fontSize: 12 }}
+              >
+                <RegistryBadge status={r?.status ?? "unknown_framework"} />
+                <span>
+                  {sp.framework} · {sp.code}
+                  {displayLabel ? ` — ${displayLabel}` : ""}
+                </span>
+              </li>
+            );
+          })}
         </ul>
+        {registryReport.some((r) => r.status !== "ok") && (
+          <p
+            className="text-xs mt-2"
+            style={{ opacity: 0.65 }}
+          >
+            <Info size={11} style={{ display: "inline", marginRight: 4 }} />
+            One or more spec points are not in this verifier's curriculum
+            registry. The signature is still valid; the codes may belong
+            to a framework version added after this verifier was last
+            updated.
+          </p>
+        )}
       </div>
 
       {subj.reviewerNote && (
@@ -447,6 +481,56 @@ function ResultFail({ reason, detail }: { reason: string; detail?: string }) {
         </p>
       )}
     </div>
+  );
+}
+
+/**
+ * Tiny badge surfacing the curriculum-registry status of a single
+ * spec-point claim. Green tick = registry recognised the (framework,
+ * code) pair. Amber dot = unknown to this verifier's registry, which
+ * is NOT a verification failure — see the explanatory note rendered
+ * below the spec-point list.
+ */
+function RegistryBadge({
+  status,
+}: {
+  status: "ok" | "unknown_framework" | "unknown_code";
+}) {
+  if (status === "ok") {
+    return (
+      <span
+        title="In curriculum registry"
+        aria-label="In curriculum registry"
+        style={{
+          display: "inline-block",
+          width: 8,
+          height: 8,
+          borderRadius: 4,
+          background: "#4c8",
+          marginTop: 5,
+          flexShrink: 0,
+        }}
+      />
+    );
+  }
+  const label =
+    status === "unknown_framework"
+      ? "Framework not in registry"
+      : "Code not in registry";
+  return (
+    <span
+      title={label}
+      aria-label={label}
+      style={{
+        display: "inline-block",
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        background: "#fb6",
+        marginTop: 5,
+        flexShrink: 0,
+      }}
+    />
   );
 }
 

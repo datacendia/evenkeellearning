@@ -37,6 +37,46 @@ import {
   STATUS_PURPOSE_REVOCATION,
   type StatusListCredential,
 } from "./status-list";
+import {
+  validateAgainstRegistry,
+  type RegistryValidationStatus,
+} from "../curriculum/registry";
+
+// ─── Registry enrichment ───────────────────────────────────────────────────
+
+/**
+ * Per-spec-point registry annotation, attached to the verifier's
+ * success result. Never causes a verification failure — registry
+ * lookups are forward-compatible and a verifier may legitimately be
+ * older than the issuer's claim catalogue.
+ */
+export interface SpecPointRegistryReport {
+  framework: string;
+  code: string;
+  status: RegistryValidationStatus;
+  /** Canonical label from the registry, if status === "ok". */
+  canonicalLabel?: string;
+  /** Canonical skill URI from the registry, if status === "ok". */
+  canonicalSkillUri?: string;
+}
+
+function buildRegistryReport(
+  credential: VerifiableCredential,
+): SpecPointRegistryReport[] {
+  return credential.credentialSubject.demonstratedSpecPoints.map((sp) => {
+    const r = validateAgainstRegistry(sp.framework, sp.code);
+    const report: SpecPointRegistryReport = {
+      framework: sp.framework,
+      code: sp.code,
+      status: r.status,
+    };
+    if (r.status === "ok" && r.specPoint) {
+      report.canonicalLabel = r.specPoint.label;
+      report.canonicalSkillUri = r.skillUri;
+    }
+    return report;
+  });
+}
 
 // ─── Result types ──────────────────────────────────────────────────────────
 
@@ -62,8 +102,29 @@ export type VcVerificationReason =
   | "revoked"
   | "status_list_mismatch";
 
-export type VcVerificationResult =
+/**
+ * Result of the cheap structural-only shape check. The full verifier
+ * result (`VcVerificationResult`) is a strict superset: every shape-
+ * success carries a credential, every full-success additionally
+ * carries a registry report.
+ */
+export type VcShapeResult =
   | { ok: true; credential: VerifiableCredential }
+  | { ok: false; reason: VcVerificationReason; detail?: string };
+
+export type VcVerificationResult =
+  | {
+      ok: true;
+      credential: VerifiableCredential;
+      /**
+       * Per-spec-point registry annotation. Populated whenever the
+       * credential verifies; consumer UI can use this to render
+       * canonical labels or flag "unknown framework" warnings. Always
+       * present on success — array order mirrors
+       * `credentialSubject.demonstratedSpecPoints`.
+       */
+      registryReport: SpecPointRegistryReport[];
+    }
   | { ok: false; reason: VcVerificationReason; detail?: string };
 
 // ─── Structural check (synchronous) ────────────────────────────────────────
@@ -77,7 +138,7 @@ export type VcVerificationResult =
 export function checkCredentialShape(
   raw: unknown,
   supportedVocabularyVersion: number = CLAIM_VOCABULARY_VERSION,
-): VcVerificationResult {
+): VcShapeResult {
   if (!raw || typeof raw !== "object") {
     return { ok: false, reason: "not_an_object" };
   }
@@ -312,5 +373,9 @@ export async function verifyCredential(
     // list === null → offline/unreachable; pass through (documented).
   }
 
-  return { ok: true, credential: shape.credential };
+  return {
+    ok: true,
+    credential: shape.credential,
+    registryReport: buildRegistryReport(shape.credential),
+  };
 }
