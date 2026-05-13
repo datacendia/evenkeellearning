@@ -37,6 +37,7 @@ export function resetDistrictStore(): void {
 }
 
 export type {
+  AddPasskeyCredentialInput,
   AppendAuditInput,
   CreateTenantInput,
   DistrictStore,
@@ -47,6 +48,8 @@ export type {
 export type {
   AuditEvent,
   DistrictRole,
+  PasskeyCredential,
+  RefreshTokenRecord,
   RoleBinding,
   Tenant,
   TenantUser,

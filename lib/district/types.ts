@@ -110,3 +110,59 @@ export interface AuditEvent {
   /** Free-form JSON-serialisable detail. */
   detail?: Record<string, unknown>;
 }
+
+/**
+ * Server-side record of a passkey credential enrolled for a tenant user.
+ *
+ * The credentialId is the public, browser-visible identifier for the
+ * key the authenticator created. The SPKI is the corresponding public
+ * key (ECDSA-P256). The PRIVATE key never leaves the user's device.
+ *
+ * One user MAY have multiple passkey credentials (e.g. a phone + a
+ * laptop + a hardware key). On revocation we set `revokedAtIso`
+ * rather than deleting, so audit trails remain intact.
+ */
+export interface PasskeyCredential {
+  id: string;
+  tenantId: string;
+  userId: string;
+  /** Base64url credentialId returned by the authenticator. Unique per-tenant. */
+  credentialIdB64url: string;
+  /** Base64url SubjectPublicKeyInfo bytes (P-256 ES256 only). */
+  spkiB64url: string;
+  /** Most-recent signCount we observed (replay-detection ratchet). */
+  signCount: number;
+  /** Optional friendly label ("Alex's iPhone"). */
+  label?: string;
+  enrolledAtIso: string;
+  lastUsedAtIso?: string;
+  /** Set when the credential is revoked (lost device etc). null = active. */
+  revokedAtIso?: string;
+}
+
+/**
+ * Long-lived refresh token bound to a specific passkey credential.
+ *
+ * On refresh the client MUST produce a fresh WebAuthn assertion using
+ * `credentialId`. The server verifies the assertion against the
+ * stored SPKI before minting a new access token. An exfiltrated
+ * refresh-token cookie is therefore useless without physical access
+ * to the user's authenticator.
+ *
+ * The store row carries:
+ *   • `jti`        — opaque token id (in the cookie body)
+ *   • `credentialId` — the passkey it's bound to
+ *   • `expiresAtIso`, `lastUsedAtIso` — TTL bookkeeping
+ *   • `revokedAtIso` — logout / admin revocation
+ */
+export interface RefreshTokenRecord {
+  jti: string;
+  tenantId: string;
+  userId: string;
+  /** The passkey credential id this token is bound to. */
+  credentialIdB64url: string;
+  issuedAtIso: string;
+  expiresAtIso: string;
+  lastUsedAtIso?: string;
+  revokedAtIso?: string;
+}

@@ -29,6 +29,8 @@
 import type {
   AuditEvent,
   DistrictRole,
+  PasskeyCredential,
+  RefreshTokenRecord,
   RoleBinding,
   Tenant,
   TenantUser,
@@ -132,4 +134,83 @@ export interface DistrictStore {
     tenantId: string,
     opts?: { limit?: number; sinceIso?: string },
   ): Promise<AuditEvent[]>;
+
+  // ── Passkey credentials ────────────────────────────────────────────
+  /**
+   * Register a new passkey credential for a user. Idempotent on
+   * `credentialIdB64url`: re-enroling the same credential returns the
+   * existing row without bumping `enrolledAtIso`.
+   */
+  addPasskeyCredential(
+    tenantId: string,
+    userId: string,
+    input: AddPasskeyCredentialInput,
+  ): Promise<PasskeyCredential | null>;
+  /** Look up a credential by its base64url id. */
+  getPasskeyCredentialByCredentialId(
+    tenantId: string,
+    credentialIdB64url: string,
+  ): Promise<PasskeyCredential | null>;
+  listPasskeyCredentialsForUser(
+    tenantId: string,
+    userId: string,
+  ): Promise<PasskeyCredential[]>;
+  /**
+   * Mark a credential as revoked. Returns true if a row was changed.
+   * Does NOT cascade to refresh tokens — caller decides whether to
+   * also `revokeAllRefreshTokensForCredential`.
+   */
+  revokePasskeyCredential(
+    tenantId: string,
+    credentialIdB64url: string,
+  ): Promise<boolean>;
+  /**
+   * Update `signCount` + `lastUsedAtIso` after a successful
+   * verification. The store enforces the ratchet: signCount MUST
+   * strictly increase, otherwise the call returns false (the caller
+   * treats this as a potential clone attack).
+   */
+  recordPasskeyAssertion(
+    tenantId: string,
+    credentialIdB64url: string,
+    newSignCount: number,
+  ): Promise<boolean>;
+
+  // ── Refresh tokens ─────────────────────────────────────────────────
+  /** Insert a new refresh-token record. */
+  insertRefreshToken(
+    record: RefreshTokenRecord,
+  ): Promise<RefreshTokenRecord>;
+  /** Look up by jti within a tenant. */
+  getRefreshToken(
+    tenantId: string,
+    jti: string,
+  ): Promise<RefreshTokenRecord | null>;
+  /** Mark a refresh token revoked. Returns true if a row was changed. */
+  revokeRefreshToken(tenantId: string, jti: string): Promise<boolean>;
+  /** Revoke every active refresh token for a user. Returns count. */
+  revokeAllRefreshTokensForUser(
+    tenantId: string,
+    userId: string,
+  ): Promise<number>;
+  /** Revoke every active refresh token bound to a passkey credential. */
+  revokeAllRefreshTokensForCredential(
+    tenantId: string,
+    credentialIdB64url: string,
+  ): Promise<number>;
+  /** List active (non-revoked, non-expired) tokens for a user. */
+  listActiveRefreshTokensForUser(
+    tenantId: string,
+    userId: string,
+  ): Promise<RefreshTokenRecord[]>;
+  /** Record a successful refresh (bumps `lastUsedAtIso`). */
+  touchRefreshToken(tenantId: string, jti: string): Promise<boolean>;
+}
+
+/** Input for `addPasskeyCredential`. */
+export interface AddPasskeyCredentialInput {
+  credentialIdB64url: string;
+  spkiB64url: string;
+  signCount: number;
+  label?: string;
 }

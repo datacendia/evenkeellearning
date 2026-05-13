@@ -29,6 +29,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type {
+  AddPasskeyCredentialInput,
   AppendAuditInput,
   CreateTenantInput,
   DistrictStore,
@@ -39,6 +40,8 @@ import type {
 import type {
   AuditEvent,
   DistrictRole,
+  PasskeyCredential,
+  RefreshTokenRecord,
   RoleBinding,
   Tenant,
   TenantUser,
@@ -70,6 +73,8 @@ export class InMemoryDistrictStore implements DistrictStore {
   private externalIndex = new Map<string, Map<string, string>>();
   private bindings: RoleBinding[] = [];
   private audit: AuditEvent[] = [];
+  private credentials: PasskeyCredential[] = [];
+  private refreshTokens = new Map<string, RefreshTokenRecord>(); // keyed by jti
 
   private now: () => number;
   private newId: () => string;
@@ -302,6 +307,181 @@ export class InMemoryDistrictStore implements DistrictStore {
     return rows.map(cloneAudit);
   }
 
+  // ── passkey credentials ────────────────────────────────────────────
+
+  async addPasskeyCredential(
+    tenantId: string,
+    userId: string,
+    input: AddPasskeyCredentialInput,
+  ): Promise<PasskeyCredential | null> {
+    const u = this.users.get(userId);
+    if (!u || u.tenantId !== tenantId) return null;
+    // Idempotent on credentialIdB64url within the tenant.
+    const existing = this.credentials.find(
+      (c) =>
+        c.tenantId === tenantId &&
+        c.credentialIdB64url === input.credentialIdB64url,
+    );
+    if (existing) return cloneCredential(existing);
+    const record: PasskeyCredential = {
+      id: this.newId(),
+      tenantId,
+      userId,
+      credentialIdB64url: input.credentialIdB64url,
+      spkiB64url: input.spkiB64url,
+      signCount: input.signCount,
+      label: input.label,
+      enrolledAtIso: this.iso(),
+    };
+    this.credentials.push(record);
+    return cloneCredential(record);
+  }
+
+  async getPasskeyCredentialByCredentialId(
+    tenantId: string,
+    credentialIdB64url: string,
+  ): Promise<PasskeyCredential | null> {
+    const c = this.credentials.find(
+      (x) =>
+        x.tenantId === tenantId && x.credentialIdB64url === credentialIdB64url,
+    );
+    return c ? cloneCredential(c) : null;
+  }
+
+  async listPasskeyCredentialsForUser(
+    tenantId: string,
+    userId: string,
+  ): Promise<PasskeyCredential[]> {
+    return this.credentials
+      .filter((c) => c.tenantId === tenantId && c.userId === userId)
+      .map(cloneCredential);
+  }
+
+  async revokePasskeyCredential(
+    tenantId: string,
+    credentialIdB64url: string,
+  ): Promise<boolean> {
+    const c = this.credentials.find(
+      (x) =>
+        x.tenantId === tenantId && x.credentialIdB64url === credentialIdB64url,
+    );
+    if (!c) return false;
+    if (c.revokedAtIso) return false; // already revoked
+    c.revokedAtIso = this.iso();
+    return true;
+  }
+
+  async recordPasskeyAssertion(
+    tenantId: string,
+    credentialIdB64url: string,
+    newSignCount: number,
+  ): Promise<boolean> {
+    const c = this.credentials.find(
+      (x) =>
+        x.tenantId === tenantId && x.credentialIdB64url === credentialIdB64url,
+    );
+    if (!c) return false;
+    if (c.revokedAtIso) return false;
+    // Strict ratchet: a stale or equal signCount is rejected because
+    // the FIDO spec says authenticators MUST monotonically increment.
+    // The only legitimate case for signCount === 0 is an authenticator
+    // that doesn't implement counters; in that case both sides remain
+    // 0 forever and we tolerate equality only when both are 0.
+    if (newSignCount === 0 && c.signCount === 0) {
+      c.lastUsedAtIso = this.iso();
+      return true;
+    }
+    if (newSignCount <= c.signCount) return false;
+    c.signCount = newSignCount;
+    c.lastUsedAtIso = this.iso();
+    return true;
+  }
+
+  // ── refresh tokens ─────────────────────────────────────────────────
+
+  async insertRefreshToken(
+    record: RefreshTokenRecord,
+  ): Promise<RefreshTokenRecord> {
+    // Defensive copy on the way in so the caller can't mutate the
+    // stored row by holding onto their input reference.
+    const stored: RefreshTokenRecord = { ...record };
+    this.refreshTokens.set(stored.jti, stored);
+    return cloneRefreshToken(stored);
+  }
+
+  async getRefreshToken(
+    tenantId: string,
+    jti: string,
+  ): Promise<RefreshTokenRecord | null> {
+    const r = this.refreshTokens.get(jti);
+    if (!r || r.tenantId !== tenantId) return null;
+    return cloneRefreshToken(r);
+  }
+
+  async revokeRefreshToken(tenantId: string, jti: string): Promise<boolean> {
+    const r = this.refreshTokens.get(jti);
+    if (!r || r.tenantId !== tenantId) return false;
+    if (r.revokedAtIso) return false;
+    r.revokedAtIso = this.iso();
+    return true;
+  }
+
+  async revokeAllRefreshTokensForUser(
+    tenantId: string,
+    userId: string,
+  ): Promise<number> {
+    let count = 0;
+    for (const r of this.refreshTokens.values()) {
+      if (r.tenantId === tenantId && r.userId === userId && !r.revokedAtIso) {
+        r.revokedAtIso = this.iso();
+        count++;
+      }
+    }
+    return count;
+  }
+
+  async revokeAllRefreshTokensForCredential(
+    tenantId: string,
+    credentialIdB64url: string,
+  ): Promise<number> {
+    let count = 0;
+    for (const r of this.refreshTokens.values()) {
+      if (
+        r.tenantId === tenantId &&
+        r.credentialIdB64url === credentialIdB64url &&
+        !r.revokedAtIso
+      ) {
+        r.revokedAtIso = this.iso();
+        count++;
+      }
+    }
+    return count;
+  }
+
+  async listActiveRefreshTokensForUser(
+    tenantId: string,
+    userId: string,
+  ): Promise<RefreshTokenRecord[]> {
+    const nowIso = this.iso();
+    const out: RefreshTokenRecord[] = [];
+    for (const r of this.refreshTokens.values()) {
+      if (r.tenantId !== tenantId) continue;
+      if (r.userId !== userId) continue;
+      if (r.revokedAtIso) continue;
+      if (r.expiresAtIso <= nowIso) continue;
+      out.push(cloneRefreshToken(r));
+    }
+    return out;
+  }
+
+  async touchRefreshToken(tenantId: string, jti: string): Promise<boolean> {
+    const r = this.refreshTokens.get(jti);
+    if (!r || r.tenantId !== tenantId) return false;
+    if (r.revokedAtIso) return false;
+    r.lastUsedAtIso = this.iso();
+    return true;
+  }
+
   // ── helpers ────────────────────────────────────────────────────────
 
   private iso(): string {
@@ -361,4 +541,10 @@ function cloneAudit(e: AuditEvent): AuditEvent {
     ...e,
     detail: e.detail ? JSON.parse(JSON.stringify(e.detail)) : undefined,
   };
+}
+function cloneCredential(c: PasskeyCredential): PasskeyCredential {
+  return { ...c };
+}
+function cloneRefreshToken(r: RefreshTokenRecord): RefreshTokenRecord {
+  return { ...r };
 }
