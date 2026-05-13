@@ -76,3 +76,32 @@ export {
   effectiveScopes,
   type OidcProviderConfig,
 } from "./provider";
+
+export {
+  BUILTIN_OIDC_PROVIDERS,
+  findOidcProvider,
+  loadOidcProviders,
+  resetOidcProvidersCache,
+  type TenantOidcProviderEntry,
+} from "./config";
+
+export {
+  buildClearOidcLoginIntentCookie,
+  buildOidcLoginIntentCookie,
+  OIDC_LOGIN_INTENT_COOKIE_NAME,
+  OIDC_LOGIN_INTENT_TTL_MS,
+  signOidcLoginIntent,
+  verifyOidcLoginIntent,
+  type OidcLoginIntentPayload,
+  type OidcLoginIntentVerifyResult,
+} from "./login-intent";
+
+export {
+  handleOidcCallback,
+  handleOidcStart,
+  type HttpResult,
+  type OidcCallbackHandlerResult,
+  type OidcCallbackInput,
+  type OidcCallbackOutcome,
+  type OidcStartInput,
+} from "./handlers";
