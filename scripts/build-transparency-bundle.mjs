@@ -98,8 +98,32 @@ export function hashFile(absolutePath) {
   return base64Url(createHash("sha256").update(bytes).digest());
 }
 
+/**
+ * Hash a string. Normalises line endings to LF first so a bundle built
+ * on Windows (CRLF working tree) and a bundle built on Linux (LF working
+ * tree) agree on the same source content. Without this, every governance
+ * doc + control map + repro / audit manifest hashes differently across
+ * platforms and CI fails the bundle-verify gate.
+ */
 export function hashString(s) {
-  return base64Url(createHash("sha256").update(s).digest());
+  const normalised = normaliseLineEndings(s);
+  return base64Url(createHash("sha256").update(normalised).digest());
+}
+
+/**
+ * Hash a TEXT file with line-ending normalisation. Use for governance docs,
+ * JSON, source — anything where the canonical content is line-ending
+ * insensitive. For genuine binary files use `hashFile`.
+ */
+export function hashTextFile(absolutePath) {
+  const raw = readFileSync(absolutePath, "utf8");
+  return hashString(raw);
+}
+
+function normaliseLineEndings(s) {
+  // Strip a leading UTF-8 BOM (some editors add one to .md files); and
+  // collapse \r\n / bare \r to a single \n.
+  return s.replace(/^﻿/, "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 }
 
 /** Build a stable, key-sorted JSON of the bundle minus the `signature`
@@ -132,12 +156,13 @@ function buildGovernanceComponent(cwd) {
     if (!existsSync(abs)) {
       return { path: toPosix(relPath), present: false, sha256: null, sizeBytes: 0 };
     }
-    const bytes = readFileSync(abs);
+    const raw = readFileSync(abs, "utf8");
+    const normalised = raw.replace(/^﻿/, "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
     return {
       path: toPosix(relPath),
       present: true,
-      sha256: base64Url(createHash("sha256").update(bytes).digest()),
-      sizeBytes: bytes.byteLength,
+      sha256: hashString(raw),
+      sizeBytes: Buffer.byteLength(normalised, "utf8"),
     };
   });
 }

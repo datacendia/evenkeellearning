@@ -22,6 +22,13 @@ interface AggregatedMetric {
   distribution: { [key: string]: number };
 }
 
+// v1.5.5 — audit M-4: fail loudly if a production build inherits the
+// development default salt. The toy hash is already disclosed as non-
+// anonymising in the file header; the salt-default check is a
+// defence-in-depth so a careless `NODE_ENV=production` deployment can
+// never quietly run with a publicly-known constant.
+const DEV_DEFAULT_SALT = "default-salt-change-in-production";
+
 interface StruggleRecord {
   studentId: string;
   status: string;
@@ -33,13 +40,6 @@ interface AggregatedStrugglePatterns {
   statusDistribution: { [key: string]: number };
   averageFriction: number;
 }
-
-// v1.5.5 — audit M-4: fail loudly if a production build inherits the
-// development default salt. The toy hash is already disclosed as non-
-// anonymising in the file header; the salt-default check is a
-// defence-in-depth so a careless `NODE_ENV=production` deployment can
-// never quietly run with a publicly-known constant.
-const DEV_DEFAULT_SALT = "default-salt-change-in-production";
 
 export class ZeroKnowledgeAggregator {
   private salt: string;

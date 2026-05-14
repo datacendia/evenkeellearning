@@ -50,7 +50,7 @@ import {
   validateSpecPointClaim,
   type SpecPointClaim,
 } from "./claim-vocabulary";
-import type { CredentialStatusEntry } from "./status-list";
+import type { StatusList2021Entry } from "./status-list";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -97,12 +97,10 @@ export interface UnsignedVerifiableCredential {
   issuer: string;
   validFrom: string;
   credentialSubject: EvenKeelCredentialSubject;
-  /**
-   * Optional StatusList2021-subset entry. Present when the issuer wants
-   * the credential to be revocable; absent for one-shot credentials
-   * (which cannot be revoked — a fact verifiers should surface).
-   */
-  credentialStatus?: CredentialStatusEntry;
+  /** Optional StatusList2021 entry pointing at a bit in the issuer's
+   *  status-list credential. Present iff the issuer was given a status
+   *  registry at issuance time. (v1.7.1) */
+  credentialStatus?: StatusList2021Entry;
 }
 
 /** Proof block embedded into the signed VC. */
@@ -173,13 +171,12 @@ export interface IssueVcInput {
     SignedEnvelope<{ canonical: string }>
   >;
   /**
-   * Optional `credentialStatus` block. When present, the issuer embeds
-   * it into the VC so verifiers can check the status-list bitstring
-   * for revocation. Build via `buildCredentialStatusEntry()` from
-   * `lib/vc/status-list.ts` — that helper also registers the
-   * allocation in the registry.
+   * Optional inline `credentialStatus` block. If present it is included
+   * in the canonical bytes BEFORE signing, so any tamper to the status
+   * pointer post-issuance breaks signature verification. Build it via
+   * `lib/vc/status-registry.ts#allocate()` for normal flows. (v1.7.1)
    */
-  credentialStatus?: CredentialStatusEntry;
+  credentialStatus?: StatusList2021Entry;
 }
 
 /**

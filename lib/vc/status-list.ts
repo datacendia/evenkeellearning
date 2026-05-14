@@ -1,116 +1,107 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // lib/vc/status-list.ts
 //
-// v1.7.1 — W3C StatusList2021-subset revocation registry.
+// v1.7.1 — W3C StatusList2021 primitives.
 //
 // What this module does
 // ─────────────────────
-// Provides the two pieces needed to revoke a previously-issued VC:
+// Pure helpers for building the bitstring that backs a `StatusList2021`
+// credential, the inline `credentialStatus` block embedded into each
+// issued VC, and the (unsigned) `StatusList2021Credential` document.
 //
-//   1. A bitstring-backed registry. Each issued VC is allocated an index
-//      into a bitstring; flipping the bit at that index revokes the
-//      credential. Lookup is O(1) by index.
+// Spec reference
+// ──────────────
+//   W3C "Status List 2021" — https://www.w3.org/TR/2023/WD-vc-status-list-20230427/
+//   (The successor draft is "Bitstring Status List"; the wire format is
+//   identical for our purposes — gzip-compressed bitstring, base64url.)
 //
-//   2. A StatusList credential builder. The bitstring is packaged as
-//      the `credentialSubject` of a status-list VC that can itself be
-//      signed + published at a stable URL. Verifiers fetch that
-//      credential, decode the bitstring, and check the bit at the
-//      index named by the VC-under-verification's `credentialStatus`.
+// Bit ordering
+// ────────────
+// Index 0 is the MOST-SIGNIFICANT bit of the FIRST byte. So bit i lives at
+// byte (i >> 3), mask (1 << (7 - (i & 7))). This matches the spec's
+// reference encoder/decoder. A verifier that uses the opposite convention
+// would read every bit at the wrong position; tested explicitly below.
 //
-// FAITHFULNESS / DEVIATION from W3C StatusList2021
-// ─────────────────────────────────────────────────
-// Faithful:
-//   • `credentialStatus.type` is `"StatusList2021Entry"`.
-//   • `credentialStatus.statusPurpose` is `"revocation"`.
-//   • `credentialStatus.statusListIndex` is a stringified integer.
-//   • `credentialStatus.statusListCredential` is a URL.
-//   • The status-list VC's subject has `type: "StatusList2021"` and
-//     carries an `encodedList` string.
+// Privacy minimum
+// ───────────────
+// The spec recommends a MINIMUM of 131,072 bits (16 KB uncompressed) so
+// that revoking a single credential does not measurably change the
+// distribution of revoked-vs-non-revoked bits in any practical sense.
+// We default to that and let callers grow it.
 //
-// Pilot deviation (called out for auditability):
-//   • The spec requires the bitstring be GZIPped then base64url-encoded.
-//     We skip gzip and store a raw base64url-encoded bitstring, because
-//     (a) gzip requires either `pako` (dependency) or
-//     `CompressionStream` (Node 18+ only; adds async to a sync path),
-//     (b) the compression factor on a pilot-scale bitstring (<<64 KB)
-//     is not worth the async cost, and
-//     (c) we control both ends of the pilot. The `encodingVersion`
-//     field on the status-list subject names the variant so a
-//     spec-compliant verifier can reject our flavour explicitly.
-//     Revisit before district phase when a standalone verifier may be
-//     fed status lists from multiple issuers.
-//
-// Every deviation is opt-in via the `encodingVersion` field; a future
-// spec-compliant registry can live alongside this one.
+// Gzip via Web Streams
+// ────────────────────
+// Encoding/decoding uses `CompressionStream("gzip")` /
+// `DecompressionStream("gzip")`, available in Node 18+ and modern
+// browsers. We do NOT depend on `pako` or `zlib` — staying on web-platform
+// APIs keeps the verifier identical between Node and browser.
 // ─────────────────────────────────────────────────────────────────────────────
-
-import type { SignedEnvelope } from "@/lib/crypto/signing";
-import { signPayloadWithAutoPasskey } from "@/lib/crypto/signing";
-import { VC_V2_CONTEXT, canonicalizeJcsSubset } from "./issuer";
 
 // ─── Constants ─────────────────────────────────────────────────────────────
 
-/** Pilot bitstring length. 16 KiB of bits = 131,072 credentials. */
-export const STATUS_LIST_BIT_LENGTH = 16 * 1024 * 8;
+/** Minimum bitstring size recommended by the spec (16 KB, 131,072 bits). */
+export const STATUS_LIST_MIN_BITS = 131_072 as const;
 
-/** The `credentialStatus.type` we emit. */
+/** Type tag emitted on the inline `credentialStatus` block. */
 export const STATUS_LIST_ENTRY_TYPE = "StatusList2021Entry" as const;
 
-/** The `credentialSubject.type` on the status-list VC we emit. */
+/** Type tag emitted on the StatusList2021Credential's credentialSubject. */
 export const STATUS_LIST_SUBJECT_TYPE = "StatusList2021" as const;
 
-/** The status-list credential's `type[1]`. */
+/** Top-level type added alongside `VerifiableCredential` for the list cred. */
 export const STATUS_LIST_CREDENTIAL_TYPE = "StatusList2021Credential" as const;
 
-/** Encoding version — names the base64url-without-gzip pilot variant. */
-export const STATUS_LIST_ENCODING_VERSION = "base64url-bitstring-v1" as const;
+/** Allowed values of `statusPurpose`. */
+export type StatusPurpose = "revocation" | "suspension";
 
-/** Status purpose constant. */
-export const STATUS_PURPOSE_REVOCATION = "revocation" as const;
+// ─── Bitstring helpers (pure, sync) ────────────────────────────────────────
 
-// ─── Bitstring ─────────────────────────────────────────────────────────────
-
-/** Allocate a zeroed bitstring of the default length. */
-export function newBitstring(
-  bitLength: number = STATUS_LIST_BIT_LENGTH,
-): Uint8Array {
-  if (bitLength <= 0 || bitLength % 8 !== 0) {
-    throw new Error("bitLength must be a positive multiple of 8");
+/**
+ * Allocate an all-zero bitstring of `bits` bits. `bits` must be a positive
+ * multiple of 8. Returns the raw byte buffer.
+ */
+export function allocBitstring(bits: number): Uint8Array {
+  if (!Number.isInteger(bits) || bits <= 0 || bits % 8 !== 0) {
+    throw new Error("bits must be a positive multiple of 8");
   }
-  return new Uint8Array(bitLength / 8);
+  return new Uint8Array(bits >> 3);
 }
 
-/** Set a bit at `index` to `value` (default 1). Mutates in place. */
-export function setBit(bits: Uint8Array, index: number, value: 0 | 1 = 1): void {
-  if (index < 0 || index >= bits.length * 8) {
-    throw new Error(`bit index ${index} out of range`);
+/** Read a bit (0 or 1) at index `i` from the raw bitstring. */
+export function getBit(bitstring: Uint8Array, i: number): 0 | 1 {
+  if (i < 0 || i >= bitstring.length * 8) {
+    throw new Error(`status_index_out_of_range:${i}`);
   }
-  const byte = Math.floor(index / 8);
-  const mask = 1 << (index % 8);
-  if (value === 1) bits[byte] |= mask;
-  else bits[byte] &= ~mask & 0xff;
+  const byte = bitstring[i >> 3]!;
+  const mask = 1 << (7 - (i & 7));
+  return (byte & mask) === 0 ? 0 : 1;
 }
 
-/** Read a bit. */
-export function getBit(bits: Uint8Array, index: number): 0 | 1 {
-  if (index < 0 || index >= bits.length * 8) {
-    throw new Error(`bit index ${index} out of range`);
+/** Set the bit at index `i` to `value` (0 or 1) IN PLACE. */
+export function setBit(
+  bitstring: Uint8Array,
+  i: number,
+  value: 0 | 1,
+): void {
+  if (i < 0 || i >= bitstring.length * 8) {
+    throw new Error(`status_index_out_of_range:${i}`);
   }
-  const byte = Math.floor(index / 8);
-  const mask = 1 << (index % 8);
-  return (bits[byte] & mask) !== 0 ? 1 : 0;
+  const byteIdx = i >> 3;
+  const mask = 1 << (7 - (i & 7));
+  if (value === 1) bitstring[byteIdx]! |= mask;
+  else bitstring[byteIdx]! &= ~mask;
 }
 
-// ─── base64url codec (no gzip — see header deviation note) ────────────────
+// ─── Gzip + base64url codec (async) ────────────────────────────────────────
 
-export function encodeBitstring(bits: Uint8Array): string {
+function bytesToBase64Url(bytes: Uint8Array): string {
   let bin = "";
-  for (let i = 0; i < bits.length; i++) bin += String.fromCharCode(bits[i]);
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]!);
   return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
-export function decodeBitstring(encoded: string): Uint8Array {
-  const b64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+function base64UrlToBytes(b64url: string): Uint8Array {
+  const b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
   const pad = b64.length % 4 ? "=".repeat(4 - (b64.length % 4)) : "";
   const bin = atob(b64 + pad);
   const out = new Uint8Array(bin.length);
@@ -118,37 +109,167 @@ export function decodeBitstring(encoded: string): Uint8Array {
   return out;
 }
 
-// ─── credentialStatus block (embedded on issued VCs) ───────────────────────
+async function streamThrough(
+  bytes: Uint8Array,
+  transform: TransformStream<Uint8Array, Uint8Array>,
+): Promise<Uint8Array> {
+  const writer = transform.writable.getWriter();
+  // Swallow rejections from write/close; the read loop below will surface
+  // the same error through `reader.read()` and we want a single error
+  // path. Without these handlers, the rejection bubbles up as an
+  // "unhandled rejection" and crashes the test runner.
+  const writePromise = writer.write(bytes).catch(() => {});
+  const closePromise = writer.close().catch(() => {});
+  const reader = transform.readable.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      if (value) {
+        chunks.push(value);
+        total += value.byteLength;
+      }
+    }
+  } finally {
+    // Make sure the writer-side promises settle so they don't outlive us.
+    await writePromise;
+    await closePromise;
+  }
+  const out = new Uint8Array(total);
+  let off = 0;
+  for (const c of chunks) {
+    out.set(c, off);
+    off += c.byteLength;
+  }
+  return out;
+}
 
-/** Shape of the `credentialStatus` field that gets embedded on every VC. */
-export interface CredentialStatusEntry {
-  /** Stable URI for this specific entry. */
+/**
+ * Encode a raw bitstring into the `encodedList` field per the spec:
+ * gzip-compress, then base64url. Async because gzip uses Web Streams.
+ */
+export async function encodeBitstring(bitstring: Uint8Array): Promise<string> {
+  const compressed = await streamThrough(
+    bitstring,
+    new (globalThis as { CompressionStream: typeof CompressionStream }).CompressionStream(
+      "gzip",
+    ) as unknown as TransformStream<Uint8Array, Uint8Array>,
+  );
+  return bytesToBase64Url(compressed);
+}
+
+/**
+ * Decode an `encodedList` string back to the raw bitstring. Async.
+ * Throws `bad_encoded_list` if base64url is malformed or gzip is invalid.
+ */
+export async function decodeBitstring(encodedList: string): Promise<Uint8Array> {
+  let compressed: Uint8Array;
+  try {
+    compressed = base64UrlToBytes(encodedList);
+  } catch {
+    throw new Error("bad_encoded_list");
+  }
+  try {
+    return await streamThrough(
+      compressed,
+      new (globalThis as { DecompressionStream: typeof DecompressionStream }).DecompressionStream(
+        "gzip",
+      ) as unknown as TransformStream<Uint8Array, Uint8Array>,
+    );
+  } catch {
+    throw new Error("bad_encoded_list");
+  }
+}
+
+/**
+ * Convenience: read the bit at a status-list index from an encoded list.
+ * Async because it has to gunzip first.
+ */
+export async function getStatusAtIndex(
+  encodedList: string,
+  index: number,
+): Promise<0 | 1> {
+  const bits = await decodeBitstring(encodedList);
+  return getBit(bits, index);
+}
+
+/**
+ * Convenience: produce a NEW encoded list with the bit at `index` flipped
+ * to `value`. Does not mutate the caller's input.
+ */
+export async function withStatusAtIndex(
+  encodedList: string,
+  index: number,
+  value: 0 | 1,
+): Promise<string> {
+  const bits = await decodeBitstring(encodedList);
+  setBit(bits, index, value);
+  return encodeBitstring(bits);
+}
+
+/**
+ * Convenience: empty list of `bits` bits, encoded.
+ */
+export async function createEmptyEncodedList(
+  bits: number = STATUS_LIST_MIN_BITS,
+): Promise<string> {
+  return encodeBitstring(allocBitstring(bits));
+}
+
+// ─── Inline credentialStatus block (sync) ──────────────────────────────────
+
+/**
+ * The inline `credentialStatus` block embedded into a VC at issuance.
+ * Pointed at a position inside the issuer's StatusList2021Credential.
+ */
+export interface StatusList2021Entry {
+  /** Stable URL with a fragment, e.g. `https://issuer.example/sl/1#42`. */
   id: string;
   type: typeof STATUS_LIST_ENTRY_TYPE;
-  statusPurpose: typeof STATUS_PURPOSE_REVOCATION;
-  /** Stringified integer — index into the bitstring. */
+  statusPurpose: StatusPurpose;
+  /** Index encoded as a string per spec (so it survives JSON-LD without
+   *  losing precision for very large indices). */
   statusListIndex: string;
-  /** URL of the status-list VC that carries the bitstring. */
+  /** URL of the StatusList2021Credential. */
   statusListCredential: string;
 }
 
-// ─── Status-list VC (the thing that carries the bitstring) ─────────────────
+export interface BuildStatusEntryInput {
+  statusListCredential: string;
+  statusListIndex: number;
+  statusPurpose?: StatusPurpose;
+}
+
+export function buildStatusEntry(input: BuildStatusEntryInput): StatusList2021Entry {
+  if (!Number.isInteger(input.statusListIndex) || input.statusListIndex < 0) {
+    throw new Error("statusListIndex must be a non-negative integer");
+  }
+  if (!input.statusListCredential.startsWith("http")) {
+    throw new Error("statusListCredential must be an http(s) URL");
+  }
+  const purpose: StatusPurpose = input.statusPurpose ?? "revocation";
+  return {
+    id: `${input.statusListCredential}#${input.statusListIndex}`,
+    type: STATUS_LIST_ENTRY_TYPE,
+    statusPurpose: purpose,
+    statusListIndex: String(input.statusListIndex),
+    statusListCredential: input.statusListCredential,
+  };
+}
+
+// ─── StatusList2021Credential body (unsigned) ──────────────────────────────
 
 export interface StatusListCredentialSubject {
-  /** Stable identifier of the status list (matches the VC id). */
   id: string;
   type: typeof STATUS_LIST_SUBJECT_TYPE;
-  statusPurpose: typeof STATUS_PURPOSE_REVOCATION;
-  /** Base64url of the bitstring (no gzip — see header note). */
+  statusPurpose: StatusPurpose;
   encodedList: string;
-  /** Names the bitstring variant. */
-  encodingVersion: typeof STATUS_LIST_ENCODING_VERSION;
-  /** Total number of bits (== max credentials in this list). */
-  bitLength: number;
 }
 
 export interface UnsignedStatusListCredential {
-  "@context": [typeof VC_V2_CONTEXT];
+  "@context": [string, ...string[]];
   id: string;
   type: ["VerifiableCredential", typeof STATUS_LIST_CREDENTIAL_TYPE];
   issuer: string;
@@ -156,217 +277,53 @@ export interface UnsignedStatusListCredential {
   credentialSubject: StatusListCredentialSubject;
 }
 
-/** Signed status-list VC — same proof shape as any other VC we issue. */
-export type StatusListCredential = UnsignedStatusListCredential & {
-  proof: {
-    type: "DataIntegrityProof";
-    cryptosuite: "ecdsa-jcs-2019";
-    created: string;
-    verificationMethod: string;
-    proofPurpose: "assertionMethod";
-    proofValue: string;
-    publicKeyB64url: string;
-  };
-};
-
-// ─── In-memory revocation registry ─────────────────────────────────────────
-
-/**
- * A revocation registry for a single status-list URL. In the pilot the
- * registry lives in memory; persistence is the caller's job (`toJSON`
- * / `fromJSON`). In production the registry would be server-backed and
- * the status-list credential would be re-issued + re-published each
- * time a bit flips.
- */
-export interface RegistryState {
-  /** Status-list credential URL (also the VC id). */
-  statusListUrl: string;
-  /** Issuer DID. */
+export interface BuildStatusListCredentialInput {
+  /** Stable URL of THIS list, e.g. `https://issuer.example/sl/1`. */
+  id: string;
   issuerDid: string;
-  /** Raw bitstring. */
-  bits: Uint8Array;
-  /** Next unused index. */
-  nextIndex: number;
-  /** Map from VC id → index, so we can look up & revoke by credential. */
-  indexByCredentialId: Record<string, number>;
-}
-
-export function createRegistry(
-  statusListUrl: string,
-  issuerDid: string,
-  bitLength: number = STATUS_LIST_BIT_LENGTH,
-): RegistryState {
-  return {
-    statusListUrl,
-    issuerDid,
-    bits: newBitstring(bitLength),
-    nextIndex: 0,
-    indexByCredentialId: {},
-  };
-}
-
-/** Reserve a fresh index for `credentialId`. Idempotent. */
-export function allocateIndex(
-  registry: RegistryState,
-  credentialId: string,
-): number {
-  const existing = registry.indexByCredentialId[credentialId];
-  if (existing !== undefined) return existing;
-  if (registry.nextIndex >= registry.bits.length * 8) {
-    throw new Error("status_list_exhausted");
-  }
-  const idx = registry.nextIndex++;
-  registry.indexByCredentialId[credentialId] = idx;
-  return idx;
-}
-
-/**
- * Build the `credentialStatus` block to embed on a VC. Allocates an
- * index automatically if the credential is not yet tracked.
- */
-export function buildCredentialStatusEntry(
-  registry: RegistryState,
-  credentialId: string,
-): CredentialStatusEntry {
-  const idx = allocateIndex(registry, credentialId);
-  return {
-    id: `${registry.statusListUrl}#${idx}`,
-    type: STATUS_LIST_ENTRY_TYPE,
-    statusPurpose: STATUS_PURPOSE_REVOCATION,
-    statusListIndex: String(idx),
-    statusListCredential: registry.statusListUrl,
-  };
-}
-
-/** Flip the bit for `credentialId`. Throws if the id is not allocated. */
-export function revokeCredential(
-  registry: RegistryState,
-  credentialId: string,
-): void {
-  const idx = registry.indexByCredentialId[credentialId];
-  if (idx === undefined) throw new Error("credential_not_in_registry");
-  setBit(registry.bits, idx, 1);
-}
-
-/** Returns `true` iff the credential is currently revoked. */
-export function isRevokedById(
-  registry: RegistryState,
-  credentialId: string,
-): boolean {
-  const idx = registry.indexByCredentialId[credentialId];
-  if (idx === undefined) return false;
-  return getBit(registry.bits, idx) === 1;
-}
-
-/** Pure bitstring-level revocation check, for verifiers that only have
- *  the decoded bits + an index (i.e. they fetched the status-list VC). */
-export function isRevokedByIndex(
-  bits: Uint8Array,
-  index: number,
-): boolean {
-  return getBit(bits, index) === 1;
-}
-
-// ─── Status-list credential build + sign ───────────────────────────────────
-
-export function buildStatusListCredential(
-  registry: RegistryState,
-  validFromIso: string,
-): UnsignedStatusListCredential {
-  return {
-    "@context": [VC_V2_CONTEXT],
-    id: registry.statusListUrl,
-    type: ["VerifiableCredential", STATUS_LIST_CREDENTIAL_TYPE],
-    issuer: registry.issuerDid,
-    validFrom: validFromIso,
-    credentialSubject: {
-      id: registry.statusListUrl,
-      type: STATUS_LIST_SUBJECT_TYPE,
-      statusPurpose: STATUS_PURPOSE_REVOCATION,
-      encodedList: encodeBitstring(registry.bits),
-      encodingVersion: STATUS_LIST_ENCODING_VERSION,
-      bitLength: registry.bits.length * 8,
-    },
-  };
-}
-
-/**
- * Sign the status-list VC. Same passkey-required default as the main
- * issuer; tests inject a session-key signer.
- */
-export async function issueStatusListCredential(input: {
-  registry: RegistryState;
   validFromIso: string;
-  signer?: (payload: { canonical: string }) => Promise<
-    SignedEnvelope<{ canonical: string }>
-  >;
-}): Promise<StatusListCredential> {
-  const unsigned = buildStatusListCredential(
-    input.registry,
-    input.validFromIso,
-  );
-  const canonical = canonicalizeJcsSubset(unsigned);
-  const sign =
-    input.signer ??
-    ((p: { canonical: string }) =>
-      signPayloadWithAutoPasskey<{ canonical: string }>(p, {
-        requirePasskey: true,
-      }));
-  const envelope = await sign({ canonical });
-
-  return {
-    ...unsigned,
-    proof: {
-      type: "DataIntegrityProof",
-      cryptosuite: "ecdsa-jcs-2019",
-      created: envelope.signedAtIso,
-      verificationMethod: `${input.registry.issuerDid}#key-1`,
-      proofPurpose: "assertionMethod",
-      proofValue: envelope.signatureB64url,
-      publicKeyB64url: envelope.publicKeyB64url,
-    },
-  };
+  encodedList: string;
+  statusPurpose?: StatusPurpose;
+  /** Optional extra @context entries. The first is always VC v2. */
+  extraContexts?: string[];
 }
 
-// ─── Persistence helpers ───────────────────────────────────────────────────
-
-/** Serialize the registry to a JSON-safe object. */
-export function registryToJson(registry: RegistryState): {
-  statusListUrl: string;
-  issuerDid: string;
-  encodedList: string;
-  nextIndex: number;
-  indexByCredentialId: Record<string, number>;
-  bitLength: number;
-} {
-  return {
-    statusListUrl: registry.statusListUrl,
-    issuerDid: registry.issuerDid,
-    encodedList: encodeBitstring(registry.bits),
-    nextIndex: registry.nextIndex,
-    indexByCredentialId: { ...registry.indexByCredentialId },
-    bitLength: registry.bits.length * 8,
-  };
-}
-
-/** Rehydrate from the shape emitted by `registryToJson`. */
-export function registryFromJson(raw: {
-  statusListUrl: string;
-  issuerDid: string;
-  encodedList: string;
-  nextIndex: number;
-  indexByCredentialId: Record<string, number>;
-  bitLength: number;
-}): RegistryState {
-  const bits = decodeBitstring(raw.encodedList);
-  if (bits.length * 8 !== raw.bitLength) {
-    throw new Error("registry_bit_length_mismatch");
+/**
+ * Build (but do not sign) a StatusList2021Credential. The issuer is
+ * expected to wrap this with the same Data Integrity proof used for
+ * regular VCs, so a verifier can authenticate the list itself.
+ */
+export function buildStatusListCredential(
+  input: BuildStatusListCredentialInput,
+): UnsignedStatusListCredential {
+  if (!input.id.startsWith("http")) {
+    throw new Error("status list id must be an http(s) URL");
   }
+  if (!input.issuerDid) {
+    throw new Error("issuerDid required");
+  }
+  if (!input.validFromIso) {
+    throw new Error("validFromIso required");
+  }
+  if (!input.encodedList) {
+    throw new Error("encodedList required");
+  }
+  const purpose: StatusPurpose = input.statusPurpose ?? "revocation";
+  const contexts: [string, ...string[]] = [
+    "https://www.w3.org/ns/credentials/v2",
+    ...(input.extraContexts ?? []),
+  ];
   return {
-    statusListUrl: raw.statusListUrl,
-    issuerDid: raw.issuerDid,
-    bits,
-    nextIndex: raw.nextIndex,
-    indexByCredentialId: { ...raw.indexByCredentialId },
+    "@context": contexts,
+    id: input.id,
+    type: ["VerifiableCredential", STATUS_LIST_CREDENTIAL_TYPE],
+    issuer: input.issuerDid,
+    validFrom: input.validFromIso,
+    credentialSubject: {
+      id: `${input.id}#list`,
+      type: STATUS_LIST_SUBJECT_TYPE,
+      statusPurpose: purpose,
+      encodedList: input.encodedList,
+    },
   };
 }

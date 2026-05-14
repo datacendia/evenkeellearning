@@ -191,10 +191,7 @@ export function generateProofOfWork(events: ReadonlyArray<{ timestamp: number }>
   return generateHash(eventHashes);
 }
 
-export function verifyProofOfWork(
-  events: ReadonlyArray<{ timestamp: number }>,
-  claimedHash: string,
-): boolean {
+export function verifyProofOfWork(events: ReadonlyArray<{ timestamp: number }>, claimedHash: string): boolean {
   const computedHash = generateProofOfWork(events);
   return computedHash === claimedHash;
 }

@@ -232,3 +232,45 @@ export function withSkillUri(
   if (claim.label) out.label = claim.label;
   return out;
 }
+
+// ─── Registry-resolver shim (decoupled from the registry module) ───────────
+
+/**
+ * Minimal contract a curriculum registry must satisfy. Decoupled from
+ * `lib/curriculum/registry.ts` so this module stays import-free of the
+ * registry — verifiers can ship without it. Pass a function that returns
+ * the canonical skillUri for a (framework, code) pair, or null when
+ * unknown. (v1.8.0)
+ */
+export type SkillUriResolver = (
+  framework: string,
+  code: string,
+) => string | null;
+
+/**
+ * Augment a claim with a registry-resolved skillUri WHEN POSSIBLE. Behaviour:
+ *   • Claim already carries a skillUri → returned unchanged.
+ *   • Resolver returns a string         → returned with skillUri populated.
+ *   • Resolver returns null             → returned unchanged.
+ *
+ * Pure. Never throws. The returned object is fresh (no aliasing).
+ */
+export function resolveSkillUriFromRegistry(
+  claim: SpecPointClaim,
+  resolver: SkillUriResolver,
+): SpecPointClaim {
+  if (claim.skillUri) return { ...claim };
+  const uri = resolver(claim.framework, claim.code);
+  if (uri == null) return { ...claim };
+  return withSkillUri(claim, uri);
+}
+
+/**
+ * Convenience: enrich every spec-point in an array. Order-stable. Pure.
+ */
+export function resolveSkillUrisFromRegistry(
+  claims: SpecPointClaim[],
+  resolver: SkillUriResolver,
+): SpecPointClaim[] {
+  return claims.map((c) => resolveSkillUriFromRegistry(c, resolver));
+}

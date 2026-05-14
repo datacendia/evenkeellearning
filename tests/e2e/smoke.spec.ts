@@ -35,8 +35,15 @@ test("compliance page renders the resolution tray heading", async ({ page }) => 
 });
 
 test("student page mounts the comprehension gate", async ({ page }) => {
+  // /student is wrapped in <AgeBandGate>, which on a fresh visit shows the
+  // "How old are you?" picker INSTEAD of the underlying student surface.
+  // Pre-seed the age band in localStorage so the gate skips itself and the
+  // student surface — including the comprehension affordance — renders.
+  // Storage key matches lib/auth/age-band.ts STORAGE_KEY.
+  await page.goto("/"); // any same-origin page so localStorage is writable
+  await page.evaluate(() => {
+    window.localStorage.setItem("evenkeel/age-band", "13-17");
+  });
   await page.goto("/student");
-  // The gate has the "Tap to begin" / "Start the gate" affordance with the
-  // word "comprehension" appearing somewhere on the page.
   await expect(page.getByText(/comprehension/i).first()).toBeVisible();
 });

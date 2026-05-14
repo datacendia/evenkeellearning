@@ -43,6 +43,17 @@ function hashFileBytes(absolutePath) {
   return base64Url(createHash("sha256").update(bytes).digest());
 }
 
+/**
+ * Hash a TEXT file with line-ending normalisation. Mirrors the build
+ * script's `hashTextFile` so a CRLF working tree (Windows) and an LF
+ * working tree (Linux/CI) produce identical hashes for the same logical
+ * content. See build-transparency-bundle.mjs for rationale.
+ */
+function hashTextFile(absolutePath) {
+  const raw = readFileSync(absolutePath, "utf8");
+  return hashString(raw);
+}
+
 function fromB64url(s) {
   const padded = s + "=".repeat((4 - (s.length % 4)) % 4);
   return Buffer.from(padded.replace(/-/g, "+").replace(/_/g, "/"), "base64");
@@ -84,7 +95,7 @@ export function verifyBundle(cwd) {
       if (g.present) errors.push(`Governance ${g.path}: bundle says present but file is missing`);
       continue;
     }
-    const sha = hashFileBytes(fileAbs);
+    const sha = hashTextFile(fileAbs);
     if (sha !== g.sha256) {
       errors.push(`Governance ${g.path}: sha256 mismatch (bundle=${g.sha256?.slice(0, 12)}…, disk=${sha.slice(0, 12)}…)`);
     } else {

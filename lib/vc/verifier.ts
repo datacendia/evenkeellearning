@@ -31,52 +31,15 @@ import {
   validateSpecPointClaim,
 } from "./claim-vocabulary";
 import {
-  decodeBitstring,
-  isRevokedByIndex,
   STATUS_LIST_ENTRY_TYPE,
-  STATUS_PURPOSE_REVOCATION,
-  type StatusListCredential,
+  decodeBitstring,
+  getBit,
 } from "./status-list";
 import {
-  validateAgainstRegistry,
-  type RegistryValidationStatus,
-} from "../curriculum/registry";
-
-// ─── Registry enrichment ───────────────────────────────────────────────────
-
-/**
- * Per-spec-point registry annotation, attached to the verifier's
- * success result. Never causes a verification failure — registry
- * lookups are forward-compatible and a verifier may legitimately be
- * older than the issuer's claim catalogue.
- */
-export interface SpecPointRegistryReport {
-  framework: string;
-  code: string;
-  status: RegistryValidationStatus;
-  /** Canonical label from the registry, if status === "ok". */
-  canonicalLabel?: string;
-  /** Canonical skill URI from the registry, if status === "ok". */
-  canonicalSkillUri?: string;
-}
-
-function buildRegistryReport(
-  credential: VerifiableCredential,
-): SpecPointRegistryReport[] {
-  return credential.credentialSubject.demonstratedSpecPoints.map((sp) => {
-    const r = validateAgainstRegistry(sp.framework, sp.code);
-    const report: SpecPointRegistryReport = {
-      framework: sp.framework,
-      code: sp.code,
-      status: r.status,
-    };
-    if (r.status === "ok" && r.specPoint) {
-      report.canonicalLabel = r.specPoint.label;
-      report.canonicalSkillUri = r.skillUri;
-    }
-    return report;
-  });
-}
+  extractAssertionPublicKey,
+  jwkToSpkiBase64Url,
+  type DidWebResolver,
+} from "./did-web";
 
 // ─── Result types ──────────────────────────────────────────────────────────
 
@@ -99,32 +62,18 @@ export type VcVerificationReason =
   | "bad_public_key"
   | "bad_signature"
   | "verify_threw"
-  | "revoked"
-  | "status_list_mismatch";
-
-/**
- * Result of the cheap structural-only shape check. The full verifier
- * result (`VcVerificationResult`) is a strict superset: every shape-
- * success carries a credential, every full-success additionally
- * carries a registry report.
- */
-export type VcShapeResult =
-  | { ok: true; credential: VerifiableCredential }
-  | { ok: false; reason: VcVerificationReason; detail?: string };
+  | "credential_revoked"
+  | "credential_suspended"
+  | "status_resolver_failed"
+  | "status_index_out_of_range"
+  | "wrong_status_list_url"
+  | "did_resolver_failed"
+  | "did_verification_method_not_found"
+  | "did_key_mismatch"
+  | "issuer_did_required";
 
 export type VcVerificationResult =
-  | {
-      ok: true;
-      credential: VerifiableCredential;
-      /**
-       * Per-spec-point registry annotation. Populated whenever the
-       * credential verifies; consumer UI can use this to render
-       * canonical labels or flag "unknown framework" warnings. Always
-       * present on success — array order mirrors
-       * `credentialSubject.demonstratedSpecPoints`.
-       */
-      registryReport: SpecPointRegistryReport[];
-    }
+  | { ok: true; credential: VerifiableCredential }
   | { ok: false; reason: VcVerificationReason; detail?: string };
 
 // ─── Structural check (synchronous) ────────────────────────────────────────
@@ -138,7 +87,7 @@ export type VcVerificationResult =
 export function checkCredentialShape(
   raw: unknown,
   supportedVocabularyVersion: number = CLAIM_VOCABULARY_VERSION,
-): VcShapeResult {
+): VcVerificationResult {
   if (!raw || typeof raw !== "object") {
     return { ok: false, reason: "not_an_object" };
   }
@@ -258,6 +207,7 @@ async function sha256(bytes: Uint8Array): Promise<Uint8Array> {
  */
 async function verifyProofSignature(
   credential: VerifiableCredential,
+  publicKeyB64urlOverride: string | null = null,
 ): Promise<{ ok: true } | { ok: false; reason: VcVerificationReason }> {
   const proof: DataIntegrityProof = credential.proof;
   const { proof: _omit, ...unsigned } = credential;
@@ -269,12 +219,14 @@ async function verifyProofSignature(
   const digest = await sha256(new TextEncoder().encode(wrapperJson));
   const digestB64url = bytesToBase64Url(digest);
 
-  // Import the SPKI public key.
+  // Import the SPKI public key. When a DID resolver supplied an
+  // override, use that; otherwise trust the embedded one.
+  const spki = publicKeyB64urlOverride ?? proof.publicKeyB64url;
   let pubKey: CryptoKey;
   try {
     pubKey = await crypto.subtle.importKey(
       "spki",
-      toArrayBuffer(base64UrlToBytes(proof.publicKeyB64url)),
+      toArrayBuffer(base64UrlToBytes(spki)),
       SIGNING_ALGORITHM,
       true,
       ["verify"],
@@ -300,25 +252,66 @@ async function verifyProofSignature(
   return { ok: true };
 }
 
+/**
+ * Resolver that fetches the encoded bitstring for a StatusList2021
+ * credential URL. Returns the `encodedList` string verbatim. The
+ * verifier handles gunzip + base64url + bit-read.
+ *
+ * In production this is `fetch(url).then(r => r.json()).then(...)`
+ * (resolving a signed StatusList2021Credential and reading
+ * `credentialSubject.encodedList`). In tests it's a stub.
+ */
+export type StatusListResolver = (
+  statusListCredentialUrl: string,
+) => Promise<string>;
+
 export interface VerifyCredentialOptions {
-  /** Clamp the accepted claim-vocabulary version (verifier-older-than-
-   *  issuer simulation). Defaults to the build's compiled version. */
+  /** Bump down to simulate an older verifier. Default: this build's
+   *  `CLAIM_VOCABULARY_VERSION`. */
   supportedVocabularyVersion?: number;
   /**
-   * Optional revocation resolver. When provided AND the VC carries a
-   * `credentialStatus` block, the verifier calls this with the status-
-   * list URL and expects either the decoded status-list credential
-   * back, or `null` if the list could not be resolved.
-   *
-   * Returning `null` is NOT a verification failure — an offline
-   * verifier is expected to pass the signature check and surface the
-   * fact that revocation could not be checked. We DO fail verification
-   * when the returned list's id does not match the URL requested, or
-   * when the bit at the entry's index is 1.
+   * Optional. If supplied AND the credential carries a
+   * `credentialStatus` block, the verifier will:
+   *   1. Call `resolver(statusListCredential)` to fetch the list.
+   *   2. Decode + read the bit at `statusListIndex`.
+   *   3. Reject with `credential_revoked` (or `credential_suspended`)
+   *      when the bit is set.
+   * If not supplied, revocation is not checked. (A verifier that wants
+   * to ENFORCE revocation should always supply a resolver.)
    */
-  resolveStatusList?: (
-    statusListUrl: string,
-  ) => Promise<StatusListCredential | null>;
+  statusListResolver?: StatusListResolver;
+  /**
+   * Optional allowlist. When set, the credential's
+   * `credentialStatus.statusListCredential` URL must appear in this
+   * list — protects against an attacker substituting a status list of
+   * their own that has the bit clear. Has no effect if the credential
+   * carries no `credentialStatus` block.
+   */
+  allowedStatusListUrls?: string[];
+  /**
+   * Optional did:web resolver. When supplied:
+   *   1. Resolve the credential's `issuer` (must be a `did:web:…` DID).
+   *   2. Look up the verification method named by `proof.verificationMethod`.
+   *   3. Compare the resolved JWK against the proof's embedded
+   *      `publicKeyB64url`. A mismatch is rejected with
+   *      `did_key_mismatch` — strong signal the issuer DID does not
+   *      actually control the key that signed the credential.
+   *   4. Verify the signature using the RESOLVED key (not the embedded
+   *      one). Even though we just compared them, signing against the
+   *      resolved key is the cryptographically meaningful check.
+   *
+   * If not supplied, the embedded `publicKeyB64url` is trusted as-is —
+   * matches v1.7.0 behaviour. A verifier that wants to ENFORCE issuer
+   * identity should always supply a resolver. (v1.7.3)
+   */
+  didResolver?: DidWebResolver;
+  /**
+   * If true AND the credential's issuer is not a `did:web:…`, reject
+   * with `issuer_did_required`. Use when the verifier has policy that
+   * only DID-anchored credentials count (e.g. an admissions office).
+   * Has no effect when no `didResolver` is supplied. Default: false.
+   */
+  requireDidIssuer?: boolean;
 }
 
 /**
@@ -327,55 +320,143 @@ export interface VerifyCredentialOptions {
  */
 export async function verifyCredential(
   raw: unknown,
-  optionsOrSupportedVersion:
-    | VerifyCredentialOptions
-    | number = CLAIM_VOCABULARY_VERSION,
+  optsOrLegacy?: VerifyCredentialOptions | number,
 ): Promise<VcVerificationResult> {
+  // Back-compat: previous signature was `(raw, supportedVocabularyVersion?)`.
   const opts: VerifyCredentialOptions =
-    typeof optionsOrSupportedVersion === "number"
-      ? { supportedVocabularyVersion: optionsOrSupportedVersion }
-      : optionsOrSupportedVersion;
-  const supportedVocabularyVersion =
+    typeof optsOrLegacy === "number"
+      ? { supportedVocabularyVersion: optsOrLegacy }
+      : (optsOrLegacy ?? {});
+  const supportedVocab =
     opts.supportedVocabularyVersion ?? CLAIM_VOCABULARY_VERSION;
 
-  const shape = checkCredentialShape(raw, supportedVocabularyVersion);
+  const shape = checkCredentialShape(raw, supportedVocab);
   if (!shape.ok) return shape;
-  const sig = await verifyProofSignature(shape.credential);
-  if (!sig.ok) return { ok: false, reason: sig.reason };
 
-  // Revocation — only checked when the VC declares a status and the
-  // caller supplied a resolver.
-  const statusEntry = shape.credential.credentialStatus;
-  if (statusEntry && opts.resolveStatusList) {
-    if (
-      statusEntry.type !== STATUS_LIST_ENTRY_TYPE ||
-      statusEntry.statusPurpose !== STATUS_PURPOSE_REVOCATION
-    ) {
-      return { ok: false, reason: "status_list_mismatch" };
-    }
-    const list = await opts.resolveStatusList(statusEntry.statusListCredential);
-    if (list) {
-      if (list.id !== statusEntry.statusListCredential) {
-        return { ok: false, reason: "status_list_mismatch" };
-      }
-      const index = Number(statusEntry.statusListIndex);
-      if (!Number.isInteger(index) || index < 0) {
-        return { ok: false, reason: "status_list_mismatch" };
-      }
-      const bits = decodeBitstring(list.credentialSubject.encodedList);
-      if (index >= bits.length * 8) {
-        return { ok: false, reason: "status_list_mismatch" };
-      }
-      if (isRevokedByIndex(bits, index)) {
-        return { ok: false, reason: "revoked" };
-      }
-    }
-    // list === null → offline/unreachable; pass through (documented).
+  // DID resolution — runs BEFORE signature verification so we can use
+  // the resolved key for the actual verify call. If no resolver is
+  // supplied, we trust the embedded `publicKeyB64url`; this matches
+  // v1.7.0 behaviour. With a resolver, the embedded key must agree
+  // with the one published in the issuer's DID document.
+  let publicKeyB64urlOverride: string | null = null;
+  if (opts.didResolver) {
+    const r = await resolveAndCheckDidIssuer(shape.credential, opts);
+    if (!r.ok) return { ok: false, reason: r.reason };
+    publicKeyB64urlOverride = r.publicKeyB64url;
+  } else if (opts.requireDidIssuer && !shape.credential.issuer.startsWith("did:web:")) {
+    return { ok: false, reason: "issuer_did_required" };
   }
 
-  return {
-    ok: true,
-    credential: shape.credential,
-    registryReport: buildRegistryReport(shape.credential),
-  };
+  const sig = await verifyProofSignature(shape.credential, publicKeyB64urlOverride);
+  if (!sig.ok) return { ok: false, reason: sig.reason };
+
+  // Revocation check — only runs if both a status block and a resolver
+  // are present. A status block without a resolver passes (caller opted
+  // out). A resolver without a status block also passes (no claim of
+  // revocability was made by the issuer).
+  const status = (shape.credential as { credentialStatus?: unknown })
+    .credentialStatus;
+  if (status && opts.statusListResolver) {
+    const r = await checkRevocation(status, opts);
+    if (!r.ok) return { ok: false, reason: r.reason };
+  }
+
+  return { ok: true, credential: shape.credential };
+}
+
+type DidResolutionResult =
+  | { ok: true; publicKeyB64url: string }
+  | { ok: false; reason: VcVerificationReason };
+
+async function resolveAndCheckDidIssuer(
+  credential: VerifiableCredential,
+  opts: VerifyCredentialOptions,
+): Promise<DidResolutionResult> {
+  const issuer = credential.issuer;
+  if (!issuer.startsWith("did:web:")) {
+    if (opts.requireDidIssuer) {
+      return { ok: false, reason: "issuer_did_required" };
+    }
+    // Resolver supplied but issuer is not a DID — nothing to resolve;
+    // fall back to embedded key with no override.
+    return { ok: true, publicKeyB64url: credential.proof.publicKeyB64url };
+  }
+  let doc;
+  try {
+    doc = await opts.didResolver!(issuer);
+  } catch {
+    return { ok: false, reason: "did_resolver_failed" };
+  }
+  const vmId = credential.proof.verificationMethod;
+  const jwk = extractAssertionPublicKey(doc, vmId);
+  if (!jwk) {
+    return { ok: false, reason: "did_verification_method_not_found" };
+  }
+  let resolvedSpki: string;
+  try {
+    resolvedSpki = await jwkToSpkiBase64Url(jwk);
+  } catch {
+    return { ok: false, reason: "bad_public_key" };
+  }
+  if (resolvedSpki !== credential.proof.publicKeyB64url) {
+    return { ok: false, reason: "did_key_mismatch" };
+  }
+  return { ok: true, publicKeyB64url: resolvedSpki };
+}
+
+type RevocationCheckResult =
+  | { ok: true }
+  | { ok: false; reason: VcVerificationReason };
+
+async function checkRevocation(
+  rawStatus: unknown,
+  opts: VerifyCredentialOptions,
+): Promise<RevocationCheckResult> {
+  if (!rawStatus || typeof rawStatus !== "object") {
+    return { ok: false, reason: "status_resolver_failed" };
+  }
+  const s = rawStatus as Record<string, unknown>;
+  if (s.type !== STATUS_LIST_ENTRY_TYPE) {
+    return { ok: false, reason: "status_resolver_failed" };
+  }
+  if (typeof s.statusListCredential !== "string") {
+    return { ok: false, reason: "status_resolver_failed" };
+  }
+  if (typeof s.statusListIndex !== "string") {
+    return { ok: false, reason: "status_resolver_failed" };
+  }
+  const idx = Number(s.statusListIndex);
+  if (!Number.isInteger(idx) || idx < 0) {
+    return { ok: false, reason: "status_index_out_of_range" };
+  }
+  if (
+    opts.allowedStatusListUrls &&
+    !opts.allowedStatusListUrls.includes(s.statusListCredential)
+  ) {
+    return { ok: false, reason: "wrong_status_list_url" };
+  }
+  let encoded: string;
+  try {
+    encoded = await opts.statusListResolver!(s.statusListCredential);
+  } catch {
+    return { ok: false, reason: "status_resolver_failed" };
+  }
+  let bits: Uint8Array;
+  try {
+    bits = await decodeBitstring(encoded);
+  } catch {
+    return { ok: false, reason: "status_resolver_failed" };
+  }
+  if (idx >= bits.length * 8) {
+    return { ok: false, reason: "status_index_out_of_range" };
+  }
+  const bit = getBit(bits, idx);
+  if (bit === 1) {
+    const purpose: VcVerificationReason =
+      s.statusPurpose === "suspension"
+        ? "credential_suspended"
+        : "credential_revoked";
+    return { ok: false, reason: purpose };
+  }
+  return { ok: true };
 }

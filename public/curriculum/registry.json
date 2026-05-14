@@ -1,0 +1,468 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-11T16:37:30.355Z",
+  "frameworks": {
+    "AQA-GCSE-9-1-Maths": {
+      "id": "AQA-GCSE-9-1-Maths",
+      "name": "AQA GCSE Mathematics (8300)",
+      "awardingBody": "AQA",
+      "jurisdiction": "UK-EN",
+      "yearStart": 10,
+      "yearEnd": 11,
+      "specPoints": [
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "N2",
+          "label": "Apply the four operations to integers, decimals and fractions, including mixed numbers",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-9-1-maths/N2",
+          "topic": "Number"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "N12",
+          "label": "Interpret fractions and percentages as operators; apply percentages, including reverse percentages",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-9-1-maths/N12",
+          "topic": "Number"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "N13",
+          "label": "Solve reverse-percentage problems and compound interest",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-9-1-maths/N13",
+          "topic": "Number"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "A17",
+          "label": "Solve linear equations in one unknown algebraically",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-9-1-maths/A17",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "A18",
+          "label": "Solve quadratic equations algebraically by factorising, completing the square, and the quadratic formula",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-9-1-maths/A18",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "A19",
+          "label": "Set up and solve quadratic equations arising from problems",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-9-1-maths/A19",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "A21",
+          "label": "Translate situations into algebraic expressions; derive and solve equations from contextual problems",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-9-1-maths/A21",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "R9",
+          "label": "Express one quantity as a percentage of another; compare via ratio and percentage",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-9-1-maths/R9",
+          "topic": "Ratio & proportion"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "R16",
+          "label": "Solve problems involving repeated proportional change, including compound interest and depreciation",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-9-1-maths/R16",
+          "topic": "Ratio & proportion"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "G14",
+          "label": "Use the standard ruler-and-compass constructions",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-9-1-maths/G14",
+          "topic": "Geometry"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "G15",
+          "label": "Apply Pythagoras' theorem and trigonometric ratios in 2D",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-9-1-maths/G15",
+          "topic": "Geometry"
+        },
+        {
+          "framework": "AQA-GCSE-9-1-Maths",
+          "code": "S2",
+          "label": "Interpret cumulative-frequency, box-plot and histogram displays",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-9-1-maths/S2",
+          "topic": "Statistics"
+        }
+      ],
+      "references": [
+        "https://www.aqa.org.uk/subjects/mathematics/gcse/mathematics-8300"
+      ]
+    },
+    "AQA-GCSE-English-Language-8700": {
+      "id": "AQA-GCSE-English-Language-8700",
+      "name": "AQA GCSE English Language (8700)",
+      "awardingBody": "AQA",
+      "jurisdiction": "UK-EN",
+      "yearStart": 10,
+      "yearEnd": 11,
+      "specPoints": [
+        {
+          "framework": "AQA-GCSE-English-Language-8700",
+          "code": "Paper-1-Q1",
+          "label": "List four things from the source about a specified subject (4 marks)",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-english-language-8700/Paper-1-Q1",
+          "topic": "Paper 1: Explorations in creative reading"
+        },
+        {
+          "framework": "AQA-GCSE-English-Language-8700",
+          "code": "Paper-1-Q2",
+          "label": "How does the writer use language to describe X? (8 marks)",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-english-language-8700/Paper-1-Q2",
+          "topic": "Paper 1: Explorations in creative reading"
+        },
+        {
+          "framework": "AQA-GCSE-English-Language-8700",
+          "code": "Paper-1-Q3",
+          "label": "How has the writer structured the text to interest you as a reader? (8 marks)",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-english-language-8700/Paper-1-Q3",
+          "topic": "Paper 1: Explorations in creative reading"
+        },
+        {
+          "framework": "AQA-GCSE-English-Language-8700",
+          "code": "Paper-1-Q4",
+          "label": "Evaluate a critical statement about the text (20 marks)",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-english-language-8700/Paper-1-Q4",
+          "topic": "Paper 1: Explorations in creative reading"
+        },
+        {
+          "framework": "AQA-GCSE-English-Language-8700",
+          "code": "Paper-1-Q5",
+          "label": "Descriptive or narrative response to a stimulus (40 marks)",
+          "skillUri": "https://evenkeel.org/curricula/aqa-gcse-english-language-8700/Paper-1-Q5",
+          "topic": "Paper 1: Creative writing"
+        }
+      ],
+      "references": [
+        "https://www.aqa.org.uk/subjects/english/gcse/english-language-8700"
+      ]
+    },
+    "CCSS-Math": {
+      "id": "CCSS-Math",
+      "name": "Common Core State Standards — Mathematics",
+      "awardingBody": "Council of Chief State School Officers (US)",
+      "jurisdiction": "US",
+      "yearStart": 0,
+      "yearEnd": 12,
+      "specPoints": [
+        {
+          "framework": "CCSS-Math",
+          "code": "5.NF.B.4",
+          "label": "Apply and extend previous understandings of multiplication to multiply a fraction or whole number by a fraction",
+          "skillUri": "https://evenkeel.org/curricula/ccss-math/5.NF.B.4",
+          "topic": "Number & operations: Fractions (Grade 5)"
+        },
+        {
+          "framework": "CCSS-Math",
+          "code": "6.NS.A.1",
+          "label": "Interpret and compute quotients of fractions and solve word problems",
+          "skillUri": "https://evenkeel.org/curricula/ccss-math/6.NS.A.1",
+          "topic": "The Number System (Grade 6)"
+        },
+        {
+          "framework": "CCSS-Math",
+          "code": "6.RP.A.3.c",
+          "label": "Find a percent of a quantity as a rate per 100; solve percent problems",
+          "skillUri": "https://evenkeel.org/curricula/ccss-math/6.RP.A.3.c",
+          "topic": "Ratios & Proportional Relationships (Grade 6)"
+        },
+        {
+          "framework": "CCSS-Math",
+          "code": "7.RP.A.3",
+          "label": "Use proportional relationships to solve multistep ratio and percent problems",
+          "skillUri": "https://evenkeel.org/curricula/ccss-math/7.RP.A.3",
+          "topic": "Ratios & Proportional Relationships (Grade 7)"
+        },
+        {
+          "framework": "CCSS-Math",
+          "code": "HSA-CED.A.1",
+          "label": "Create equations and inequalities in one variable and use them to solve problems",
+          "skillUri": "https://evenkeel.org/curricula/ccss-math/HSA-CED.A.1",
+          "topic": "Algebra: Creating Equations (HS)"
+        },
+        {
+          "framework": "CCSS-Math",
+          "code": "HSA-CED.A.2",
+          "label": "Create equations in two or more variables to represent relationships",
+          "skillUri": "https://evenkeel.org/curricula/ccss-math/HSA-CED.A.2",
+          "topic": "Algebra: Creating Equations (HS)"
+        },
+        {
+          "framework": "CCSS-Math",
+          "code": "HSA-REI.B.4.b",
+          "label": "Solve quadratic equations by inspection, factoring, completing the square, the quadratic formula, or graphing",
+          "skillUri": "https://evenkeel.org/curricula/ccss-math/HSA-REI.B.4.b",
+          "topic": "Algebra: Reasoning with Equations (HS)"
+        },
+        {
+          "framework": "CCSS-Math",
+          "code": "HSF-LE.A.2",
+          "label": "Construct linear and exponential functions, including arithmetic and geometric sequences",
+          "skillUri": "https://evenkeel.org/curricula/ccss-math/HSF-LE.A.2",
+          "topic": "Functions: Linear, Quadratic & Exponential Models (HS)"
+        },
+        {
+          "framework": "CCSS-Math",
+          "code": "HSG-SRT.C.8",
+          "label": "Use trigonometric ratios and the Pythagorean Theorem to solve right triangles in applied problems",
+          "skillUri": "https://evenkeel.org/curricula/ccss-math/HSG-SRT.C.8",
+          "topic": "Geometry: Similarity, Right Triangles, Trigonometry (HS)"
+        }
+      ],
+      "references": [
+        "https://www.thecorestandards.org/Math/"
+      ]
+    },
+    "DES-JC-Maths-2024": {
+      "id": "DES-JC-Maths-2024",
+      "name": "DES Junior Cycle Mathematics (2024)",
+      "awardingBody": "Department of Education (IE)",
+      "jurisdiction": "IE",
+      "yearStart": 7,
+      "yearEnd": 9,
+      "specPoints": [
+        {
+          "framework": "DES-JC-Maths-2024",
+          "code": "N.2",
+          "label": "Perform percentage calculations including reverse percentages and compound interest",
+          "skillUri": "https://evenkeel.org/curricula/des-jc-maths-2024/N.2",
+          "topic": "Number"
+        },
+        {
+          "framework": "DES-JC-Maths-2024",
+          "code": "N.3",
+          "label": "Solve problems involving fractions in context, including the four operations",
+          "skillUri": "https://evenkeel.org/curricula/des-jc-maths-2024/N.3",
+          "topic": "Number"
+        },
+        {
+          "framework": "DES-JC-Maths-2024",
+          "code": "AF.1",
+          "label": "Solve linear equations in one variable",
+          "skillUri": "https://evenkeel.org/curricula/des-jc-maths-2024/AF.1",
+          "topic": "Algebra & functions"
+        },
+        {
+          "framework": "DES-JC-Maths-2024",
+          "code": "AF.2",
+          "label": "Form and solve linear equations from situations and worded contexts",
+          "skillUri": "https://evenkeel.org/curricula/des-jc-maths-2024/AF.2",
+          "topic": "Algebra & functions"
+        },
+        {
+          "framework": "DES-JC-Maths-2024",
+          "code": "AF.4",
+          "label": "Form and solve quadratic equations including in contextual problems",
+          "skillUri": "https://evenkeel.org/curricula/des-jc-maths-2024/AF.4",
+          "topic": "Algebra & functions"
+        },
+        {
+          "framework": "DES-JC-Maths-2024",
+          "code": "GT.1",
+          "label": "Use Pythagoras' theorem to solve problems",
+          "skillUri": "https://evenkeel.org/curricula/des-jc-maths-2024/GT.1",
+          "topic": "Geometry & trigonometry"
+        },
+        {
+          "framework": "DES-JC-Maths-2024",
+          "code": "SP.1",
+          "label": "Display and interpret univariate data",
+          "skillUri": "https://evenkeel.org/curricula/des-jc-maths-2024/SP.1",
+          "topic": "Statistics & probability"
+        }
+      ],
+      "references": [
+        "https://www.curriculumonline.ie/Junior-cycle/Junior-Cycle-Subjects/Mathematics/"
+      ]
+    },
+    "Edexcel-GCSE-9-1-Maths": {
+      "id": "Edexcel-GCSE-9-1-Maths",
+      "name": "Edexcel GCSE Mathematics (1MA1)",
+      "awardingBody": "Pearson Edexcel",
+      "jurisdiction": "UK-EN",
+      "yearStart": 10,
+      "yearEnd": 11,
+      "specPoints": [
+        {
+          "framework": "Edexcel-GCSE-9-1-Maths",
+          "code": "1.3",
+          "label": "Calculate exactly with fractions, including mixed numbers",
+          "skillUri": "https://evenkeel.org/curricula/edexcel-gcse-9-1-maths/1.3",
+          "topic": "Number"
+        },
+        {
+          "framework": "Edexcel-GCSE-9-1-Maths",
+          "code": "1.12",
+          "label": "Work with percentages as operators; percentage change",
+          "skillUri": "https://evenkeel.org/curricula/edexcel-gcse-9-1-maths/1.12",
+          "topic": "Ratio & proportion"
+        },
+        {
+          "framework": "Edexcel-GCSE-9-1-Maths",
+          "code": "1.13",
+          "label": "Solve problems involving compound interest and reverse percentages",
+          "skillUri": "https://evenkeel.org/curricula/edexcel-gcse-9-1-maths/1.13",
+          "topic": "Ratio & proportion"
+        },
+        {
+          "framework": "Edexcel-GCSE-9-1-Maths",
+          "code": "2.4",
+          "label": "Solve quadratic equations algebraically by factorising and the formula",
+          "skillUri": "https://evenkeel.org/curricula/edexcel-gcse-9-1-maths/2.4",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "Edexcel-GCSE-9-1-Maths",
+          "code": "2.5",
+          "label": "Translate simple situations into algebraic expressions",
+          "skillUri": "https://evenkeel.org/curricula/edexcel-gcse-9-1-maths/2.5",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "Edexcel-GCSE-9-1-Maths",
+          "code": "2.7",
+          "label": "Set up and solve linear equations from worded and geometric contexts",
+          "skillUri": "https://evenkeel.org/curricula/edexcel-gcse-9-1-maths/2.7",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "Edexcel-GCSE-9-1-Maths",
+          "code": "3.4",
+          "label": "Apply Pythagoras' theorem and trigonometric ratios",
+          "skillUri": "https://evenkeel.org/curricula/edexcel-gcse-9-1-maths/3.4",
+          "topic": "Geometry"
+        },
+        {
+          "framework": "Edexcel-GCSE-9-1-Maths",
+          "code": "5.2",
+          "label": "Interpret box plots and cumulative-frequency diagrams",
+          "skillUri": "https://evenkeel.org/curricula/edexcel-gcse-9-1-maths/5.2",
+          "topic": "Statistics"
+        }
+      ],
+      "references": [
+        "https://qualifications.pearson.com/en/qualifications/edexcel-gcses/mathematics-2015.html"
+      ]
+    },
+    "NC-KS3-Maths-England": {
+      "id": "NC-KS3-Maths-England",
+      "name": "England National Curriculum — Mathematics, KS3",
+      "awardingBody": "Department for Education (England)",
+      "jurisdiction": "UK-EN",
+      "yearStart": 7,
+      "yearEnd": 9,
+      "specPoints": [
+        {
+          "framework": "NC-KS3-Maths-England",
+          "code": "Num-frac-4ops",
+          "label": "Use the four operations with fractions, including mixed numbers and improper fractions",
+          "skillUri": "https://evenkeel.org/curricula/nc-ks3-maths-england/Num-frac-4ops",
+          "topic": "Number"
+        },
+        {
+          "framework": "NC-KS3-Maths-England",
+          "code": "Num-pct",
+          "label": "Solve problems involving percentage change, percentage increase / decrease and original-value problems",
+          "skillUri": "https://evenkeel.org/curricula/nc-ks3-maths-england/Num-pct",
+          "topic": "Number"
+        },
+        {
+          "framework": "NC-KS3-Maths-England",
+          "code": "Alg-form-solve",
+          "label": "Substitute numerical values into formulae and expressions; rearrange and solve linear equations",
+          "skillUri": "https://evenkeel.org/curricula/nc-ks3-maths-england/Alg-form-solve",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "NC-KS3-Maths-England",
+          "code": "Alg-quad",
+          "label": "Recognise and solve simple quadratic equations using factorisation",
+          "skillUri": "https://evenkeel.org/curricula/nc-ks3-maths-england/Alg-quad",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "NC-KS3-Maths-England",
+          "code": "Geo-pythagoras",
+          "label": "Use Pythagoras' theorem in two dimensions",
+          "skillUri": "https://evenkeel.org/curricula/nc-ks3-maths-england/Geo-pythagoras",
+          "topic": "Geometry"
+        }
+      ],
+      "references": [
+        "https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study"
+      ]
+    },
+    "OCR-GCSE-9-1-Maths": {
+      "id": "OCR-GCSE-9-1-Maths",
+      "name": "OCR GCSE Mathematics (J560)",
+      "awardingBody": "OCR",
+      "jurisdiction": "UK-EN",
+      "yearStart": 10,
+      "yearEnd": 11,
+      "specPoints": [
+        {
+          "framework": "OCR-GCSE-9-1-Maths",
+          "code": "3.06a",
+          "label": "Reverse percentage (finding the pre-change amount)",
+          "skillUri": "https://evenkeel.org/curricula/ocr-gcse-9-1-maths/3.06a",
+          "topic": "Ratio & proportion"
+        },
+        {
+          "framework": "OCR-GCSE-9-1-Maths",
+          "code": "3.06b",
+          "label": "Compound interest and exponential growth / decay",
+          "skillUri": "https://evenkeel.org/curricula/ocr-gcse-9-1-maths/3.06b",
+          "topic": "Ratio & proportion"
+        },
+        {
+          "framework": "OCR-GCSE-9-1-Maths",
+          "code": "6.02a",
+          "label": "Solve quadratic equations by factorising",
+          "skillUri": "https://evenkeel.org/curricula/ocr-gcse-9-1-maths/6.02a",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "OCR-GCSE-9-1-Maths",
+          "code": "6.02b",
+          "label": "Solve quadratic equations by factorisation when the coefficient of x² is not 1",
+          "skillUri": "https://evenkeel.org/curricula/ocr-gcse-9-1-maths/6.02b",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "OCR-GCSE-9-1-Maths",
+          "code": "6.05",
+          "label": "Form linear equations from geometric problems",
+          "skillUri": "https://evenkeel.org/curricula/ocr-gcse-9-1-maths/6.05",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "OCR-GCSE-9-1-Maths",
+          "code": "5.01",
+          "label": "Substitute numerical values into formulae and expressions",
+          "skillUri": "https://evenkeel.org/curricula/ocr-gcse-9-1-maths/5.01",
+          "topic": "Algebra"
+        },
+        {
+          "framework": "OCR-GCSE-9-1-Maths",
+          "code": "9.04",
+          "label": "Construct and interpret cumulative-frequency diagrams",
+          "skillUri": "https://evenkeel.org/curricula/ocr-gcse-9-1-maths/9.04",
+          "topic": "Statistics"
+        }
+      ],
+      "references": [
+        "https://www.ocr.org.uk/qualifications/gcse/mathematics-j560-from-2015/"
+      ]
+    }
+  }
+}
