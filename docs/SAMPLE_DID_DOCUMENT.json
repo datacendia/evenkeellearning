@@ -1,0 +1,25 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1"
+  ],
+  "id": "did:web:school.example",
+  "verificationMethod": [
+    {
+      "id": "did:web:school.example#key-1",
+      "type": "JsonWebKey2020",
+      "controller": "did:web:school.example",
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "REPLACE_WITH_BASE64URL_X",
+        "y": "REPLACE_WITH_BASE64URL_Y",
+        "alg": "ES256",
+        "use": "sig"
+      }
+    }
+  ],
+  "assertionMethod": [
+    "did:web:school.example#key-1"
+  ]
+}

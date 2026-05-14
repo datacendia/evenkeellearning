@@ -64,6 +64,7 @@ export interface DidDocument {
 
 export const DID_CORE_CONTEXT = "https://www.w3.org/ns/did/v1" as const;
 export const JWS_2020_CONTEXT = "https://w3id.org/security/suites/jws-2020/v1" as const;
+export const DID_CONTEXT_V1 = DID_CORE_CONTEXT;
 
 // ─── URL conversion (sync, pure) ───────────────────────────────────────────
 
@@ -113,6 +114,16 @@ export function didWebToHttpsUrl(did: string): string {
   return `https://${host}/${pathSegments.join("/")}/did.json`;
 }
 
+export function resolveDidWebUrl(did: string): string {
+  if (!did.startsWith("did:web:")) {
+    throw new Error("not_did_web");
+  }
+  if (did === "did:web:") {
+    throw new Error("empty_did_identifier");
+  }
+  return didWebToHttpsUrl(did);
+}
+
 // ─── Builder (sync, pure) ──────────────────────────────────────────────────
 
 export interface BuildDidDocumentInput {
@@ -151,6 +162,51 @@ export function buildDidWebDocument(input: BuildDidDocumentInput): DidDocument {
   };
 }
 
+export interface BuildDidDocumentBatchInput {
+  did: string;
+  keys: Array<{
+    fragmentId: string;
+    publicKeyB64url: string;
+  }>;
+}
+
+export async function buildDidDocument(
+  input: BuildDidDocumentBatchInput,
+): Promise<DidDocument> {
+  if (!input.did.startsWith("did:web:")) {
+    throw new Error("not_did_web");
+  }
+  if (input.keys.length === 0) {
+    throw new Error("no_keys");
+  }
+  const verificationMethod: DidVerificationMethod[] = [];
+  const assertionMethod: string[] = [];
+  for (const key of input.keys) {
+    const vmId = `${input.did}#${key.fragmentId}`;
+    const jwk = await spkiBase64UrlToJwk(key.publicKeyB64url);
+    const jwkWithMeta = {
+      ...jwk,
+      kid: key.fragmentId,
+      alg: "ES256",
+      use: "sig",
+    } as JsonWebKey;
+    verificationMethod.push({
+      id: vmId,
+      type: "JsonWebKey2020",
+      controller: input.did,
+      publicKeyJwk: jwkWithMeta,
+    });
+    assertionMethod.push(vmId);
+  }
+  return {
+    "@context": [DID_CONTEXT_V1, JWS_2020_CONTEXT],
+    id: input.did,
+    verificationMethod,
+    assertionMethod,
+    authentication: assertionMethod,
+  };
+}
+
 // ─── Lookup (sync, pure) ───────────────────────────────────────────────────
 
 /**
@@ -185,6 +241,39 @@ export function extractAssertionPublicKey(
     return null;
   }
   return vm.publicKeyJwk;
+}
+
+export type DidBindingReason =
+  | "did_mismatch"
+  | "vm_not_found"
+  | "vm_not_assertion_method"
+  | "key_mismatch";
+
+export type DidBindingResult =
+  | { ok: true; verificationMethod: DidVerificationMethod }
+  | { ok: false; reason: DidBindingReason; detail?: string };
+
+export async function verifyVerificationMethodBinding(input: {
+  didDocument: DidDocument;
+  expectedDid: string;
+  verificationMethodId: string;
+  embeddedPublicKeyB64url: string;
+}): Promise<DidBindingResult> {
+  if (input.didDocument.id !== input.expectedDid) {
+    return { ok: false, reason: "did_mismatch" };
+  }
+  const vm = findVerificationMethod(input.didDocument, input.verificationMethodId);
+  if (!vm) {
+    return { ok: false, reason: "vm_not_found" };
+  }
+  if (!input.didDocument.assertionMethod.includes(input.verificationMethodId)) {
+    return { ok: false, reason: "vm_not_assertion_method" };
+  }
+  const canonicalSpki = await jwkToSpkiBase64Url(vm.publicKeyJwk);
+  if (canonicalSpki !== input.embeddedPublicKeyB64url) {
+    return { ok: false, reason: "key_mismatch" };
+  }
+  return { ok: true, verificationMethod: vm };
 }
 
 // ─── Key-format conversion (async) ─────────────────────────────────────────
